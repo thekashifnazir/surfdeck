@@ -54,3 +54,8 @@ Dated screenshots and notes of Kiro authoring this project: steering, specs, tas
 
 ![Task 1.2 validation gate](screenshots/2026-08-19-15-task-1-2-validation-gate.png)
 ![Task 1.2 complete](screenshots/2026-08-19-16-task-1-2-complete.png)
+
+**17–18 · Task 2.1 — CSV-to-D1 seed script.** Kiro read the CSV first, then wrote `scripts/seed.ts`: a hand-rolled RFC 4180 parser (quoted fields, escaped quotes, CRLF), blank provenance → SQL `NULL`, `nsfw` false→0, `tier='featured'` + ISO 8601 `added_at`, `INSERT OR IGNORE` on `url`, executed as one `wrangler d1 execute` call with a `--remote` flag ready for the production seed (task 12.2). Unprompted, it also fixed the pinning gap flagged at task 1.1: `tsx 4.19.4` and `@types/node` added as exact-pinned devDependencies, and the temp SQL file gitignored. Verified independently after its own checks: `tsc --noEmit` clean; seed run twice more from disk — 288 rows before, after run 1, and after run 2 (idempotent); all NULL/no-"unknown"/no-empty-string invariants hold in D1. One corpus fact surfaced by the audit: all 288 rows ship with blank `stack`/`host`/`static_or_dynamic` — the seed handles this correctly (NULLs), noted as a product consideration for the build-filter UI. 7.07 credits, 11m13s. Kiro's offer to continue into the next wave was declined — one task per review.
+
+![Task 2.1 seed run](screenshots/2026-08-19-17-task-2-1-seed-run.png)
+![Task 2.1 complete](screenshots/2026-08-19-18-task-2-1-complete.png)
