@@ -200,6 +200,25 @@
         "chatSessionId": "sess_f4976abf-3ee4-468c-b28c-de989345e8eb",
         "timestamp": 1787167806968
       }
+    ],
+    "7.4 Implement BuildFilter component (`src/client/components/BuildFilter.tsx`)": [
+      {
+        "executionId": "90a0b883-9a28-4d04-9b72-0316d9cab1c3",
+        "chatSessionId": "sess_2d573902-67b3-46f4-a4e6-9a849ff8fae3",
+        "timestamp": 1787168489556
+      },
+      {
+        "executionId": "90a0b883-9a28-4d04-9b72-0316d9cab1c3",
+        "chatSessionId": "sess_2d573902-67b3-46f4-a4e6-9a849ff8fae3",
+        "timestamp": 1787168707712
+      }
+    ],
+    "7. React SPA - Filter components": [
+      {
+        "executionId": "90a0b883-9a28-4d04-9b72-0316d9cab1c3",
+        "chatSessionId": "sess_2d573902-67b3-46f4-a4e6-9a849ff8fae3",
+        "timestamp": 1787168707778
+      }
     ]
   }
 }

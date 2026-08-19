@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import MoodSelector from "./components/MoodSelector";
 import CharacterFilter from "./components/CharacterFilter";
+import BuildFilter from "./components/BuildFilter";
 
 /** Shape of a site returned by the /api/stumble endpoint. */
 export interface StumbleSite {
@@ -95,20 +96,13 @@ export default function App() {
         <CharacterFilter selectedCharacter={selectedCharacter} onCharacterChange={setSelectedCharacter} />
       </section>
 
-      {/* Build filter area — BuildFilter component (task 7.4) */}
+      {/* Build filters */}
       <section aria-label="Build filters">
-        <p>
-          Stacks: {buildFilters.stacks.length > 0 ? buildFilters.stacks.join(", ") : "none"}
-        </p>
-        <p>
-          Hosts: {buildFilters.hosts.length > 0 ? buildFilters.hosts.join(", ") : "none"}
-        </p>
-        <p>
-          Type: {buildFilters.static_or_dynamic.length > 0 ? buildFilters.static_or_dynamic.join(", ") : "none"}
-        </p>
-        <p>Available stacks: {availableFilters.stacks.join(", ") || "loading..."}</p>
-        <p>Available hosts: {availableFilters.hosts.join(", ") || "loading..."}</p>
-        <p>Available types: {availableFilters.static_or_dynamic.join(", ") || "loading..."}</p>
+        <BuildFilter
+          available={availableFilters}
+          selected={buildFilters}
+          onSelectionChange={setBuildFilters}
+        />
       </section>
 
       {/* Stumble button area — StumbleButton component (task 8.1) */}
