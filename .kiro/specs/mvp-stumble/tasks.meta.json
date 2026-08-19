@@ -231,6 +231,18 @@
         "chatSessionId": "sess_6f0a49db-1f5d-49ce-9768-4deab6b7bfaa",
         "timestamp": 1787169387656
       }
+    ],
+    "8.2 Implement ProvenanceCard component (`src/client/components/ProvenanceCard.tsx`)": [
+      {
+        "executionId": "8394e793-9a12-41bc-bd5b-20fefb8bf112",
+        "chatSessionId": "sess_3e2ed475-9e8d-477b-a761-b635269bcdf9",
+        "timestamp": 1787169673635
+      },
+      {
+        "executionId": "8394e793-9a12-41bc-bd5b-20fefb8bf112",
+        "chatSessionId": "sess_3e2ed475-9e8d-477b-a761-b635269bcdf9",
+        "timestamp": 1787169789681
+      }
     ]
   }
 }

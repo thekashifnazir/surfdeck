@@ -3,6 +3,7 @@ import MoodSelector from "./components/MoodSelector";
 import CharacterFilter from "./components/CharacterFilter";
 import BuildFilter from "./components/BuildFilter";
 import StumbleButton from "./components/StumbleButton";
+import ProvenanceCard from "./components/ProvenanceCard";
 
 /** Shape of a site returned by the /api/stumble endpoint. */
 export interface StumbleSite {
@@ -118,16 +119,9 @@ export default function App() {
         />
       </section>
 
-      {/* Provenance card area — ProvenanceCard component (task 8.2) */}
+      {/* Provenance card */}
       <section aria-label="Provenance card">
-        {lastStumbleResult && (
-          <div>
-            <p>{lastStumbleResult.title}</p>
-            <p>{lastStumbleResult.stack ?? ""}</p>
-            <p>{lastStumbleResult.host ?? ""}</p>
-            <p>{lastStumbleResult.static_or_dynamic ?? ""}</p>
-          </div>
-        )}
+        {lastStumbleResult && <ProvenanceCard site={lastStumbleResult} />}
       </section>
 
       {/* Status message area — StatusMessage component (task 8.3) */}

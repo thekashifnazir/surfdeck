@@ -131,7 +131,7 @@ Implement Surfdeck's core stumble interaction as a single Cloudflare Worker (Hon
     - Detect popup-blocked: if `window.open` returns null, show fallback message with clickable link
     - _Requirements: 1.1, 1.2, 1.5, 1.6, 1.7, 7.1, 7.2, 7.3, 7.4_
 
-  - [ ] 8.2 Implement ProvenanceCard component (`src/client/components/ProvenanceCard.tsx`)
+  - [x] 8.2 Implement ProvenanceCard component (`src/client/components/ProvenanceCard.tsx`)
     - Display non-blank provenance fields with labels: "Stack", "Hosted on", "Type"
     - Omit fields whose value is null/blank
     - If all three blank: display "Hand-made on the open web."
