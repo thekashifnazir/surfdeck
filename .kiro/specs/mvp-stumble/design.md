@@ -164,32 +164,18 @@ Response (200):
 
 ### Stumble Engine (Query Builder)
 
-The core query logic lives in `src/worker/engine/stumble.ts`. It constructs a D1 batch that:
+The core query logic lives in `src/worker/engine/stumble.ts`. It constructs a query that:
 
 1. Always excludes NSFW (`WHERE nsfw = 0`)
 2. Applies mood filter via `LIKE` against the semicolon-separated `mood_tags` column
 3. Applies character filter via exact match on `character` column
 4. Applies build filters (OR within each dimension, AND across dimensions)
-5. Excludes seen IDs via a temp table + subquery (avoids D1's 100-param binding limit)
+5. Excludes seen IDs via inlined integer literals in `NOT IN (1,2,3,...)` (D1 forbids temp tables and has a 100-binding limit)
 6. Orders by `RANDOM()` and limits to 1
 
 ```typescript
-// Pseudocode for query construction + D1 batch execution
-function buildStumbleBatch(params: StumbleParams): D1PreparedStatement[] {
-  const batch: D1PreparedStatement[] = [];
-
-  // --- Seen-list via temp table (avoids D1's 100-param binding limit) ---
-  if (params.seen?.length) {
-    // Validate: all seen IDs must be positive integers (server-assigned)
-    const validIds = params.seen.filter((id) => Number.isInteger(id) && id > 0);
-    batch.push(db.prepare("CREATE TEMP TABLE IF NOT EXISTS _seen (id INTEGER PRIMARY KEY)"));
-    batch.push(db.prepare("DELETE FROM _seen"));
-    // Inline validated integer IDs — safe because they are server-assigned, never user strings
-    const values = validIds.map((id) => `(${id})`).join(",");
-    batch.push(db.prepare(`INSERT OR IGNORE INTO _seen (id) VALUES ${values}`));
-  }
-
-  // --- Main query ---
+// Pseudocode for query construction
+function buildStumbleQuery(params: StumbleParams) {
   const conditions: string[] = ["nsfw = 0"];
   const bindings: unknown[] = [];
 
@@ -222,17 +208,18 @@ function buildStumbleBatch(params: StumbleParams): D1PreparedStatement[] {
     bindings.push(params.staticOrDynamic);
   }
 
-  // Seen-list exclusion via temp table
+  // Seen-list exclusion via inlined integer literals (NOT bound params).
+  // D1 forbids CREATE TEMP TABLE and has a 100-binding limit,
+  // so validated IDs are inlined directly: AND id NOT IN (1,2,3,...)
   if (params.seen?.length) {
-    conditions.push("sites.id NOT IN (SELECT id FROM _seen)");
+    const validIds = params.seen.filter((id) => Number.isInteger(id) && id > 0);
+    if (validIds.length > 0) {
+      conditions.push(`id NOT IN (${validIds.join(",")})`);
+    }
   }
 
   const sql = `SELECT * FROM sites WHERE ${conditions.join(" AND ")} ORDER BY RANDOM() LIMIT 1`;
-  batch.push(db.prepare(sql).bind(...bindings));
-
-  return batch;
-  // Execute with: const results = await env.DB.batch(batch);
-  // The last result in the batch array contains the site row.
+  return db.prepare(sql).bind(...bindings).first<SiteRow>();
 }
 ```
 
@@ -402,7 +389,7 @@ This avoids substring false positives (e.g., a hypothetical tag `relearn` matchi
 
 7. **Workers Assets for static serving** — Cloudflare's Workers Assets feature handles static file serving with correct MIME types and SPA fallback natively, avoiding manual middleware or asset binding code.
 
-8. **Temp-table for seen-list exclusion** — D1 has a limit of 100 bound parameters per query. The seen-list can grow to 288 (the whole corpus), which would exceed this limit with `NOT IN (?, ?, ...)`. Instead, the handler creates a connection-scoped temp table, inserts all seen IDs with inlined integer literals, and uses a subquery for exclusion. The IDs are server-assigned integers validated on receipt (must be positive integers), so inlining them is safe from SQL injection. This adds ~1-2ms overhead per request — negligible for a 288-row corpus. Alternative considered: sending the seen-list as a JSON body via POST and using `json_each()` — rejected because `json_each()` availability in D1 is not guaranteed and GET semantics are simpler for a read operation.
+8. **Inlined integer literals for seen-list exclusion** — D1's SQLite authorizer forbids `CREATE TEMP TABLE` (returns `SQLITE_AUTH`), ruling out the temp-table approach. D1 also has a 100-bound-parameter limit per query, and the seen-list can grow to 288 (the whole corpus), which would exceed this limit with `NOT IN (?, ?, ...)`. Instead, seen-list exclusion uses validated-integer literal inlining: `AND id NOT IN (1,2,3,...)`. This is safe because `validateSeenIds()` guarantees only deduplicated positive integers (server-assigned IDs), so SQL injection is impossible. The IDs are literals rather than bound parameters, sidestepping D1's binding limit entirely. Alternative considered: sending the seen-list as a JSON body via POST and using `json_each()` — rejected because `json_each()` availability in D1 is not guaranteed and GET semantics are simpler for a read operation.
 
 9. **Open-then-navigate for tab opening** — `window.open` called after an awaited `fetch()` is outside the browser's user-gesture window and gets blocked by Safari (and often Chrome). The fix: open a blank tab synchronously within the click handler (`window.open('about:blank', '_blank')`), then navigate it after the API response arrives (`tab.location.href = url`). On failure/timeout, close the blank tab. This makes popup blocking a rare edge case (only extremely aggressive blockers) rather than the default on Safari.
 

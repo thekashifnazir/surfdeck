@@ -36,11 +36,11 @@ Implement Surfdeck's core stumble interaction as a single Cloudflare Worker (Hon
     - **Property 10: Blanks preserved as NULL** — blank CSV values become NULL in D1
     - **Validates: Requirements 8.3, 8.4**
 
-- [ ] 3. Checkpoint - Seed import working
+- [x] 3. Checkpoint - Seed import working
   - Ensure all tests pass, ask the user if questions arise.
 
 - [ ] 4. Stumble Engine (API core logic)
-  - [ ] 4.1 Implement Stumble Engine query builder (`src/worker/engine/stumble.ts`)
+  - [x] 4.1 Implement Stumble Engine query builder (`src/worker/engine/stumble.ts`)
     - Define `StumbleParams` interface (mood, character, stacks, hosts, staticOrDynamic, seen)
     - Build D1 batch: temp table for seen-list, WHERE conditions for NSFW exclusion, mood LIKE patterns, character exact match, build filter IN clauses, seen-list subquery exclusion
     - ORDER BY RANDOM() LIMIT 1

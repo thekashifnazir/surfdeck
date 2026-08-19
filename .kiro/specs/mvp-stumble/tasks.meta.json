@@ -67,6 +67,25 @@
         "chatSessionId": "sess_b77a6dfb-03c7-4fa8-96eb-a70e8dc33dca",
         "timestamp": 1787163297371
       }
+    ],
+    "3. Checkpoint - Seed import working": [
+      {
+        "executionId": "73d0897d-1167-4fb9-bffb-460d91de63a8",
+        "chatSessionId": "sess_2b9a11b5-58f0-4784-910b-70cd54f04caf",
+        "timestamp": 1787163546925
+      }
+    ],
+    "4.1 Implement Stumble Engine query builder (`src/worker/engine/stumble.ts`)": [
+      {
+        "executionId": "54ee0c61-2b42-4ffa-bb29-8ee5e8ad778e",
+        "chatSessionId": "sess_3659ee0b-f0f6-49b0-9961-ce99a9e4a24d",
+        "timestamp": 1787163595417
+      },
+      {
+        "executionId": "54ee0c61-2b42-4ffa-bb29-8ee5e8ad778e",
+        "chatSessionId": "sess_3659ee0b-f0f6-49b0-9961-ce99a9e4a24d",
+        "timestamp": 1787163722586
+      }
     ]
   }
 }
