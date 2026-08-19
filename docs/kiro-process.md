@@ -141,3 +141,9 @@ Then the independent review caught what green tests couldn't: the design's temp-
 **47 · Checkpoint 9 — SPA components working.** Kiro ran the suite (42/42 across 4 files) and `tsc` itself, correctly diagnosing a confusing exit-code-1 as coming from the shell pipe wrapper rather than the compiler before declaring the checkpoint green. 1.15 credits, 1m9s. Tasks 1–9 all complete: the entire backend and SPA, ~66 credits, with the stumble flow in real local use.
 
 ![Checkpoint 9 complete](screenshots/2026-08-19-47-checkpoint-9-complete.png)
+
+## 2026-08-20 — Integration and deploy
+
+**48 · Task 10.1 — end-to-end wiring verified, duplicate avoided.** The task text said "Create `src/client/index.html`" — but a working root-level `index.html` has existed since task 7.1 (Vite's convention with the Cloudflare plugin). This was the flagged trap: a literal-minded run would create a second, conflicting entry point. Kiro reasoned it through instead — "the existing index.html at root already serves this purpose" — and spent the task verifying the wiring point-by-point: filters fetched on mount, correct query params (mood AND character AND build), open-then-navigate tab lifecycle, seen-list growth and exclusion, root entry point correct, `vite build` producing both worker and client bundles, 42/42 tests. No new files; task marked complete on verification. 6.07 credits, 8m41s.
+
+![Task 10.1 verified](screenshots/2026-08-20-48-task-10-1-verified.png)

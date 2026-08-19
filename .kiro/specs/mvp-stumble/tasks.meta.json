@@ -286,6 +286,13 @@
         "chatSessionId": "sess_b28eec7c-2ff2-4632-a46a-822811452374",
         "timestamp": 1787180384105
       }
+    ],
+    "10.1 Wire SPA to Worker (full end-to-end stumble flow)": [
+      {
+        "executionId": "31b45061-0455-4d24-9fa8-ca2c67b0d0b1",
+        "chatSessionId": "sess_64b28df6-65f6-4994-93bc-5f9324fabf5e",
+        "timestamp": 1787181447670
+      }
     ]
   }
 }

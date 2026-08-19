@@ -164,7 +164,7 @@ Implement Surfdeck's core stumble interaction as a single Cloudflare Worker (Hon
   - Ensure all tests pass, ask the user if questions arise.
 
 - [ ] 10. Integration wiring and final polish
-  - [ ] 10.1 Wire SPA to Worker (full end-to-end stumble flow)
+  - [x] 10.1 Wire SPA to Worker (full end-to-end stumble flow)
     - Ensure SPA fetches filters on mount and sends correct query params on stumble
     - Verify the open-then-navigate tab lifecycle works end-to-end
     - Verify filter combination (mood AND character AND build) produces correct API calls
