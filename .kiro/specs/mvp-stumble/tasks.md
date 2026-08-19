@@ -101,7 +101,7 @@ Implement Surfdeck's core stumble interaction as a single Cloudflare Worker (Hon
     - "Surprise me" sends no mood filter (equivalent to unselected)
     - _Requirements: 2.1, 2.3, 2.4, 2.5, 2.6, 2.7_
 
-  - [ ] 7.3 Implement CharacterFilter component (`src/client/components/CharacterFilter.tsx`)
+  - [x] 7.3 Implement CharacterFilter component (`src/client/components/CharacterFilter.tsx`)
     - Render four options: `modern_indie`, `old_web`, `retro_personal`, `minimal_static`
     - Single-select with toggle-off, no default selection
     - Persist selection across stumbles

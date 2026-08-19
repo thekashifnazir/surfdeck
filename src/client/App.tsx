@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import MoodSelector from "./components/MoodSelector";
+import CharacterFilter from "./components/CharacterFilter";
 
 /** Shape of a site returned by the /api/stumble endpoint. */
 export interface StumbleSite {
@@ -89,9 +90,9 @@ export default function App() {
         <MoodSelector selectedMood={selectedMood} onMoodChange={setSelectedMood} />
       </section>
 
-      {/* Character filter area — CharacterFilter component (task 7.3) */}
+      {/* Character filter */}
       <section aria-label="Character filter">
-        <p>Character: {selectedCharacter ?? "none"}</p>
+        <CharacterFilter selectedCharacter={selectedCharacter} onCharacterChange={setSelectedCharacter} />
       </section>
 
       {/* Build filter area — BuildFilter component (task 7.4) */}
