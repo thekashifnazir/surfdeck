@@ -116,3 +116,9 @@ Then the independent review caught what green tests couldn't: the design's temp-
 
 ![Task 7.4 complete](screenshots/2026-08-19-36-task-7-4-complete.png)
 ![UI with empty build filters — correct corpus behavior](screenshots/2026-08-19-37-ui-empty-buildfilter.png)
+
+**38–40 · Task 8.1 — StumbleButton: the product works.** The highest-judgment UI task, implementing design Decision #9, and Kiro got the critical part exactly right: `window.open('about:blank', '_blank')` is the *first line* of the click handler, before any `await` — the ordering that defeats Safari's popup blocker. Also correct: blank tab closed on every failure path (server error, no_match, exhausted, timeout, bad response shape), `AbortController` with 5s timeout and cleanup on both paths, seen-list read from localStorage with validation and deduped append after success, button disabled only in-flight with `finally` re-enable. Then the moment that matters: **first real stumble clicked in the browser — a new tab opened onto a corpus site (bouncingdvdlogo.com).** The core loop of the product, working end to end. One deviation caught in review and deliberately deferred to task 8.3 (which owns the popup-blocked message): when the popup is actually blocked, the code returns without fetching, so the manual-open fallback link can only ever point at a previous site — the correction (fetch even when blocked, link to the fresh result) spans both files and will ride with 8.3. 4.06 credits, 3m45s. `tsc` clean, 42/42.
+
+![Stumble button on screen](screenshots/2026-08-19-38-ui-stumble-button.png)
+![First stumble: new tab on a corpus site](screenshots/2026-08-19-39-first-stumble-two-tabs.png)
+![Task 8.1 complete](screenshots/2026-08-19-40-task-8-1-complete.png)
