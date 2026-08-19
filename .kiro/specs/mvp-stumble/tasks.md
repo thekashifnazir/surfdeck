@@ -163,7 +163,7 @@ Implement Surfdeck's core stumble interaction as a single Cloudflare Worker (Hon
 - [x] 9. Checkpoint - SPA components working
   - Ensure all tests pass, ask the user if questions arise.
 
-- [ ] 10. Integration wiring and final polish
+- [x] 10. Integration wiring and final polish
   - [x] 10.1 Wire SPA to Worker (full end-to-end stumble flow)
     - Ensure SPA fetches filters on mount and sends correct query params on stumble
     - Verify the open-then-navigate tab lifecycle works end-to-end
@@ -172,7 +172,7 @@ Implement Surfdeck's core stumble interaction as a single Cloudflare Worker (Hon
     - Create `src/client/index.html` entry point with correct script/link tags
     - _Requirements: 1.1, 1.2, 6.1, 9.1, 9.6_
 
-  - [ ] 10.2 Configure Vite build output for Workers Assets
+  - [x] 10.2 Configure Vite build output for Workers Assets
     - Ensure `vite build` outputs to the directory referenced by `wrangler.jsonc` assets config
     - Verify correct MIME types served for JS, CSS, HTML
     - Verify SPA fallback: non-API, non-asset paths return index.html with 200
