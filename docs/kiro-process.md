@@ -76,3 +76,8 @@ Then the independent review caught what green tests couldn't: the design's temp-
 ![Task 4.1 complete](screenshots/2026-08-19-22-task-4-1-complete.png)
 ![Temp-table correction sent to Kiro](screenshots/2026-08-19-23-task-4-1-temp-table-correction.png)
 ![Fix review: stumble.ts + design.md](screenshots/2026-08-19-24-task-4-1-fix-review.png)
+
+**25–26 · Task 4.2 — engine property tests, and an honest look at the mock.** Kiro read the engine implementation first, then wrote 13 property tests for Properties 1–7 against a hand-built mock D1 — a "specification oracle" that intercepts the engine's *actual* generated SQL and bindings, sniffs which conditions are present, regex-extracts the inlined seen-list, and applies the spec's intended semantics in JS. A first run failed 13/13 (mock/binding mismatch); Kiro fixed it and landed 21/21 green (8 seed + 13 engine). The design is stronger than a canned-rows mock — an omitted filter condition or wrong binding order genuinely fails Property 1 — but it has one blind spot, called out honestly: the mock never *executes* the engine's LIKE patterns (it uses idealized `tags.includes()` semantics), so Property 4's substring-false-positive claim was resting on the ideal, not on SQLite. That gap was closed by independent verification instead of more test code: the engine's exact 4-pattern WHERE clause was run against real SQLite with ten adversarial tag layouts (`reuseful`, `usefulness`, every position) — all four legitimate positions match, all six collisions rejected. Real-D1 end-to-end coverage still lands at tasks 10.3/12.4.
+
+![Task 4.2 first run failing](screenshots/2026-08-19-25-task-4-2-failing-run.png)
+![Task 4.2 green, review pending](screenshots/2026-08-19-26-task-4-2-green-review.png)
