@@ -85,3 +85,7 @@ Then the independent review caught what green tests couldn't: the design's temp-
 **27 · Task 5.1 — `/api/stumble` route.** Kiro read the engine interface first, then implemented the route as a faithful transcription of the design contract: vocabulary-validated mood/character/static_or_dynamic (invalid values silently treated as absent, per Requirement 5.4), comma-separated stack/host/seen parsing with positive-integer validation, the three response statuses, and JSON `{ error }` 500 on D1 failures. The response transformation (mood_tags split to an array, provenance nulls included, internal columns omitted) matches the design's example byte-for-byte — checked against `design.md` before accepting, since "returns mood_tags as an array" could equally have been an invention. Unprompted but welcome: 18 route unit tests covering param validation and response shapes. Full suite now 39/39 green. 5.58 credits, 4m52s.
 
 ![Task 5.1 complete](screenshots/2026-08-19-27-task-5-1-complete.png)
+
+**28 · Task 5.2 — `/api/filters` route.** Small and clean: three `SELECT DISTINCT ... IS NOT NULL AND != ''` queries run in parallel, exact response shape from the design, JSON 500 on D1 errors, plus 3 unit tests (happy path, empty corpus, error handling). The empty-corpus test matters more than it looks — the real corpus has no provenance data yet, so `{ stacks: [], hosts: [], static_or_dynamic: [] }` is what production will actually serve until enrichment. 2.8 credits, 2m39s. Suite 42/42.
+
+![Task 5.2 complete](screenshots/2026-08-19-28-task-5-2-complete.png)
