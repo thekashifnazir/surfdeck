@@ -121,7 +121,7 @@ Implement Surfdeck's core stumble interaction as a single Cloudflare Worker (Hon
     - _Requirements: 2.1, 2.5, 2.6, 3.1, 3.3, 4.1, 4.4_
 
 - [ ] 8. React SPA - Stumble interaction and results
-  - [ ] 8.1 Implement StumbleButton component (`src/client/components/StumbleButton.tsx`)
+  - [x] 8.1 Implement StumbleButton component (`src/client/components/StumbleButton.tsx`)
     - Open-then-navigate pattern: `window.open('about:blank', '_blank')` synchronously within click handler
     - Send GET `/api/stumble` with active filters + seen-list from localStorage
     - On success: navigate pre-opened tab to site URL, update seen-list in localStorage

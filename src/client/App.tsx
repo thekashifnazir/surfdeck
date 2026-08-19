@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import MoodSelector from "./components/MoodSelector";
 import CharacterFilter from "./components/CharacterFilter";
 import BuildFilter from "./components/BuildFilter";
+import StumbleButton from "./components/StumbleButton";
 
 /** Shape of a site returned by the /api/stumble endpoint. */
 export interface StumbleSite {
@@ -105,9 +106,16 @@ export default function App() {
         />
       </section>
 
-      {/* Stumble button area — StumbleButton component (task 8.1) */}
+      {/* Stumble button */}
       <section aria-label="Stumble action">
-        <button type="button">Stumble</button>
+        <StumbleButton
+          selectedMood={selectedMood}
+          selectedCharacter={selectedCharacter}
+          buildFilters={buildFilters}
+          onStumbleResult={setLastStumbleResult}
+          onStatusChange={setStatusMessage}
+          lastSiteUrl={lastStumbleResult?.url ?? null}
+        />
       </section>
 
       {/* Provenance card area — ProvenanceCard component (task 8.2) */}
