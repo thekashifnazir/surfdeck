@@ -105,3 +105,9 @@ Then the independent review caught what green tests couldn't: the design's temp-
 **32 · Task 7.2 — MoodSelector.** All six button labels verified character-for-character against the frozen copy, values mapped to the correct query vocabulary, single-select with toggle-off, `aria-pressed` plus visual styling for the selected state. Kiro also ran a production `vite build` as part of its own verification — usefully confirming the client bundle lands in `dist/client/`, the fact task 10.2 will need. One judgment call accepted as-is: "Surprise me" is implemented as a clear-the-filter action (never shows selected), a literal reading of Requirement 2.7's "equivalent to unselected" — flagged as possible polish, not a defect. 2.72 credits, 2m31s. Suite 42/42, `tsc` clean.
 
 ![Task 7.2 complete](screenshots/2026-08-19-32-task-7-2-complete.png)
+
+**33–35 · Task 7.3 — CharacterFilter, and the first pixels.** First live render of the UI in a browser via `vite dev`: the six mood buttons on screen with the frozen copy exactly as written. Then task 7.3: Kiro read MoodSelector first for pattern consistency, then implemented CharacterFilter the same way — four options with human-readable labels ("Modern Indie", "Old Web", "Retro Personal", "Minimal Static") mapped to exact snake_case query values, single-select toggle-off, no default, selection lifted into App state so it persists across stumbles. Verified: exact vocabulary values, `tsc` clean, 42/42. Both filter rows confirmed rendering in the browser. 1.74 credits, 1m59s.
+
+![First UI render — mood buttons](screenshots/2026-08-19-33-first-ui-render-moods.png)
+![Moods + characters rendering](screenshots/2026-08-19-34-ui-moods-characters.png)
+![Task 7.3 complete](screenshots/2026-08-19-35-task-7-3-complete.png)
