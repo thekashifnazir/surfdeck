@@ -26,3 +26,8 @@ Dated screenshots and notes of Kiro authoring this project: steering, specs, tas
 
 ![Design challenge corrections](screenshots/2026-08-19-07-design-challenge-corrections.png)
 ![Design fixes summary](screenshots/2026-08-19-08-design-fixes-summary.png)
+
+**09–10 · Task plan, and the day-one trail complete.** Generated `tasks.md`: 12 top-level tasks in dependency waves with checkpoints, each traced to requirement numbers. Review added the missing production-deployment task (12.1–12.4: prod D1, seed, wrangler deploy, logged-out verification) and made the seed-import/engine property tests (2.2, 4.2) required rather than optional; UI/integration tests stay time-pressure-skippable. Day one ends with the full trail committed before any application code: reference → steering → requirements → design → tasks. All authored by Kiro; ~26 credits spent.
+
+![Task list corrections](screenshots/2026-08-19-09-tasks-corrections-applied.png)
+![Spec trail complete](screenshots/2026-08-19-10-spec-trail-complete.png)
