@@ -83,7 +83,7 @@ Implement Surfdeck's core stumble interaction as a single Cloudflare Worker (Hon
     - **Property 11: Filter endpoint returns exactly distinct non-null values** — response matches corpus data, no blanks, no duplicates
     - **Validates: Requirements 4.1, 4.5**
 
-- [ ] 6. Checkpoint - API routes working
+- [x] 6. Checkpoint - API routes working
   - Ensure all tests pass, ask the user if questions arise.
 
 - [ ] 7. React SPA - Filter components
