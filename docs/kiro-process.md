@@ -21,3 +21,8 @@ Dated screenshots and notes of Kiro authoring this project: steering, specs, tas
 
 ![Analyze Requirements Q&A](screenshots/2026-08-19-05-analyze-requirements-qa.png)
 ![Clarifications incorporated](screenshots/2026-08-19-06-analysis-clarifications.png)
+
+**07–08 · Design phase.** Generated `design.md`: single Worker (Hono + Workers Assets), D1 schema mapped from the CSV contract, distinct `no_match`/`exhausted` API statuses, 11 correctness properties traced to requirement numbers, fast-check PBT strategy. Review caught two real flaws: seen-list exclusion via `NOT IN (?,...)` would exceed D1's 100-bound-parameter limit at full corpus size (fixed: validated-integer temp-table + subquery, Decision #8), and `window.open` after an awaited fetch would be popup-blocked on Safari (fixed: open-then-navigate within the click gesture, Decision #9; Requirements 1.2/1.6/1.7 updated). Also dropped five pointless indexes and corrected transaction wording to D1 batch semantics.
+
+![Design challenge corrections](screenshots/2026-08-19-07-design-challenge-corrections.png)
+![Design fixes summary](screenshots/2026-08-19-08-design-fixes-summary.png)

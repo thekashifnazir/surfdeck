@@ -23,11 +23,12 @@ Surfdeck is a web discovery tool that opens a single random independent website 
 #### Acceptance Criteria
 
 1. WHEN the user activates the Stumble button, THE Stumble_Engine SHALL select one site uniformly at random from all sites in the Site_Corpus matching every currently active filter and return its URL to the SPA_Shell within 2 seconds.
-2. WHEN the SPA_Shell receives a site URL from the Stumble_Engine, THE SPA_Shell SHALL open that URL in a new browser tab.
+2. WHEN the user activates the Stumble button, THE SPA_Shell SHALL synchronously open a new browser tab within the click gesture and, upon receiving a site URL from the Stumble_Engine, navigate that tab to the URL.
 3. WHEN the user activates the Stumble button with no filters selected, THE Stumble_Engine SHALL select one site uniformly at random from the entire Site_Corpus.
 4. IF the active filter combination matches zero sites in the Site_Corpus, THEN THE Stumble_Engine SHALL return an empty-result indicator and THE SPA_Shell SHALL display the heading "Nothing in that corner right now." with sub-line "Loosen a filter and try again." and keep the Stumble button enabled.
 5. IF the Stumble_Engine returns a network error, THEN THE SPA_Shell SHALL remain interactive, keep the Stumble button enabled, and allow the user to stumble again without displaying a modal or blocking overlay.
-6. IF the browser blocks the new tab due to popup blockers or security policies, THEN THE SPA_Shell SHALL display a message informing the user that the tab was blocked and SHALL keep the current tab unchanged.
+6. IF the browser blocks the synchronous tab open (due to aggressive popup blockers), THEN THE SPA_Shell SHALL display a message informing the user and provide the site URL as a clickable link in the current tab.
+7. IF the Stumble_Engine request fails or times out after the tab has been opened, THEN THE SPA_Shell SHALL close the pre-opened blank tab and display the error state in the current tab.
 
 ### Requirement 2: Mood Selection
 
