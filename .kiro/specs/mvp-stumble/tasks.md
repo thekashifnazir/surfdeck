@@ -93,7 +93,7 @@ Implement Surfdeck's core stumble interaction as a single Cloudflare Worker (Hon
     - Fetch `/api/filters` on mount to populate build filter options
     - _Requirements: 9.6_
 
-  - [ ] 7.2 Implement MoodSelector component (`src/client/components/MoodSelector.tsx`)
+  - [x] 7.2 Implement MoodSelector component (`src/client/components/MoodSelector.tsx`)
     - Render six buttons with exact labels: "Show me something useful", "Teach me something", "Waste my time", "Show me something beautiful", "Make me think", "Surprise me"
     - Single-select with toggle-off (tap selected → deselect)
     - Visually distinguish selected button

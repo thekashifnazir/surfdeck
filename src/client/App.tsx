@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import MoodSelector from "./components/MoodSelector";
 
 /** Shape of a site returned by the /api/stumble endpoint. */
 export interface StumbleSite {
@@ -83,9 +84,9 @@ export default function App() {
 
   return (
     <main>
-      {/* Mood selector area — MoodSelector component (task 7.2) */}
+      {/* Mood selector */}
       <section aria-label="Mood selector">
-        <p>Mood: {selectedMood ?? "none"}</p>
+        <MoodSelector selectedMood={selectedMood} onMoodChange={setSelectedMood} />
       </section>
 
       {/* Character filter area — CharacterFilter component (task 7.3) */}
