@@ -133,3 +133,7 @@ Then the independent review caught what green tests couldn't: the design's temp-
 ![Popup-blocked correction sent](screenshots/2026-08-19-43-popup-blocked-correction.png)
 ![Fix summary across both components](screenshots/2026-08-19-44-popup-fix-summary.png)
 ![UI after fix — permanent popup line gone](screenshots/2026-08-19-45-ui-after-fix.png)
+
+**46 · Task 8.4 — seen-list management, verified rather than re-built.** The right behavior when a task's substance already landed in earlier tasks: Kiro read the existing StumbleButton and App code, confirmed all four requirements were already implemented (JSON array under `surfdeck_seen`, append after success, sent with each request, reset clears the key — plus edge cases: corrupt-localStorage tolerance, positive-integer filtering, deduped appends), re-ran the suite to a clean exit 0, and marked the task complete without writing a line of new code. 0.83 credits, 51s. Parent task 8 — the entire stumble-interaction wave — auto-closed.
+
+![Task 8.4 verified complete](screenshots/2026-08-19-46-task-8-4-verified-complete.png)

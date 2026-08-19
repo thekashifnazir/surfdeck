@@ -255,6 +255,25 @@
         "chatSessionId": "sess_ae6f2fd7-64d1-4f6f-a918-2a8d51b9d16e",
         "timestamp": 1787170228241
       }
+    ],
+    "8.4 Implement seen-list management (localStorage)": [
+      {
+        "executionId": "900e88f9-a635-492e-9efb-0d34113399d9",
+        "chatSessionId": "sess_eeba0181-0acc-4600-aabe-a342115fe5d7",
+        "timestamp": 1787170901836
+      },
+      {
+        "executionId": "900e88f9-a635-492e-9efb-0d34113399d9",
+        "chatSessionId": "sess_eeba0181-0acc-4600-aabe-a342115fe5d7",
+        "timestamp": 1787170941397
+      }
+    ],
+    "8. React SPA - Stumble interaction and results": [
+      {
+        "executionId": "900e88f9-a635-492e-9efb-0d34113399d9",
+        "chatSessionId": "sess_eeba0181-0acc-4600-aabe-a342115fe5d7",
+        "timestamp": 1787170941447
+      }
     ]
   }
 }

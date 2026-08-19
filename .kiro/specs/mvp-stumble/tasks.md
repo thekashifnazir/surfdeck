@@ -120,7 +120,7 @@ Implement Surfdeck's core stumble interaction as a single Cloudflare Worker (Hon
     - BuildFilter: multi-select within group, populated from API data
     - _Requirements: 2.1, 2.5, 2.6, 3.1, 3.3, 4.1, 4.4_
 
-- [ ] 8. React SPA - Stumble interaction and results
+- [x] 8. React SPA - Stumble interaction and results
   - [x] 8.1 Implement StumbleButton component (`src/client/components/StumbleButton.tsx`)
     - Open-then-navigate pattern: `window.open('about:blank', '_blank')` synchronously within click handler
     - Send GET `/api/stumble` with active filters + seen-list from localStorage
@@ -147,7 +147,7 @@ Implement Surfdeck's core stumble interaction as a single Cloudflare Worker (Hon
     - Clear zero-match message when user changes a filter
     - _Requirements: 1.4, 1.6, 6.2, 6.3, 6.4, 11.1, 11.2, 11.3_
 
-  - [ ] 8.4 Implement seen-list management (localStorage)
+  - [x] 8.4 Implement seen-list management (localStorage)
     - Store seen site IDs as JSON array under key `surfdeck_seen`
     - Append site ID after successful stumble
     - Send seen-list with each stumble request
