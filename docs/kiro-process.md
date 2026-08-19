@@ -16,3 +16,8 @@ Dated screenshots and notes of Kiro authoring this project: steering, specs, tas
 
 ![Correcting product.md](screenshots/2026-08-19-03-steering-correction-product.png)
 ![Correcting tech.md](screenshots/2026-08-19-04-steering-correction-tech.png)
+
+**05–06 · Requirements phase.** Spec `mvp-stumble` created (Requirements-First). First draft reviewed against the frozen contract: caught an internal contradiction (repeats permitted vs last-3 no-repeat) and replaced both with the decided session seen-list rule; added the exhausted state, NSFW guard, and frozen empty-state copy. Then ran Kiro's Analyze Requirements: answered 12 clarifying questions (rejecting speculative scope like component-failure fallbacks), and accepted 4 incorporated clarifications (popup-blocker notice, network-timeout abort, atomic seed rows, API 5xx-as-JSON). Final doc: 12 requirements in EARS form.
+
+![Analyze Requirements Q&A](screenshots/2026-08-19-05-analyze-requirements-qa.png)
+![Clarifications incorporated](screenshots/2026-08-19-06-analysis-clarifications.png)
