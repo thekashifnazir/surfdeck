@@ -1,0 +1,16 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "surfdeck",
+  "compatibility_date": "2025-04-01",
+  "main": "./src/worker/index.ts",
+  "assets": {
+    "not_found_handling": "single-page-application"
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "surfdeck-db",
+      "database_id": "local"
+    }
+  ]
+}

@@ -7,7 +7,7 @@ Implement Surfdeck's core stumble interaction as a single Cloudflare Worker (Hon
 ## Tasks
 
 - [ ] 1. Project scaffolding and configuration
-  - [ ] 1.1 Initialize project with Vite, React, TypeScript, Hono, and Wrangler
+  - [x] 1.1 Initialize project with Vite, React, TypeScript, Hono, and Wrangler
     - Create `package.json` with pinned dependencies: `hono`, `react`, `react-dom`, `@cloudflare/workers-types`, `wrangler`, `vite`, `@vitejs/plugin-react`, `vitest`, `fast-check`, `typescript`
     - Create `tsconfig.json` for TypeScript with strict mode
     - Create `vite.config.ts` with React plugin and Cloudflare dev integration
