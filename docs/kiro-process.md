@@ -59,3 +59,8 @@ Dated screenshots and notes of Kiro authoring this project: steering, specs, tas
 
 ![Task 2.1 seed run](screenshots/2026-08-19-17-task-2-1-seed-run.png)
 ![Task 2.1 complete](screenshots/2026-08-19-18-task-2-1-complete.png)
+
+**19–20 · Task 2.2 — property tests, and a good refactor.** Kiro extracted the seed's pure logic into `scripts/seed-logic.ts` (CSV parse → row map → SQL generation) so fast-check can drive it directly — the right testability seam, chosen unprompted over shelling out to wrangler per case. Eight property tests (100 runs each) cover Properties 8/9/10 with generated corpora: idempotent statement generation, no `'unknown'` ever emitted, blank-vs-value NULL mapping including whitespace-only blanks. It hit a real snag — the Cloudflare Vite plugin breaks vitest startup — and fixed it with a standalone `vitest.config.ts`. It also created a clearly-labeled 16-line `src/worker/index.ts` stub (health route only, "full implementation in task 5.3") because the plugin requires wrangler's `main` to exist; accepted as pragmatic, noted as early scaffolding for 5.3. Caveat logged: Property 8 is tested at the SQL-generation level (deterministic statements + `INSERT OR IGNORE`), a proxy for true DB-level idempotency — which was verified manually against local D1 (288 rows across repeated imports) and remains covered by integration task 10.3. Verified fresh: `tsc` clean, 8/8 tests pass, seed re-run post-refactor still yields 288 rows. 5.73 credits, 6m45s. Parent task 2 auto-closed.
+
+![Task 2.2 vitest snag](screenshots/2026-08-19-19-task-2-2-vitest-snag.png)
+![Task 2.2 complete](screenshots/2026-08-19-20-task-2-2-complete.png)
