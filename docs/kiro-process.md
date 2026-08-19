@@ -49,3 +49,8 @@ Dated screenshots and notes of Kiro authoring this project: steering, specs, tas
 **14 · Task 1.1 complete.** Marked `[x]` in the task list. Est. 8.46 credits, 16m52s elapsed.
 
 ![Task 1.1 complete](screenshots/2026-08-19-14-task-1-1-complete.png)
+
+**15–16 · Task 1.2 — D1 schema, and a validation claim worth double-checking.** Same session, next task. Kiro wrote `schema.sql` exactly to spec — 13 columns, `url TEXT NOT NULL UNIQUE`, nullable `stack`/`host`/`static_or_dynamic`, `nsfw INTEGER NOT NULL DEFAULT 0`, no indexes (per the design review), plus design-doc `NOT NULL` constraints on the always-populated columns. Its self-validation command, though, ended in `|| true` — an exit-code mask that makes "validated, parses cleanly" unverifiable from the transcript. Re-verified independently: `wrangler d1 execute --local --file=schema.sql` exits 0, and a CSV audit confirmed all 288 corpus rows satisfy every `NOT NULL` constraint (zero blanks, no duplicate URLs), so the stricter schema is safe for the seed import. 1.63 credits, 2m1s. This closed parent task 1.
+
+![Task 1.2 validation gate](screenshots/2026-08-19-15-task-1-2-validation-gate.png)
+![Task 1.2 complete](screenshots/2026-08-19-16-task-1-2-complete.png)
