@@ -111,3 +111,8 @@ Then the independent review caught what green tests couldn't: the design's temp-
 ![First UI render — mood buttons](screenshots/2026-08-19-33-first-ui-render-moods.png)
 ![Moods + characters rendering](screenshots/2026-08-19-34-ui-moods-characters.png)
 ![Task 7.3 complete](screenshots/2026-08-19-35-task-7-3-complete.png)
+
+**36–37 · Task 7.4 — BuildFilter, and the empty state proven on screen.** Three multi-select groups populated from `/api/filters`, blank values filtered, and — the key line — a group with no values returns `null` and renders nothing. The browser confirms it against the real corpus: the placeholder "loading..." lines are gone and the build-filter area is simply absent, which is the spec working ("do not display blank/empty values"), not a bug. The section will materialize by itself the moment provenance enrichment lands in the corpus. This closed parent task 7 (all filter components). 2.36 credits, 3m51s. Suite 42/42.
+
+![Task 7.4 complete](screenshots/2026-08-19-36-task-7-4-complete.png)
+![UI with empty build filters — correct corpus behavior](screenshots/2026-08-19-37-ui-empty-buildfilter.png)
