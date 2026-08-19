@@ -48,7 +48,7 @@ Implement Surfdeck's core stumble interaction as a single Cloudflare Worker (Hon
     - Distinguish zero-match vs exhausted: query once without seen-list exclusion to check if pool exists, then with exclusion
     - _Requirements: 1.1, 1.3, 2.2, 2.3, 2.4, 3.2, 4.2, 4.3, 10.5, 10.6, 12.1, 12.2_
 
-  - [ ] 4.2 Write property tests for Stumble Engine (Properties 1, 2, 3, 4, 5, 6, 7)
+  - [-] 4.2 Write property tests for Stumble Engine (Properties 1, 2, 3, 4, 5, 6, 7)
     - **Property 1: Filter-matching** — returned site satisfies all active filter constraints
     - **Property 2: NSFW exclusion** — NSFW sites never returned regardless of filters
     - **Property 3: Seen-list exclusion** — returned site ID never in seen-list
