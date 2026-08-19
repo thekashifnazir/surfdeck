@@ -12,6 +12,25 @@
         "chatSessionId": "sess_46faa273-9ec2-4af8-b965-f186b5341747",
         "timestamp": 1787161112492
       }
+    ],
+    "1.2 Create D1 schema file": [
+      {
+        "executionId": "7436ccfd-0da0-4086-8afa-53a3ba1724de",
+        "chatSessionId": "sess_f0fd41f7-63ad-4378-aa6d-cf6304e35a1c",
+        "timestamp": 1787161306497
+      },
+      {
+        "executionId": "7436ccfd-0da0-4086-8afa-53a3ba1724de",
+        "chatSessionId": "sess_f0fd41f7-63ad-4378-aa6d-cf6304e35a1c",
+        "timestamp": 1787161410467
+      }
+    ],
+    "1. Project scaffolding and configuration": [
+      {
+        "executionId": "7436ccfd-0da0-4086-8afa-53a3ba1724de",
+        "chatSessionId": "sess_f0fd41f7-63ad-4378-aa6d-cf6304e35a1c",
+        "timestamp": 1787161410515
+      }
     ]
   }
 }

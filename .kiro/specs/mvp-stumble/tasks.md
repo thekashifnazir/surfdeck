@@ -6,7 +6,7 @@ Implement Surfdeck's core stumble interaction as a single Cloudflare Worker (Hon
 
 ## Tasks
 
-- [ ] 1. Project scaffolding and configuration
+- [x] 1. Project scaffolding and configuration
   - [x] 1.1 Initialize project with Vite, React, TypeScript, Hono, and Wrangler
     - Create `package.json` with pinned dependencies: `hono`, `react`, `react-dom`, `@cloudflare/workers-types`, `wrangler`, `vite`, `@vitejs/plugin-react`, `vitest`, `fast-check`, `typescript`
     - Create `tsconfig.json` for TypeScript with strict mode
@@ -15,7 +15,7 @@ Implement Surfdeck's core stumble interaction as a single Cloudflare Worker (Hon
     - Create directory structure: `src/worker/`, `src/worker/routes/`, `src/worker/engine/`, `src/client/`, `src/client/components/`, `scripts/`
     - _Requirements: 9.1, 9.3_
 
-  - [ ] 1.2 Create D1 schema file
+  - [x] 1.2 Create D1 schema file
     - Create `schema.sql` with the `sites` table definition (id, url, title, mood_tags, character, stack, host, static_or_dynamic, why_note, nsfw, source, tier, added_at)
     - url is TEXT NOT NULL UNIQUE, stack/host/static_or_dynamic are nullable TEXT, nsfw is INTEGER NOT NULL DEFAULT 0
     - _Requirements: 8.1, 8.3_
