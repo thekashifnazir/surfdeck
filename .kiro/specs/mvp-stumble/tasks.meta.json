@@ -164,6 +164,18 @@
         "chatSessionId": "sess_ed0f6427-ca35-4c6c-b0d3-952e79951445",
         "timestamp": 1787166731174
       }
+    ],
+    "7.1 Create SPA entry point and App shell (`src/client/main.tsx`, `src/client/App.tsx`)": [
+      {
+        "executionId": "b290665e-859b-4a2f-a12f-538bfa00157f",
+        "chatSessionId": "sess_d7c9f77b-b6d2-4248-8e84-c9cc1ca2c4c4",
+        "timestamp": 1787166934936
+      },
+      {
+        "executionId": "b290665e-859b-4a2f-a12f-538bfa00157f",
+        "chatSessionId": "sess_d7c9f77b-b6d2-4248-8e84-c9cc1ca2c4c4",
+        "timestamp": 1787167109089
+      }
     ]
   }
 }

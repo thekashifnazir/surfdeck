@@ -87,7 +87,7 @@ Implement Surfdeck's core stumble interaction as a single Cloudflare Worker (Hon
   - Ensure all tests pass, ask the user if questions arise.
 
 - [ ] 7. React SPA - Filter components
-  - [ ] 7.1 Create SPA entry point and App shell (`src/client/main.tsx`, `src/client/App.tsx`)
+  - [x] 7.1 Create SPA entry point and App shell (`src/client/main.tsx`, `src/client/App.tsx`)
     - Set up React root mount
     - App component manages top-level state: selected mood, character, build filters, last stumble result, status messages
     - Fetch `/api/filters` on mount to populate build filter options
