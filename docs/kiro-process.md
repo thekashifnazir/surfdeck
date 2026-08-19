@@ -31,3 +31,21 @@ Dated screenshots and notes of Kiro authoring this project: steering, specs, tas
 
 ![Task list corrections](screenshots/2026-08-19-09-tasks-corrections-applied.png)
 ![Spec trail complete](screenshots/2026-08-19-10-spec-trail-complete.png)
+
+## 2026-08-19 — Task execution
+
+**11 · Fresh session, task list view.** New Kiro session for execution — the day-one chat thread deliberately discarded; steering + spec auto-load into every task run. Task list open at task 1.1, Autopilot off, tasks run one at a time via each task's own "Start task" link (never "Run all tasks").
+
+![Fresh session, task list](screenshots/2026-08-19-11-fresh-session-task-list.png)
+
+**12 · Task 1.1 started — approval gates.** Kiro delegated to its spec-task-execution subagent, which paused at an approval gate for every side effect: URL fetch, file writes, `mkdir -p` for the directory skeleton, in-file replaces. Each was reviewed and allowed individually — with Autopilot off, nothing lands without a human click.
+
+![Approval gate: mkdir](screenshots/2026-08-19-12-approval-gate-mkdir.png)
+
+**13 · Review panel before accepting.** Kiro's end-of-task review listed 4 pending changes (`package.json`, `tsconfig.json`, `vite.config.ts`, `.gitignore`). Before accepting, the diff was independently reviewed from disk against the task spec: all ten required dependencies exact-pinned (no ranges), strict-mode tsconfig, React + Cloudflare Vite plugins, `wrangler.jsonc` with the `DB` binding / `src/worker/index.ts` main / SPA fallback, all six directories present, no scope creep into task 1.2. `npm install` verified clean (94 packages); `tsc --noEmit` reports TS18003 "no inputs" as expected for an empty scaffold. One item deferred to task 2.1: the `seed` script references `tsx`, which isn't yet a pinned devDependency.
+
+![Review changes pending](screenshots/2026-08-19-13-task-1-1-review-changes.png)
+
+**14 · Task 1.1 complete.** Marked `[x]` in the task list. Est. 8.46 credits, 16m52s elapsed.
+
+![Task 1.1 complete](screenshots/2026-08-19-14-task-1-1-complete.png)
