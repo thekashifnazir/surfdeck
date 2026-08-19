@@ -160,7 +160,7 @@ Implement Surfdeck's core stumble interaction as a single Cloudflare Worker (Hon
     - StatusMessage: correct headings for zero-match vs exhausted, reset clears seen-list
     - _Requirements: 1.2, 1.4, 1.5, 1.6, 5.1, 5.2, 5.3, 7.1, 7.2, 11.1, 11.2_
 
-- [ ] 9. Checkpoint - SPA components working
+- [x] 9. Checkpoint - SPA components working
   - Ensure all tests pass, ask the user if questions arise.
 
 - [ ] 10. Integration wiring and final polish

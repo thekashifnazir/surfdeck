@@ -137,3 +137,7 @@ Then the independent review caught what green tests couldn't: the design's temp-
 **46 · Task 8.4 — seen-list management, verified rather than re-built.** The right behavior when a task's substance already landed in earlier tasks: Kiro read the existing StumbleButton and App code, confirmed all four requirements were already implemented (JSON array under `surfdeck_seen`, append after success, sent with each request, reset clears the key — plus edge cases: corrupt-localStorage tolerance, positive-integer filtering, deduped appends), re-ran the suite to a clean exit 0, and marked the task complete without writing a line of new code. 0.83 credits, 51s. Parent task 8 — the entire stumble-interaction wave — auto-closed.
 
 ![Task 8.4 verified complete](screenshots/2026-08-19-46-task-8-4-verified-complete.png)
+
+**47 · Checkpoint 9 — SPA components working.** Kiro ran the suite (42/42 across 4 files) and `tsc` itself, correctly diagnosing a confusing exit-code-1 as coming from the shell pipe wrapper rather than the compiler before declaring the checkpoint green. 1.15 credits, 1m9s. Tasks 1–9 all complete: the entire backend and SPA, ~66 credits, with the stumble flow in real local use.
+
+![Checkpoint 9 complete](screenshots/2026-08-19-47-checkpoint-9-complete.png)
