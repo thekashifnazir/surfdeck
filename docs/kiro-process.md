@@ -81,3 +81,7 @@ Then the independent review caught what green tests couldn't: the design's temp-
 
 ![Task 4.2 first run failing](screenshots/2026-08-19-25-task-4-2-failing-run.png)
 ![Task 4.2 green, review pending](screenshots/2026-08-19-26-task-4-2-green-review.png)
+
+**27 · Task 5.1 — `/api/stumble` route.** Kiro read the engine interface first, then implemented the route as a faithful transcription of the design contract: vocabulary-validated mood/character/static_or_dynamic (invalid values silently treated as absent, per Requirement 5.4), comma-separated stack/host/seen parsing with positive-integer validation, the three response statuses, and JSON `{ error }` 500 on D1 failures. The response transformation (mood_tags split to an array, provenance nulls included, internal columns omitted) matches the design's example byte-for-byte — checked against `design.md` before accepting, since "returns mood_tags as an array" could equally have been an invention. Unprompted but welcome: 18 route unit tests covering param validation and response shapes. Full suite now 39/39 green. 5.58 credits, 4m52s.
+
+![Task 5.1 complete](screenshots/2026-08-19-27-task-5-1-complete.png)
