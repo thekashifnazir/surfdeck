@@ -122,3 +122,7 @@ Then the independent review caught what green tests couldn't: the design's temp-
 ![Stumble button on screen](screenshots/2026-08-19-38-ui-stumble-button.png)
 ![First stumble: new tab on a corpus site](screenshots/2026-08-19-39-first-stumble-two-tabs.png)
 ![Task 8.1 complete](screenshots/2026-08-19-40-task-8-1-complete.png)
+
+**41 · Task 8.2 — ProvenanceCard.** Spec-faithful: labels exactly "Stack" / "Hosted on" / "Type", fields omitted when null or blank, and the frozen fallback line "Hand-made on the open web." character-for-character when all three are empty — which, against the unenriched corpus, is what every stumble displays for now. Kiro added one defensive notch beyond the spec: the display guard also rejects the literal string "unknown" case-insensitively, so even corrupted data could never surface it. Renders purely from the stumble response — no secondary requests. 2.08 credits, 2m21s. `tsc` clean, 42/42.
+
+![Task 8.2 complete](screenshots/2026-08-19-41-task-8-2-complete.png)
