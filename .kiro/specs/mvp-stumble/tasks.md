@@ -139,7 +139,7 @@ Implement Surfdeck's core stumble interaction as a single Cloudflare Worker (Hon
     - Render from precomputed data in stumble response (no secondary network request)
     - _Requirements: 5.1, 5.2, 5.3, 5.4_
 
-  - [ ] 8.3 Implement StatusMessage component (`src/client/components/StatusMessage.tsx`)
+  - [x] 8.3 Implement StatusMessage component (`src/client/components/StatusMessage.tsx`)
     - Zero-match: heading "Nothing in that corner right now." + sub-line "Loosen a filter and try again."
     - Exhausted: heading "You've wandered the whole neighbourhood." + sub-line "Reset history to start fresh?" + reset button
     - Popup-blocked: message with clickable link to the site URL

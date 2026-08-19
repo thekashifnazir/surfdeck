@@ -13,7 +13,6 @@ export interface StumbleButtonProps {
   buildFilters: BuildFilterSelection;
   onStumbleResult: (site: StumbleSite | null) => void;
   onStatusChange: (status: StatusKind) => void;
-  lastSiteUrl: string | null;
 }
 
 /**
@@ -92,7 +91,9 @@ function buildQueryString(
  * 2. Fetches /api/stumble with current filters + seen-list.
  * 3. On success: navigates the pre-opened tab to the site URL.
  * 4. On failure/timeout: closes the blank tab and shows error state.
- * 5. If popup is blocked (window.open returns null): shows fallback message with link.
+ * 5. If popup is blocked (window.open returns null): still fetches, updates
+ *    seen-list and result, then sets popup_blocked so StatusMessage can link
+ *    to the freshly fetched site.
  */
 export default function StumbleButton({
   selectedMood,
@@ -100,19 +101,13 @@ export default function StumbleButton({
   buildFilters,
   onStumbleResult,
   onStatusChange,
-  lastSiteUrl,
 }: StumbleButtonProps) {
   const [isLoading, setIsLoading] = useState(false);
 
   async function handleStumble() {
     // Open blank tab synchronously within the click gesture (required for Safari)
     const tab = window.open("about:blank", "_blank");
-
-    // Detect popup blocked
-    if (!tab) {
-      onStatusChange("popup_blocked");
-      return;
-    }
+    const popupBlocked = !tab;
 
     setIsLoading(true);
     onStatusChange(null);
@@ -134,7 +129,7 @@ export default function StumbleButton({
 
       if (!response.ok) {
         // Server error (500, etc.)
-        tab.close();
+        tab?.close();
         onStatusChange("error");
         return;
       }
@@ -145,30 +140,35 @@ export default function StumbleButton({
       };
 
       if (data.status === "ok" && data.site) {
-        // Navigate the pre-opened tab to the site URL
-        tab.location.href = data.site.url;
-        // Update seen-list
-        appendToSeenList(data.site.id);
-        // Notify parent
-        onStumbleResult(data.site);
-        onStatusChange("ok");
+        if (popupBlocked) {
+          // Popup was blocked — update state so StatusMessage shows a link to the fresh site
+          appendToSeenList(data.site.id);
+          onStumbleResult(data.site);
+          onStatusChange("popup_blocked");
+        } else {
+          // Navigate the pre-opened tab to the site URL
+          tab.location.href = data.site.url;
+          appendToSeenList(data.site.id);
+          onStumbleResult(data.site);
+          onStatusChange("ok");
+        }
       } else if (data.status === "no_match") {
-        tab.close();
+        tab?.close();
         onStumbleResult(null);
         onStatusChange("no_match");
       } else if (data.status === "exhausted") {
-        tab.close();
+        tab?.close();
         onStumbleResult(null);
         onStatusChange("exhausted");
       } else {
         // Unexpected response shape
-        tab.close();
+        tab?.close();
         onStatusChange("error");
       }
     } catch {
       // Network error or timeout (AbortError)
       clearTimeout(timeoutId);
-      tab.close();
+      tab?.close();
       onStatusChange("error");
     } finally {
       setIsLoading(false);
@@ -194,23 +194,8 @@ export default function StumbleButton({
           transition: "background 0.15s ease",
         }}
       >
-        {isLoading ? "Stumbling…" : "Stumble"}
+        {isLoading ? "Stumbling\u2026" : "Stumble"}
       </button>
-
-      {/* Popup-blocked fallback: show clickable link when last URL is available */}
-      {lastSiteUrl && (
-        <p style={{ marginTop: "0.5rem", fontSize: "0.9rem", color: "#555" }}>
-          Popup blocked?{" "}
-          <a
-            href={lastSiteUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            style={{ color: "#1a73e8", textDecoration: "underline" }}
-          >
-            Open site manually
-          </a>
-        </p>
-      )}
     </div>
   );
 }

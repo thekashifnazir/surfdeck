@@ -4,6 +4,7 @@ import CharacterFilter from "./components/CharacterFilter";
 import BuildFilter from "./components/BuildFilter";
 import StumbleButton from "./components/StumbleButton";
 import ProvenanceCard from "./components/ProvenanceCard";
+import StatusMessage from "./components/StatusMessage";
 
 /** Shape of a site returned by the /api/stumble endpoint. */
 export interface StumbleSite {
@@ -51,6 +52,9 @@ export default function App() {
     static_or_dynamic: [],
   });
 
+  /** localStorage key for the seen-list. */
+  const SEEN_KEY = "surfdeck_seen";
+
   // Available filter options (fetched from API)
   const [availableFilters, setAvailableFilters] = useState<AvailableFilters>({
     stacks: [],
@@ -86,6 +90,23 @@ export default function App() {
     };
   }, []);
 
+  // Clear status message when user changes any filter (Req 6.4)
+  useEffect(() => {
+    setStatusMessage((prev) => {
+      if (prev === "no_match" || prev === "error") {
+        return null;
+      }
+      return prev;
+    });
+  }, [selectedMood, selectedCharacter, buildFilters]);
+
+  /** Clears the seen-list from localStorage and re-enables stumbling (Req 11.3). */
+  function handleReset() {
+    localStorage.removeItem(SEEN_KEY);
+    setStatusMessage(null);
+    setLastStumbleResult(null);
+  }
+
   return (
     <main>
       {/* Mood selector */}
@@ -115,7 +136,6 @@ export default function App() {
           buildFilters={buildFilters}
           onStumbleResult={setLastStumbleResult}
           onStatusChange={setStatusMessage}
-          lastSiteUrl={lastStumbleResult?.url ?? null}
         />
       </section>
 
@@ -124,9 +144,13 @@ export default function App() {
         {lastStumbleResult && <ProvenanceCard site={lastStumbleResult} />}
       </section>
 
-      {/* Status message area — StatusMessage component (task 8.3) */}
+      {/* Status message area */}
       <section aria-label="Status message">
-        {statusMessage && <p>{statusMessage}</p>}
+        <StatusMessage
+          status={statusMessage}
+          siteUrl={lastStumbleResult?.url ?? null}
+          onReset={handleReset}
+        />
       </section>
     </main>
   );
