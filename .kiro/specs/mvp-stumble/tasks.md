@@ -39,7 +39,7 @@ Implement Surfdeck's core stumble interaction as a single Cloudflare Worker (Hon
 - [x] 3. Checkpoint - Seed import working
   - Ensure all tests pass, ask the user if questions arise.
 
-- [ ] 4. Stumble Engine (API core logic)
+- [x] 4. Stumble Engine (API core logic)
   - [x] 4.1 Implement Stumble Engine query builder (`src/worker/engine/stumble.ts`)
     - Define `StumbleParams` interface (mood, character, stacks, hosts, staticOrDynamic, seen)
     - Build D1 batch: temp table for seen-list, WHERE conditions for NSFW exclusion, mood LIKE patterns, character exact match, build filter IN clauses, seen-list subquery exclusion
@@ -48,7 +48,7 @@ Implement Surfdeck's core stumble interaction as a single Cloudflare Worker (Hon
     - Distinguish zero-match vs exhausted: query once without seen-list exclusion to check if pool exists, then with exclusion
     - _Requirements: 1.1, 1.3, 2.2, 2.3, 2.4, 3.2, 4.2, 4.3, 10.5, 10.6, 12.1, 12.2_
 
-  - [-] 4.2 Write property tests for Stumble Engine (Properties 1, 2, 3, 4, 5, 6, 7)
+  - [x] 4.2 Write property tests for Stumble Engine (Properties 1, 2, 3, 4, 5, 6, 7)
     - **Property 1: Filter-matching** — returned site satisfies all active filter constraints
     - **Property 2: NSFW exclusion** — NSFW sites never returned regardless of filters
     - **Property 3: Seen-list exclusion** — returned site ID never in seen-list
@@ -59,7 +59,7 @@ Implement Surfdeck's core stumble interaction as a single Cloudflare Worker (Hon
     - **Validates: Requirements 1.1, 1.3, 1.4, 2.2, 2.3, 2.4, 3.2, 4.2, 4.3, 10.5, 10.6, 12.1, 12.2**
 
 - [ ] 5. API routes
-  - [ ] 5.1 Implement `/api/stumble` route (`src/worker/routes/stumble.ts`)
+  - [x] 5.1 Implement `/api/stumble` route (`src/worker/routes/stumble.ts`)
     - Parse and validate query parameters (mood, character, stack, host, static_or_dynamic, seen)
     - Call Stumble Engine with parsed params
     - Return JSON responses: `{ status: "ok", site: {...} }`, `{ status: "no_match" }`, or `{ status: "exhausted" }`
