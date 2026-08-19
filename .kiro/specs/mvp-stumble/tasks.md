@@ -67,7 +67,7 @@ Implement Surfdeck's core stumble interaction as a single Cloudflare Worker (Hon
     - Ignore invalid filter values (treat as absent)
     - _Requirements: 1.1, 1.4, 5.4, 10.5, 10.6, 11.1_
 
-  - [ ] 5.2 Implement `/api/filters` route (`src/worker/routes/filters.ts`)
+  - [x] 5.2 Implement `/api/filters` route (`src/worker/routes/filters.ts`)
     - Query D1 for distinct non-NULL values of `stack`, `host`, and `static_or_dynamic`
     - Return JSON: `{ stacks: [...], hosts: [...], static_or_dynamic: [...] }`
     - Exclude blank/NULL values from response

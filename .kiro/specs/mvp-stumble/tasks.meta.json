@@ -121,6 +121,18 @@
         "chatSessionId": "sess_b9d50e49-99f7-4867-80b7-8d3f9f8888d3",
         "timestamp": 1787165614505
       }
+    ],
+    "5.2 Implement `/api/filters` route (`src/worker/routes/filters.ts`)": [
+      {
+        "executionId": "de535572-de39-421c-a766-62a3c35eb071",
+        "chatSessionId": "sess_7463929a-5745-479d-b90d-2eaa5a3974fd",
+        "timestamp": 1787165840897
+      },
+      {
+        "executionId": "de535572-de39-421c-a766-62a3c35eb071",
+        "chatSessionId": "sess_7463929a-5745-479d-b90d-2eaa5a3974fd",
+        "timestamp": 1787165991312
+      }
     ]
   }
 }
