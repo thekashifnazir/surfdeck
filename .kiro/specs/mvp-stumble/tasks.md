@@ -20,7 +20,7 @@ Implement Surfdeck's core stumble interaction as a single Cloudflare Worker (Hon
     - url is TEXT NOT NULL UNIQUE, stack/host/static_or_dynamic are nullable TEXT, nsfw is INTEGER NOT NULL DEFAULT 0
     - _Requirements: 8.1, 8.3_
 
-- [ ] 2. Seed import script
+- [x] 2. Seed import script
   - [x] 2.1 Implement CSV-to-D1 seed script (`scripts/seed.ts`)
     - Read and parse `data/featured-sites.csv` (UTF-8, header row, handle quoted fields with commas)
     - Skip rows with empty `url`, log warning for each skipped row
@@ -30,7 +30,7 @@ Implement Surfdeck's core stumble interaction as a single Cloudflare Worker (Hon
     - Execute via D1 batch (single batch call for all 288 rows — under 1000-statement limit)
     - _Requirements: 8.1, 8.2, 8.3, 8.4, 8.5, 8.6_
 
-  - [ ] 2.2 Write property tests for seed import (Properties 8, 9, 10)
+  - [x] 2.2 Write property tests for seed import (Properties 8, 9, 10)
     - **Property 8: Seed import idempotency** — running import N times produces same row count as once
     - **Property 9: No "unknown" strings** — provenance fields are NULL or valid vocabulary, never "unknown"
     - **Property 10: Blanks preserved as NULL** — blank CSV values become NULL in D1

@@ -1,5 +1,10 @@
 {
-  "pbtResults": {},
+  "pbtResults": {
+    "2.2 Write property tests for seed import (Properties 8, 9, 10)": {
+      "status": "passed",
+      "lastRunTimestamp": 1787163270342
+    }
+  },
   "executionHistory": {
     "1.1 Initialize project with Vite, React, TypeScript, Hono, and Wrangler": [
       {
@@ -42,6 +47,25 @@
         "executionId": "44deb727-1d30-42d4-9fc7-c18e8a7c309e",
         "chatSessionId": "sess_fb885119-1e77-4fb0-8874-05a91a1c52ac",
         "timestamp": 1787162237305
+      }
+    ],
+    "2.2 Write property tests for seed import (Properties 8, 9, 10)": [
+      {
+        "executionId": "0edee866-7a70-4498-9121-06355d169f8d",
+        "chatSessionId": "sess_b77a6dfb-03c7-4fa8-96eb-a70e8dc33dca",
+        "timestamp": 1787162904926
+      },
+      {
+        "executionId": "0edee866-7a70-4498-9121-06355d169f8d",
+        "chatSessionId": "sess_b77a6dfb-03c7-4fa8-96eb-a70e8dc33dca",
+        "timestamp": 1787163297323
+      }
+    ],
+    "2. Seed import script": [
+      {
+        "executionId": "0edee866-7a70-4498-9121-06355d169f8d",
+        "chatSessionId": "sess_b77a6dfb-03c7-4fa8-96eb-a70e8dc33dca",
+        "timestamp": 1787163297371
       }
     ]
   }
