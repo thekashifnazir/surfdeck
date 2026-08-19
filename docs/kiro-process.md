@@ -64,3 +64,15 @@ Dated screenshots and notes of Kiro authoring this project: steering, specs, tas
 
 ![Task 2.2 vitest snag](screenshots/2026-08-19-19-task-2-2-vitest-snag.png)
 ![Task 2.2 complete](screenshots/2026-08-19-20-task-2-2-complete.png)
+
+**21 · Checkpoint 3 — seed import working.** Kiro ran the full suite itself (8/8 pass) and marked the checkpoint. 0.67 credits, 35s.
+
+![Checkpoint 3 complete](screenshots/2026-08-19-21-checkpoint-3-complete.png)
+
+**22–24 · Task 4.1 — the Stumble Engine, and the day's biggest catch.** Kiro implemented `src/worker/engine/stumble.ts` to spec: `StumbleParams`/`SiteRow`/`StumbleResult` types, NSFW always excluded, boundary-anchored 4-pattern mood `LIKE`s (no substring false positives), `surprise` = no filter, OR-within/AND-across build filters as bound params, validated positive-integer seen IDs, and the zero-match/exhausted distinction via pool-count-first. It hit and self-fixed 3 TypeScript errors mid-task. 2.11 credits, 2m18s — `tsc` clean, all tests green.
+
+Then the independent review caught what green tests couldn't: the design's temp-table pattern (Decision #8) **doesn't work on D1 at all** — `CREATE TEMP TABLE` is rejected by D1's SQLite authorizer with `not authorized: SQLITE_AUTH`, verified against local D1 in isolation. Every stumble request carrying a seen-list would have thrown in production; nothing surfaced it because no test exercised the batch path yet. The correction went back through Kiro chat with the verified evidence and the fix shape: since `validateSeenIds()` already guarantees deduplicated positive integers (and the code already inlined them as literals for the temp-table INSERT), the seen-list is inlined directly as `id NOT IN (1,2,3,...)` literals — no bound params, so the 100-binding limit doesn't apply; filter values stay parameterized. Kiro applied the fix to both `stumble.ts` and `design.md` (Decision #8 rewritten to record why). Re-verified: `tsc` clean, 8/8 tests, and the exact fixed SQL shape runs against local D1 (283-row pool after excluding 5 seen IDs). A design decision falsified by a platform check before it shipped — the clearest demonstration yet of why the review gate runs real commands instead of trusting a green suite.
+
+![Task 4.1 complete](screenshots/2026-08-19-22-task-4-1-complete.png)
+![Temp-table correction sent to Kiro](screenshots/2026-08-19-23-task-4-1-temp-table-correction.png)
+![Fix review: stumble.ts + design.md](screenshots/2026-08-19-24-task-4-1-fix-review.png)
