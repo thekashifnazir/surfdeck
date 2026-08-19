@@ -133,6 +133,25 @@
         "chatSessionId": "sess_7463929a-5745-479d-b90d-2eaa5a3974fd",
         "timestamp": 1787165991312
       }
+    ],
+    "5.3 Implement Worker entry point (`src/worker/index.ts`)": [
+      {
+        "executionId": "11966e4d-67b7-4e82-820e-7c9e85056ef8",
+        "chatSessionId": "sess_670a6d2a-f8fd-4bc3-ba47-0e969f637bca",
+        "timestamp": 1787166141747
+      },
+      {
+        "executionId": "11966e4d-67b7-4e82-820e-7c9e85056ef8",
+        "chatSessionId": "sess_670a6d2a-f8fd-4bc3-ba47-0e969f637bca",
+        "timestamp": 1787166198653
+      }
+    ],
+    "5. API routes": [
+      {
+        "executionId": "11966e4d-67b7-4e82-820e-7c9e85056ef8",
+        "chatSessionId": "sess_670a6d2a-f8fd-4bc3-ba47-0e969f637bca",
+        "timestamp": 1787166198706
+      }
     ]
   }
 }

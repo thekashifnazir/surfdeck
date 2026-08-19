@@ -58,7 +58,7 @@ Implement Surfdeck's core stumble interaction as a single Cloudflare Worker (Hon
     - **Property 7: Zero-match vs exhausted distinction** — correct status based on pool state
     - **Validates: Requirements 1.1, 1.3, 1.4, 2.2, 2.3, 2.4, 3.2, 4.2, 4.3, 10.5, 10.6, 12.1, 12.2**
 
-- [ ] 5. API routes
+- [x] 5. API routes
   - [x] 5.1 Implement `/api/stumble` route (`src/worker/routes/stumble.ts`)
     - Parse and validate query parameters (mood, character, stack, host, static_or_dynamic, seen)
     - Call Stumble Engine with parsed params
@@ -73,7 +73,7 @@ Implement Surfdeck's core stumble interaction as a single Cloudflare Worker (Hon
     - Exclude blank/NULL values from response
     - _Requirements: 4.1, 4.5_
 
-  - [ ] 5.3 Implement Worker entry point (`src/worker/index.ts`)
+  - [x] 5.3 Implement Worker entry point (`src/worker/index.ts`)
     - Create Hono app with Bindings type (DB: D1Database)
     - Mount stumble and filters routes under `/api`
     - Add catch-all `/api/*` route returning 404 JSON for unknown API paths
