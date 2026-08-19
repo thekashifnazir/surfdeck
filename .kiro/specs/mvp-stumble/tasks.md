@@ -21,7 +21,7 @@ Implement Surfdeck's core stumble interaction as a single Cloudflare Worker (Hon
     - _Requirements: 8.1, 8.3_
 
 - [ ] 2. Seed import script
-  - [ ] 2.1 Implement CSV-to-D1 seed script (`scripts/seed.ts`)
+  - [x] 2.1 Implement CSV-to-D1 seed script (`scripts/seed.ts`)
     - Read and parse `data/featured-sites.csv` (UTF-8, header row, handle quoted fields with commas)
     - Skip rows with empty `url`, log warning for each skipped row
     - Map CSV columns to D1 columns: blank `stack`/`host`/`static_or_dynamic` → NULL, `nsfw` false→0 / true→1

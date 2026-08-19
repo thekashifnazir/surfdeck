@@ -31,6 +31,18 @@
         "chatSessionId": "sess_f0fd41f7-63ad-4378-aa6d-cf6304e35a1c",
         "timestamp": 1787161410515
       }
+    ],
+    "2.1 Implement CSV-to-D1 seed script (`scripts/seed.ts`)": [
+      {
+        "executionId": "44deb727-1d30-42d4-9fc7-c18e8a7c309e",
+        "chatSessionId": "sess_fb885119-1e77-4fb0-8874-05a91a1c52ac",
+        "timestamp": 1787161586249
+      },
+      {
+        "executionId": "44deb727-1d30-42d4-9fc7-c18e8a7c309e",
+        "chatSessionId": "sess_fb885119-1e77-4fb0-8874-05a91a1c52ac",
+        "timestamp": 1787162237305
+      }
     ]
   }
 }
