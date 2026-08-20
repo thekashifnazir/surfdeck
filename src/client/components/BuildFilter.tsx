@@ -1,4 +1,5 @@
 import type { AvailableFilters, BuildFilterSelection } from "../App";
+import { getProvenanceLabel } from "../provenance-labels";
 
 /** Friendly labels for each build filter dimension. */
 const DIMENSION_LABELS: Record<keyof BuildFilterSelection, string> = {
@@ -77,7 +78,7 @@ export default function BuildFilter({ available, selected, onSelectionChange }: 
                       cursor: "pointer",
                     }}
                   >
-                    {value}
+                    {getProvenanceLabel(value)}
                   </button>
                 );
               })}

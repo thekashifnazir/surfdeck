@@ -1,4 +1,5 @@
 import type { SurfSite } from "../App";
+import { getProvenanceLabel } from "../provenance-labels";
 
 export interface ProvenanceCardProps {
   site: SurfSite;
@@ -28,13 +29,13 @@ export default function ProvenanceCard({ site }: ProvenanceCardProps) {
   const fields: { label: string; value: string }[] = [];
 
   if (isDisplayable(site.stack)) {
-    fields.push({ label: "Stack", value: site.stack });
+    fields.push({ label: "Stack", value: getProvenanceLabel(site.stack) });
   }
   if (isDisplayable(site.host)) {
-    fields.push({ label: "Hosted on", value: site.host });
+    fields.push({ label: "Hosted on", value: getProvenanceLabel(site.host) });
   }
   if (isDisplayable(site.static_or_dynamic)) {
-    fields.push({ label: "Type", value: site.static_or_dynamic });
+    fields.push({ label: "Type", value: getProvenanceLabel(site.static_or_dynamic) });
   }
 
   // All three provenance fields are blank — show the quiet fallback line

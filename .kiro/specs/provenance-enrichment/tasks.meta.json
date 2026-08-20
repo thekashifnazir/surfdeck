@@ -112,6 +112,61 @@
         "chatSessionId": "sess_d63c4937-4824-4e70-85b2-4b58ea890424",
         "timestamp": 1787238709638
       }
+    ],
+    "5.1 Create `src/client/provenance-labels.ts` with PROVENANCE_LABELS map": [
+      {
+        "executionId": "0347d6ab-11b6-460a-86a9-2eec55b6b14c",
+        "chatSessionId": "sess_5ca18917-3582-4f77-82e7-16e2034f24da",
+        "timestamp": 1787238911669
+      },
+      {
+        "executionId": "0347d6ab-11b6-460a-86a9-2eec55b6b14c",
+        "chatSessionId": "sess_5ca18917-3582-4f77-82e7-16e2034f24da",
+        "timestamp": 1787239015866
+      }
+    ],
+    "5.2 Modify `ProvenanceCard.tsx` to use `getProvenanceLabel()`": [
+      {
+        "executionId": "95d4ad91-87e7-4898-87f3-3b9dc54d1e22",
+        "chatSessionId": "sess_abc7ab1a-bf71-45d9-b88e-ce2261b61115",
+        "timestamp": 1787239063962
+      },
+      {
+        "executionId": "95d4ad91-87e7-4898-87f3-3b9dc54d1e22",
+        "chatSessionId": "sess_abc7ab1a-bf71-45d9-b88e-ce2261b61115",
+        "timestamp": 1787239140470
+      }
+    ],
+    "5.3 Modify `BuildFilter.tsx` to use `getProvenanceLabel()`": [
+      {
+        "executionId": "4fd45264-6f40-4962-92a6-a5d7b742e053",
+        "chatSessionId": "sess_9bdf506f-e93b-4bde-9a00-619b70777572",
+        "timestamp": 1787239197345
+      },
+      {
+        "executionId": "4fd45264-6f40-4962-92a6-a5d7b742e053",
+        "chatSessionId": "sess_9bdf506f-e93b-4bde-9a00-619b70777572",
+        "timestamp": 1787239246043
+      }
+    ],
+    "5.4 Write label tests (`src/client/provenance-labels.test.ts`)": [
+      {
+        "executionId": "d4d626b6-f120-43b7-adc6-51d2b80907ca",
+        "chatSessionId": "sess_af25a3d4-cf98-4f86-8ed5-272b45eb6788",
+        "timestamp": 1787239265147
+      },
+      {
+        "executionId": "d4d626b6-f120-43b7-adc6-51d2b80907ca",
+        "chatSessionId": "sess_af25a3d4-cf98-4f86-8ed5-272b45eb6788",
+        "timestamp": 1787239376846
+      }
+    ],
+    "5. Display labels": [
+      {
+        "executionId": "d4d626b6-f120-43b7-adc6-51d2b80907ca",
+        "chatSessionId": "sess_af25a3d4-cf98-4f86-8ed5-272b45eb6788",
+        "timestamp": 1787239376897
+      }
     ]
   }
 }

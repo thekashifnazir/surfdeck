@@ -73,24 +73,24 @@ Populate the currently-blank `stack`, `host`, and `static_or_dynamic` columns fo
     - Test: Idempotency — running UPSERT N times produces same DB state as once
     - _Requirements: 12.2_
 
-- [ ] 5. Display labels
-  - [ ] 5.1 Create `src/client/provenance-labels.ts` with PROVENANCE_LABELS map
+- [x] 5. Display labels
+  - [x] 5.1 Create `src/client/provenance-labels.ts` with PROVENANCE_LABELS map
     - Export `PROVENANCE_LABELS: Record<string, string>` covering all stack, host, and static_or_dynamic controlled vocabulary values with human-friendly names
     - Export `getProvenanceLabel(value: string): string` — returns label or falls through to raw value
     - _Requirements: 11.1, 11.4_
 
-  - [ ] 5.2 Modify `ProvenanceCard.tsx` to use `getProvenanceLabel()`
+  - [x] 5.2 Modify `ProvenanceCard.tsx` to use `getProvenanceLabel()`
     - Import `getProvenanceLabel` from `../provenance-labels`
     - Apply it to `site.stack`, `site.host`, `site.static_or_dynamic` before rendering in the `<dd>` element
     - Ensure the "Hand-made on the open web." fallback remains unchanged for all-blank
     - _Requirements: 11.2, 11.6_
 
-  - [ ] 5.3 Modify `BuildFilter.tsx` to use `getProvenanceLabel()`
+  - [x] 5.3 Modify `BuildFilter.tsx` to use `getProvenanceLabel()`
     - Import `getProvenanceLabel` from `../provenance-labels`
     - Apply it to the button text content (display only — the `value` used in filter logic and sent to API remains the raw snake_case string)
     - _Requirements: 11.3, 11.5_
 
-  - [ ] 5.4 Write label tests (`src/client/provenance-labels.test.ts`)
+  - [x] 5.4 Write label tests (`src/client/provenance-labels.test.ts`)
     - Test: `getProvenanceLabel("nextjs")` → "Next.js"
     - Test: `getProvenanceLabel("github_pages")` → "GitHub Pages"
     - Test: `getProvenanceLabel("static")` → "Static"
