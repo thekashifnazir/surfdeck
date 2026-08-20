@@ -191,6 +191,25 @@
         "chatSessionId": "sess_6c247d7b-3afc-4108-a560-15e969eec45e",
         "timestamp": 1787240185580
       }
+    ],
+    "7.2 STOP — present `data/provenance-report.md` for human review": [
+      {
+        "executionId": "165a4e79-3893-4edb-a493-5fa8f8fbf040",
+        "chatSessionId": "sess_fd655a26-fd3f-4513-9287-1219b952ec5f",
+        "timestamp": 1787240846219
+      },
+      {
+        "executionId": "165a4e79-3893-4edb-a493-5fa8f8fbf040",
+        "chatSessionId": "sess_fd655a26-fd3f-4513-9287-1219b952ec5f",
+        "timestamp": 1787240981144
+      }
+    ],
+    "7. Run detector and emit report": [
+      {
+        "executionId": "165a4e79-3893-4edb-a493-5fa8f8fbf040",
+        "chatSessionId": "sess_fd655a26-fd3f-4513-9287-1219b952ec5f",
+        "timestamp": 1787240981209
+      }
     ]
   }
 }

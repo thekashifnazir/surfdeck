@@ -103,7 +103,7 @@ Populate the currently-blank `stack`, `host`, and `static_or_dynamic` columns fo
   - All rule tests, UPSERT tests, and label tests must pass
   - Show command output to user
 
-- [ ] 7. Run detector and emit report
+- [x] 7. Run detector and emit report
   - [x] 7.1 Execute `npx tsx scripts/detect-provenance.ts`
     - Run the detector against all 288 URLs
     - Show progress output (fetched count, cache hits, errors)
@@ -111,7 +111,7 @@ Populate the currently-blank `stack`, `host`, and `static_or_dynamic` columns fo
     - Show summary stats (sites scanned, fields detected, all-blank count)
     - _Requirements: 1.1, 8.1_
 
-  - [ ] 7.2 STOP — present `data/provenance-report.md` for human review
+  - [x] 7.2 STOP — present `data/provenance-report.md` for human review
     - Show the report to the user
     - Wait for explicit approval of which values to write to the CSV
     - Do NOT proceed to CSV write until user approves
