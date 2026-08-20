@@ -40,8 +40,8 @@ Populate the currently-blank `stack`, `host`, and `static_or_dynamic` columns fo
     - Each test must fail without its corresponding rule implementation
     - _Requirements: 12.1_
 
-- [ ] 3. Detector script (I/O layer)
-  - [ ] 3.1 Implement `scripts/detect-provenance.ts` — fetcher + cache + report emitter
+- [x] 3. Detector script (I/O layer)
+  - [x] 3.1 Implement `scripts/detect-provenance.ts` — fetcher + cache + report emitter
     - Read URLs from `data/featured-sites.csv` (reuse `parseCSV` + `buildColIndex` from `seed-logic.ts`)
     - For each URL: check cache (`.provenance-cache/<sha256-of-url>.json`); if cache miss:
       - Fetch and parse `robots.txt` for the origin (one fetch per domain, cached separately in `.provenance-cache/robots/<domain>.txt`); skip if path disallowed

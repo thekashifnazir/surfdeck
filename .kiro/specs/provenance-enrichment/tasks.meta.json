@@ -62,6 +62,25 @@
         "chatSessionId": "sess_ee16d3d6-ab46-4b1b-85a3-eed2b7b81c9b",
         "timestamp": 1787237402955
       }
+    ],
+    "3.1 Implement `scripts/detect-provenance.ts` — fetcher + cache + report emitter": [
+      {
+        "executionId": "8bcc0909-193c-4658-a20a-91da92e59502",
+        "chatSessionId": "sess_982798fd-c495-4bae-9687-d5658b377f79",
+        "timestamp": 1787237719937
+      },
+      {
+        "executionId": "8bcc0909-193c-4658-a20a-91da92e59502",
+        "chatSessionId": "sess_982798fd-c495-4bae-9687-d5658b377f79",
+        "timestamp": 1787238055023
+      }
+    ],
+    "3. Detector script (I/O layer)": [
+      {
+        "executionId": "8bcc0909-193c-4658-a20a-91da92e59502",
+        "chatSessionId": "sess_982798fd-c495-4bae-9687-d5658b377f79",
+        "timestamp": 1787238055073
+      }
     ]
   }
 }
