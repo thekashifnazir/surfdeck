@@ -270,6 +270,37 @@
         "chatSessionId": "sess_9a5e38f2-5d9a-40e2-aaf3-72fe5528047a",
         "timestamp": 1787264248320
       }
+    ],
+    "6.1 Create `scripts/discover-vibecoded.ts`": [
+      {
+        "executionId": "2978cc8a-07be-49be-9845-2adab33edeee",
+        "chatSessionId": "sess_a1223a27-bff1-458a-bcdf-6fb6dfda2b65",
+        "timestamp": 1787265377935
+      },
+      {
+        "executionId": "2978cc8a-07be-49be-9845-2adab33edeee",
+        "chatSessionId": "sess_a1223a27-bff1-458a-bcdf-6fb6dfda2b65",
+        "timestamp": 1787265740208
+      }
+    ],
+    "6.2 Write sampler pure-function tests (`scripts/discover-vibecoded.test.ts`)": [
+      {
+        "executionId": "735e35a2-5f46-480a-a7eb-c5154b4573c6",
+        "chatSessionId": "sess_36356ea3-1417-4d58-a317-7627d01acd80",
+        "timestamp": 1787265760225
+      },
+      {
+        "executionId": "735e35a2-5f46-480a-a7eb-c5154b4573c6",
+        "chatSessionId": "sess_36356ea3-1417-4d58-a317-7627d01acd80",
+        "timestamp": 1787265933181
+      }
+    ],
+    "6. Discovery sampler": [
+      {
+        "executionId": "735e35a2-5f46-480a-a7eb-c5154b4573c6",
+        "chatSessionId": "sess_36356ea3-1417-4d58-a317-7627d01acd80",
+        "timestamp": 1787265933234
+      }
     ]
   }
 }

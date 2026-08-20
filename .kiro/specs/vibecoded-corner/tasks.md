@@ -154,8 +154,8 @@ Add a curated "Vibecoded Corner" — a distinct surf mode for AI-built sites spa
     - Test: Response body contains a link
     - _Requirements: 12.3_
 
-- [ ] 6. Discovery sampler
-  - [ ] 6.1 Create `scripts/discover-vibecoded.ts`
+- [x] 6. Discovery sampler
+  - [x] 6.1 Create `scripts/discover-vibecoded.ts`
     - Query crt.sh JSON API for recent certs on: `%.lovable.app`, `%.bolt.host`, `%.vercel.app`, `%.netlify.app`, `%.pages.dev`, `%.fly.dev`
     - Extract unique subdomains from cert entries, construct URLs
     - Liveness check: fetch with 10s timeout, confirm 2xx, detect parked pages
@@ -167,7 +167,7 @@ Add a curated "Vibecoded Corner" — a distinct surf mode for AI-built sites spa
     - Fail gracefully on every error — never crash, never write a guess
     - _Requirements: 10.1, 10.2, 10.3, 10.4, 10.5, 10.6, 10.7, 10.8, 10.9_
 
-  - [ ] 6.2 Write sampler pure-function tests (`scripts/discover-vibecoded.test.ts`)
+  - [x] 6.2 Write sampler pure-function tests (`scripts/discover-vibecoded.test.ts`)
     - Test: domain pattern mapping — `coolapp.lovable.app` → built_with=lovable, tier=2
     - Test: dedupe — candidate URL in existing CSV → excluded
     - Test: report sorting — tier ascending, then alphabetical
