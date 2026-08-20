@@ -200,9 +200,10 @@ Implement Surfdeck's core stumble interaction as a single Cloudflare Worker (Hon
     - Verify 288 rows imported with correct tier/added_at values and NULL preservation
     - _Requirements: 8.1, 8.2, 8.3, 8.4_
 
-  - [ ] 12.3 Deploy to workers.dev
+  - [x] 12.3 Deploy to workers.dev
     - Run `npx wrangler deploy` to deploy the Worker + SPA to workers.dev
     - Verify deployment succeeds and the workers.dev URL is accessible
+    - Deployed URL: https://surfdeck.kash-553.workers.dev (HTTP 200 confirmed)
     - _Requirements: 9.1_
 
   - [ ] 12.4 Verify deployed stumble flow end-to-end
