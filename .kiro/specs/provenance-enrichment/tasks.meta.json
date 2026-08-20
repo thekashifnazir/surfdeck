@@ -1,0 +1,36 @@
+{
+  "pbtResults": {},
+  "executionHistory": {
+    "1.1 Add `vibecoded` column to `schema.sql` and provide production ALTER statement": [
+      {
+        "executionId": "c1ba21b5-07f2-42c3-886d-3323a7d70bf7",
+        "chatSessionId": "sess_e1dbb3b8-a196-4ddf-8341-52912f77dfd9",
+        "timestamp": 1787236301153
+      },
+      {
+        "executionId": "c1ba21b5-07f2-42c3-886d-3323a7d70bf7",
+        "chatSessionId": "sess_e1dbb3b8-a196-4ddf-8341-52912f77dfd9",
+        "timestamp": 1787236393648
+      }
+    ],
+    "1.2 Add `.provenance-cache/` to `.gitignore` and install `robots-parser`": [
+      {
+        "executionId": "0d5cc03d-621c-4d80-93f8-6f972fd7869d",
+        "chatSessionId": "sess_d9bb96fc-64cc-4ad2-ab2a-6c43cb6cef6e",
+        "timestamp": 1787236427398
+      },
+      {
+        "executionId": "0d5cc03d-621c-4d80-93f8-6f972fd7869d",
+        "chatSessionId": "sess_d9bb96fc-64cc-4ad2-ab2a-6c43cb6cef6e",
+        "timestamp": 1787236463914
+      }
+    ],
+    "1. Schema migration and project setup": [
+      {
+        "executionId": "0d5cc03d-621c-4d80-93f8-6f972fd7869d",
+        "chatSessionId": "sess_d9bb96fc-64cc-4ad2-ab2a-6c43cb6cef6e",
+        "timestamp": 1787236463958
+      }
+    ]
+  }
+}
