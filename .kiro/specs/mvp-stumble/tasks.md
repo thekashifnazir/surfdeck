@@ -189,7 +189,7 @@ Implement Surfdeck's core stumble interaction as a single Cloudflare Worker (Hon
 - [x] 11. Final checkpoint - Ensure all tests pass
   - Ensure all tests pass, ask the user if questions arise.
 
-- [ ] 12. Production deployment
+- [x] 12. Production deployment
   - [x] 12.1 Create production D1 database and apply schema
     - Create the production D1 database via `wrangler d1 create`
     - Apply `schema.sql` to production D1 via `wrangler d1 execute --remote`
@@ -206,7 +206,7 @@ Implement Surfdeck's core stumble interaction as a single Cloudflare Worker (Hon
     - Deployed URL: https://surfdeck.kash-553.workers.dev (HTTP 200 confirmed)
     - _Requirements: 9.1_
 
-  - [ ] 12.4 Verify deployed stumble flow end-to-end
+  - [x] 12.4 Verify deployed stumble flow end-to-end
     - From a logged-out/incognito browser, verify the full stumble flow on the deployed URL:
     - Filters load correctly (mood, character, build)
     - Stumble returns a random site and opens in new tab
