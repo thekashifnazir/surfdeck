@@ -186,7 +186,7 @@ Implement Surfdeck's core stumble interaction as a single Cloudflare Worker (Hon
     - API 404: unknown `/api/` routes return JSON 404
     - _Requirements: 1.1, 8.1, 8.3, 8.4, 9.1, 9.3, 9.4_
 
-- [ ] 11. Final checkpoint - Ensure all tests pass
+- [x] 11. Final checkpoint - Ensure all tests pass
   - Ensure all tests pass, ask the user if questions arise.
 
 - [ ] 12. Production deployment
