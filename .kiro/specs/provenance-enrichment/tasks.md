@@ -98,13 +98,13 @@ Populate the currently-blank `stack`, `host`, and `static_or_dynamic` columns fo
     - Test: ProvenanceCard with all-blank still shows "Hand-made on the open web." (integration with labels)
     - _Requirements: 12.3_
 
-- [ ] 6. Checkpoint — run full test suite
+- [x] 6. Checkpoint — run full test suite
   - Run `npx tsc --noEmit` and `npm test`
   - All rule tests, UPSERT tests, and label tests must pass
   - Show command output to user
 
 - [ ] 7. Run detector and emit report
-  - [ ] 7.1 Execute `npx tsx scripts/detect-provenance.ts`
+  - [x] 7.1 Execute `npx tsx scripts/detect-provenance.ts`
     - Run the detector against all 288 URLs
     - Show progress output (fetched count, cache hits, errors)
     - Confirm `data/provenance-report.md` is generated

@@ -167,6 +167,30 @@
         "chatSessionId": "sess_af25a3d4-cf98-4f86-8ed5-272b45eb6788",
         "timestamp": 1787239376897
       }
+    ],
+    "6. Checkpoint — run full test suite": [
+      {
+        "executionId": "8eb6a2e8-0710-42ed-8b9a-08996324b29c",
+        "chatSessionId": "sess_a0ce2ab4-0651-49fe-9c4f-e2d4aea7c151",
+        "timestamp": 1787239567364
+      },
+      {
+        "executionId": "8eb6a2e8-0710-42ed-8b9a-08996324b29c",
+        "chatSessionId": "sess_a0ce2ab4-0651-49fe-9c4f-e2d4aea7c151",
+        "timestamp": 1787239683105
+      }
+    ],
+    "7.1 Execute `npx tsx scripts/detect-provenance.ts`": [
+      {
+        "executionId": "83aac32a-4734-4478-a343-8ae5848df186",
+        "chatSessionId": "sess_6c247d7b-3afc-4108-a560-15e969eec45e",
+        "timestamp": 1787239732826
+      },
+      {
+        "executionId": "83aac32a-4734-4478-a343-8ae5848df186",
+        "chatSessionId": "sess_6c247d7b-3afc-4108-a560-15e969eec45e",
+        "timestamp": 1787240185580
+      }
     ]
   }
 }
