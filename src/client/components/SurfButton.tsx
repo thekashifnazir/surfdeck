@@ -11,6 +11,8 @@ export interface SurfButtonProps {
   selectedMood: string | null;
   selectedCharacter: string | null;
   buildFilters: BuildFilterSelection;
+  cornerMode: boolean;
+  selectedTiers: number[];
   onSurfResult: (site: SurfSite | null) => void;
   onStatusChange: (status: StatusKind) => void;
 }
@@ -51,9 +53,21 @@ function buildQueryString(
   mood: string | null,
   character: string | null,
   buildFilters: BuildFilterSelection,
-  seen: number[]
+  seen: number[],
+  cornerMode: boolean,
+  selectedTiers: number[]
 ): string {
   const params = new URLSearchParams();
+
+  // Vibecoded corner mode
+  if (cornerMode) {
+    params.set("vibecoded", "1");
+
+    // Tier filter (only in corner mode)
+    if (selectedTiers.length > 0) {
+      params.set("tier", selectedTiers.join(","));
+    }
+  }
 
   // Mood: only send if a real mood is selected (not null / not "surprise")
   if (mood) {
@@ -99,6 +113,8 @@ export default function SurfButton({
   selectedMood,
   selectedCharacter,
   buildFilters,
+  cornerMode,
+  selectedTiers,
   onSurfResult,
   onStatusChange,
 }: SurfButtonProps) {
@@ -114,7 +130,7 @@ export default function SurfButton({
     onSurfResult(null);
 
     const seen = getSeenList();
-    const queryString = buildQueryString(selectedMood, selectedCharacter, buildFilters, seen);
+    const queryString = buildQueryString(selectedMood, selectedCharacter, buildFilters, seen, cornerMode, selectedTiers);
 
     // AbortController with 5-second timeout
     const controller = new AbortController();

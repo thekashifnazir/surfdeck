@@ -20,6 +20,35 @@ export interface StatusMessageProps {
  * The zero-match message should be cleared by the parent when a filter changes (Req 6.4).
  */
 export default function StatusMessage({ status, siteUrl, onReset }: StatusMessageProps) {
+  // Ouroboros treatment: when the surfed site is Surfdeck itself
+  if (status === "ok" && siteUrl === "/ouroboros") {
+    return (
+      <div
+        role="status"
+        aria-live="polite"
+        style={{
+          marginTop: "1.5rem",
+          padding: "1rem 1.25rem",
+          borderRadius: "8px",
+          background: "#f0fdf4",
+          border: "1px solid #86efac",
+          textAlign: "center",
+        }}
+      >
+        <p
+          style={{
+            margin: 0,
+            fontSize: "1rem",
+            fontWeight: 600,
+            color: "#166534",
+          }}
+        >
+          The loop closes — you surfed to the surfer.
+        </p>
+      </div>
+    );
+  }
+
   if (!status || status === "ok") {
     return null;
   }

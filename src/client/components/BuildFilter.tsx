@@ -1,5 +1,12 @@
-import type { AvailableFilters, BuildFilterSelection } from "../App";
+import type { BuildFilterSelection } from "../App";
 import { getProvenanceLabel } from "../provenance-labels";
+
+/** The subset of available filter values that BuildFilter needs (string arrays only). */
+export interface BuildFilterAvailable {
+  stacks: string[];
+  hosts: string[];
+  static_or_dynamic: string[];
+}
 
 /** Friendly labels for each build filter dimension. */
 const DIMENSION_LABELS: Record<keyof BuildFilterSelection, string> = {
@@ -9,7 +16,7 @@ const DIMENSION_LABELS: Record<keyof BuildFilterSelection, string> = {
 };
 
 export interface BuildFilterProps {
-  available: AvailableFilters;
+  available: BuildFilterAvailable;
   selected: BuildFilterSelection;
   onSelectionChange: (selection: BuildFilterSelection) => void;
 }
@@ -34,8 +41,8 @@ export default function BuildFilter({ available, selected, onSelectionChange }: 
     onSelectionChange({ ...selected, [dimension]: next });
   }
 
-  /** Maps an AvailableFilters key to its corresponding BuildFilterSelection key. */
-  const dimensions: { availableKey: keyof AvailableFilters; selectionKey: keyof BuildFilterSelection }[] = [
+  /** Maps an BuildFilterAvailable key to its corresponding BuildFilterSelection key. */
+  const dimensions: { availableKey: keyof BuildFilterAvailable; selectionKey: keyof BuildFilterSelection }[] = [
     { availableKey: "stacks", selectionKey: "stacks" },
     { availableKey: "hosts", selectionKey: "hosts" },
     { availableKey: "static_or_dynamic", selectionKey: "static_or_dynamic" },

@@ -160,6 +160,116 @@
         "chatSessionId": "sess_137f5e42-15a3-4a70-bc48-286d855b8f55",
         "timestamp": 1787262607332
       }
+    ],
+    "4.1 Create `src/client/components/CornerTierFilter.tsx`": [
+      {
+        "executionId": "0643ee12-0695-4997-aa92-5d9793e5b95a",
+        "chatSessionId": "sess_bc674f9a-cde0-4ede-90e8-5ceee9bd8c6e",
+        "timestamp": 1787262948622
+      },
+      {
+        "executionId": "0643ee12-0695-4997-aa92-5d9793e5b95a",
+        "chatSessionId": "sess_bc674f9a-cde0-4ede-90e8-5ceee9bd8c6e",
+        "timestamp": 1787263086288
+      }
+    ],
+    "4.2 Update `src/client/App.tsx` — corner mode state and toggle": [
+      {
+        "executionId": "b2113d6a-9d31-40f0-98c3-06a5b33c3ad1",
+        "chatSessionId": "sess_fdef66ff-d4f4-45cd-8b6e-1f26acd197d4",
+        "timestamp": 1787263122774
+      },
+      {
+        "executionId": "b2113d6a-9d31-40f0-98c3-06a5b33c3ad1",
+        "chatSessionId": "sess_fdef66ff-d4f4-45cd-8b6e-1f26acd197d4",
+        "timestamp": 1787263331975
+      }
+    ],
+    "4.3 Update `src/client/components/SurfButton.tsx` — pass vibecoded + tier params": [
+      {
+        "executionId": "7d2c8afd-7953-404a-a89d-8fbb5c4d497e",
+        "chatSessionId": "sess_4c8d1a6c-c3a1-4d4e-81ca-6522e60e2a26",
+        "timestamp": 1787263351966
+      },
+      {
+        "executionId": "7d2c8afd-7953-404a-a89d-8fbb5c4d497e",
+        "chatSessionId": "sess_4c8d1a6c-c3a1-4d4e-81ca-6522e60e2a26",
+        "timestamp": 1787263381861
+      }
+    ],
+    "4.4 Update `src/client/components/ProvenanceCard.tsx` — builder-first in corner": [
+      {
+        "executionId": "de7528d5-8dc2-4eae-a305-4d16cddeae3f",
+        "chatSessionId": "sess_0286ab84-2ec7-4084-bbec-616f3d91a9fb",
+        "timestamp": 1787263408495
+      },
+      {
+        "executionId": "de7528d5-8dc2-4eae-a305-4d16cddeae3f",
+        "chatSessionId": "sess_0286ab84-2ec7-4084-bbec-616f3d91a9fb",
+        "timestamp": 1787263536891
+      }
+    ],
+    "4.5 Update `src/client/components/StatusMessage.tsx` — ouroboros treatment": [
+      {
+        "executionId": "61e0d8b0-c95c-4505-a9d2-e64717a23f92",
+        "chatSessionId": "sess_c036f46a-fee1-417f-8672-31cb23a3e0aa",
+        "timestamp": 1787263556413
+      },
+      {
+        "executionId": "61e0d8b0-c95c-4505-a9d2-e64717a23f92",
+        "chatSessionId": "sess_c036f46a-fee1-417f-8672-31cb23a3e0aa",
+        "timestamp": 1787263646780
+      }
+    ],
+    "4. Corner UI (structural, minimal)": [
+      {
+        "executionId": "61e0d8b0-c95c-4505-a9d2-e64717a23f92",
+        "chatSessionId": "sess_c036f46a-fee1-417f-8672-31cb23a3e0aa",
+        "timestamp": 1787263646841
+      }
+    ],
+    "5.1 Create `src/worker/routes/ouroboros.ts` — standalone colophon HTML page": [
+      {
+        "executionId": "8ca85d49-7477-47f3-ad0c-1c4ed3429b58",
+        "chatSessionId": "sess_a4613d38-8eb2-4655-b0d2-9faac7f7ab3c",
+        "timestamp": 1787263809317
+      },
+      {
+        "executionId": "8ca85d49-7477-47f3-ad0c-1c4ed3429b58",
+        "chatSessionId": "sess_a4613d38-8eb2-4655-b0d2-9faac7f7ab3c",
+        "timestamp": 1787263920128
+      }
+    ],
+    "5.2 Mount ouroboros route in `src/worker/index.ts`": [
+      {
+        "executionId": "a3cbbc13-3bbc-49a5-ad41-6e54353ea0ba",
+        "chatSessionId": "sess_05d92f29-459b-43d6-9ed1-08cef8bcaba5",
+        "timestamp": 1787263964968
+      },
+      {
+        "executionId": "a3cbbc13-3bbc-49a5-ad41-6e54353ea0ba",
+        "chatSessionId": "sess_05d92f29-459b-43d6-9ed1-08cef8bcaba5",
+        "timestamp": 1787264044671
+      }
+    ],
+    "5.3 Write ouroboros tests": [
+      {
+        "executionId": "c3f4aca6-8414-46e4-83a3-4fd522d1383e",
+        "chatSessionId": "sess_9a5e38f2-5d9a-40e2-aaf3-72fe5528047a",
+        "timestamp": 1787264105901
+      },
+      {
+        "executionId": "c3f4aca6-8414-46e4-83a3-4fd522d1383e",
+        "chatSessionId": "sess_9a5e38f2-5d9a-40e2-aaf3-72fe5528047a",
+        "timestamp": 1787264248257
+      }
+    ],
+    "5. Ouroboros page": [
+      {
+        "executionId": "c3f4aca6-8414-46e4-83a3-4fd522d1383e",
+        "chatSessionId": "sess_9a5e38f2-5d9a-40e2-aaf3-72fe5528047a",
+        "timestamp": 1787264248320
+      }
     ]
   }
 }

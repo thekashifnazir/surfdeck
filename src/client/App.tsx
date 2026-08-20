@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import MoodSelector from "./components/MoodSelector";
 import CharacterFilter from "./components/CharacterFilter";
 import BuildFilter from "./components/BuildFilter";
+import CornerTierFilter from "./components/CornerTierFilter";
 import SurfButton from "./components/SurfButton";
 import ProvenanceCard from "./components/ProvenanceCard";
 import StatusMessage from "./components/StatusMessage";
@@ -17,6 +18,7 @@ export interface SurfSite {
   stack: string | null;
   host: string | null;
   static_or_dynamic: string | null;
+  built_with: string | null;
 }
 
 /** Available build filter values from /api/filters. */
@@ -24,6 +26,7 @@ export interface AvailableFilters {
   stacks: string[];
   hosts: string[];
   static_or_dynamic: string[];
+  corner_tiers: number[];
 }
 
 /** Active build filter selections (multi-select within each dimension). */
@@ -52,6 +55,10 @@ export default function App() {
     static_or_dynamic: [],
   });
 
+  // Corner mode state
+  const [cornerMode, setCornerMode] = useState(false);
+  const [selectedTiers, setSelectedTiers] = useState<number[]>([]);
+
   /** localStorage key for the seen-list. */
   const SEEN_KEY = "surfdeck_seen";
 
@@ -60,6 +67,7 @@ export default function App() {
     stacks: [],
     hosts: [],
     static_or_dynamic: [],
+    corner_tiers: [],
   });
 
   // Surf result state
@@ -98,7 +106,7 @@ export default function App() {
       }
       return prev;
     });
-  }, [selectedMood, selectedCharacter, buildFilters]);
+  }, [selectedMood, selectedCharacter, buildFilters, selectedTiers, cornerMode]);
 
   /** Clears the seen-list from localStorage and re-enables stumbling (Req 11.3). */
   function handleReset() {
@@ -107,8 +115,59 @@ export default function App() {
     setLastSurfResult(null);
   }
 
+  /** Enter the Vibecoded Corner. */
+  function enterCorner() {
+    setCornerMode(true);
+    setLastSurfResult(null);
+    setStatusMessage(null);
+  }
+
+  /** Exit corner mode and return to open-web surf. */
+  function exitCorner() {
+    setCornerMode(false);
+    setSelectedTiers([]);
+    setLastSurfResult(null);
+    setStatusMessage(null);
+  }
+
   return (
     <main>
+      {/* Corner mode toggle */}
+      <section aria-label="Surf mode">
+        {cornerMode ? (
+          <button
+            type="button"
+            onClick={exitCorner}
+            style={{
+              padding: "0.5rem 1rem",
+              border: "none",
+              background: "transparent",
+              color: "#1a73e8",
+              cursor: "pointer",
+              fontWeight: 600,
+            }}
+          >
+            &larr; Back to open-web surf
+          </button>
+        ) : (
+          <button
+            type="button"
+            onClick={enterCorner}
+            style={{
+              padding: "0.5rem 1rem",
+              border: "2px solid #7c3aed",
+              borderRadius: "6px",
+              background: "#f5f3ff",
+              color: "#7c3aed",
+              cursor: "pointer",
+              fontWeight: 600,
+            }}
+          >
+            Enter the Vibecoded Corner
+          </button>
+        )}
+      </section>
+
       {/* Mood selector */}
       <section aria-label="Mood selector">
         <MoodSelector selectedMood={selectedMood} onMoodChange={setSelectedMood} />
@@ -119,14 +178,27 @@ export default function App() {
         <CharacterFilter selectedCharacter={selectedCharacter} onCharacterChange={setSelectedCharacter} />
       </section>
 
-      {/* Build filters */}
-      <section aria-label="Build filters">
-        <BuildFilter
-          available={availableFilters}
-          selected={buildFilters}
-          onSelectionChange={setBuildFilters}
-        />
-      </section>
+      {/* Build filters — hidden in corner mode (Req 7.6) */}
+      {!cornerMode && (
+        <section aria-label="Build filters">
+          <BuildFilter
+            available={availableFilters}
+            selected={buildFilters}
+            onSelectionChange={setBuildFilters}
+          />
+        </section>
+      )}
+
+      {/* Tier filter — visible only in corner mode (Req 7.2) */}
+      {cornerMode && (
+        <section aria-label="Tier filter">
+          <CornerTierFilter
+            availableTiers={availableFilters.corner_tiers}
+            selectedTiers={selectedTiers}
+            onTierChange={setSelectedTiers}
+          />
+        </section>
+      )}
 
       {/* Surf button */}
       <section aria-label="Surf action">
@@ -134,6 +206,8 @@ export default function App() {
           selectedMood={selectedMood}
           selectedCharacter={selectedCharacter}
           buildFilters={buildFilters}
+          cornerMode={cornerMode}
+          selectedTiers={selectedTiers}
           onSurfResult={setLastSurfResult}
           onStatusChange={setStatusMessage}
         />

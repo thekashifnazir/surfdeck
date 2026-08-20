@@ -6,12 +6,16 @@
 import { Hono } from "hono";
 import { surfRoute } from "./routes/surf";
 import { filtersRoute } from "./routes/filters";
+import { ouroborosRoute } from "./routes/ouroboros";
 
 type Bindings = {
   DB: D1Database;
 };
 
 const app = new Hono<{ Bindings: Bindings }>();
+
+// Mount standalone pages (before API and SPA fallback)
+app.route("", ouroborosRoute);
 
 // Mount API routes
 app.route("/api", surfRoute);

@@ -96,8 +96,8 @@ Add a curated "Vibecoded Corner" — a distinct surf mode for AI-built sites spa
     - Test: existing open-web seen/no_match/exhausted still work with vibecoded=0
     - _Requirements: 12.1_
 
-- [ ] 4. Corner UI (structural, minimal)
-  - [ ] 4.1 Create `src/client/components/CornerTierFilter.tsx`
+- [x] 4. Corner UI (structural, minimal)
+  - [x] 4.1 Create `src/client/components/CornerTierFilter.tsx`
     - Accept props: `availableTiers: number[]`, `selectedTiers: number[]`, `onTierChange: (tiers: number[]) => void`
     - Render 4 tier buttons (using TIER_LABELS) as multi-select toggles
     - Render a "YOLO — surf all tiers" button that clears tier selection
@@ -105,7 +105,7 @@ Add a curated "Vibecoded Corner" — a distinct surf mode for AI-built sites spa
     - Accessible: proper ARIA roles and labels
     - _Requirements: 7.2, 7.3_
 
-  - [ ] 4.2 Update `src/client/App.tsx` — corner mode state and toggle
+  - [x] 4.2 Update `src/client/App.tsx` — corner mode state and toggle
     - Add `cornerMode: boolean` state (default false)
     - Add `selectedTiers: number[]` state (default empty)
     - Add "Enter the Vibecoded Corner" link/toggle that sets cornerMode=true
@@ -116,26 +116,26 @@ Add a curated "Vibecoded Corner" — a distinct surf mode for AI-built sites spa
     - Render CornerTierFilter when cornerMode is true
     - _Requirements: 7.1, 7.3, 7.4, 7.5, 7.6_
 
-  - [ ] 4.3 Update `src/client/components/SurfButton.tsx` — pass vibecoded + tier params
+  - [x] 4.3 Update `src/client/components/SurfButton.tsx` — pass vibecoded + tier params
     - Accept new props: `cornerMode: boolean`, `selectedTiers: number[]`
     - When `cornerMode` is true, append `&vibecoded=1` to the API URL
     - When `selectedTiers` is non-empty AND cornerMode, append `&tier=2,3` etc.
     - _Requirements: 7.3_
 
-  - [ ] 4.4 Update `src/client/components/ProvenanceCard.tsx` — builder-first in corner
+  - [x] 4.4 Update `src/client/components/ProvenanceCard.tsx` — builder-first in corner
     - When site has non-null `built_with`: show "Built with {label}" as primary line
     - Show "{TIER_LABELS[tier]} · Tier {N}" as secondary line
     - Demote existing stack/host/static_or_dynamic to tertiary "(runs: ...)" line
     - When `built_with` is null: existing behaviour unchanged
     - _Requirements: 8.1, 8.2, 8.3, 8.4, 8.5_
 
-  - [ ] 4.5 Update `src/client/components/StatusMessage.tsx` — ouroboros treatment
+  - [x] 4.5 Update `src/client/components/StatusMessage.tsx` — ouroboros treatment
     - When surfed site URL is `/ouroboros`, show "The loop closes — you surfed to the surfer."
     - No special rarity code — it's naturally rare (one row in the pool)
     - _Requirements: 9.6_
 
-- [ ] 5. Ouroboros page
-  - [ ] 5.1 Create `src/worker/routes/ouroboros.ts` — standalone colophon HTML page
+- [x] 5. Ouroboros page
+  - [x] 5.1 Create `src/worker/routes/ouroboros.ts` — standalone colophon HTML page
     - Export `ouroborosRoute` as a Hono router
     - Serve GET `/ouroboros` with a standalone HTML page (not the SPA)
     - Include required text: "You're inside the app you're surfing with. Surfdeck was built end-to-end by AI in Kiro — exhibit #1 in its own vibecoded corner."
@@ -143,12 +143,12 @@ Add a curated "Vibecoded Corner" — a distinct surf mode for AI-built sites spa
     - Include glyph placeholder
     - _Requirements: 9.1, 9.2, 9.3, 9.4_
 
-  - [ ] 5.2 Mount ouroboros route in `src/worker/index.ts`
+  - [x] 5.2 Mount ouroboros route in `src/worker/index.ts`
     - Import and mount `ouroborosRoute` before the `/api/*` catch-all
     - Ensure `/ouroboros` is served by the Worker, not the SPA fallback
     - _Requirements: 9.1_
 
-  - [ ] 5.3 Write ouroboros tests
+  - [x] 5.3 Write ouroboros tests
     - Test: GET `/ouroboros` returns 200 with Content-Type text/html
     - Test: Response body contains required colophon text
     - Test: Response body contains a link
