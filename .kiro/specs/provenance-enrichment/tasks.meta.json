@@ -31,6 +31,37 @@
         "chatSessionId": "sess_d9bb96fc-64cc-4ad2-ab2a-6c43cb6cef6e",
         "timestamp": 1787236463958
       }
+    ],
+    "2.1 Implement `scripts/rules.ts` — the pure detection rule module": [
+      {
+        "executionId": "71fd376d-92ec-444a-84ad-8e8a3d3efcb5",
+        "chatSessionId": "sess_977832c5-fbee-4837-ad0c-bec03060e5e6",
+        "timestamp": 1787236913788
+      },
+      {
+        "executionId": "71fd376d-92ec-444a-84ad-8e8a3d3efcb5",
+        "chatSessionId": "sess_977832c5-fbee-4837-ad0c-bec03060e5e6",
+        "timestamp": 1787237170783
+      }
+    ],
+    "2.2 Write detection rule tests (`scripts/rules.test.ts`)": [
+      {
+        "executionId": "0c42d285-f293-481b-b7a2-8f365710c607",
+        "chatSessionId": "sess_ee16d3d6-ab46-4b1b-85a3-eed2b7b81c9b",
+        "timestamp": 1787237206272
+      },
+      {
+        "executionId": "0c42d285-f293-481b-b7a2-8f365710c607",
+        "chatSessionId": "sess_ee16d3d6-ab46-4b1b-85a3-eed2b7b81c9b",
+        "timestamp": 1787237402901
+      }
+    ],
+    "2. Detection rule set (pure logic, no I/O)": [
+      {
+        "executionId": "0c42d285-f293-481b-b7a2-8f365710c607",
+        "chatSessionId": "sess_ee16d3d6-ab46-4b1b-85a3-eed2b7b81c9b",
+        "timestamp": 1787237402955
+      }
     ]
   }
 }

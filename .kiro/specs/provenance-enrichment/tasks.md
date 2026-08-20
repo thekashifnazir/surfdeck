@@ -18,8 +18,8 @@ Populate the currently-blank `stack`, `host`, and `static_or_dynamic` columns fo
     - Verify `package.json` has the new dependency with an exact version
     - _Requirements: 3.4_
 
-- [ ] 2. Detection rule set (pure logic, no I/O)
-  - [ ] 2.1 Implement `scripts/rules.ts` — the pure detection rule module
+- [x] 2. Detection rule set (pure logic, no I/O)
+  - [x] 2.1 Implement `scripts/rules.ts` — the pure detection rule module
     - Export `detectProvenance(input: SignalInput): RuleResult` function
     - Implement `detectStack`: HIGH-confidence HTML fingerprints (11 rules), MEDIUM-confidence fallbacks (4 rules) in priority order per design doc
     - Implement `detectHost`: HIGH-confidence header + DNS rules (12 rules including surge via `*.surge.sh` and firebase via `*.web.app`/`*.firebaseapp.com`) with CF-Ray trap guard
@@ -28,7 +28,7 @@ Populate the currently-blank `stack`, `host`, and `static_or_dynamic` columns fo
     - Export type interfaces: `SignalInput`, `RuleResult`
     - _Requirements: 4.1–4.5, 5.1–5.5, 6.1–6.5, 7.1–7.3_
 
-  - [ ] 2.2 Write detection rule tests (`scripts/rules.test.ts`)
+  - [x] 2.2 Write detection rule tests (`scripts/rules.test.ts`)
     - Test 1: Next.js HIGH — `__NEXT_DATA__` + `/_next/static/` → stack=`nextjs`
     - Test 2: Hugo + GitHub Pages — generator meta "Hugo 0.120" + CNAME `*.github.io` + no Set-Cookie → stack=`hugo`, host=`github_pages`, sod=`static`
     - Test 3: CF-Ray trap — `CF-Ray` + `Server: cloudflare`, no `*.pages.dev` CNAME → host=blank
