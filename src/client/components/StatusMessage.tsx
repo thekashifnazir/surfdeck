@@ -10,7 +10,7 @@ export interface StatusMessageProps {
 }
 
 /**
- * StatusMessage renders contextual messages after a stumble attempt:
+ * StatusMessage renders contextual messages after a surf attempt:
  *
  * - **no_match**: "Nothing in that corner right now." + "Loosen a filter and try again."
  * - **exhausted**: "You've wandered the whole neighbourhood." + "Reset history to start fresh?" + reset button
@@ -182,7 +182,7 @@ export default function StatusMessage({ status, siteUrl, onReset }: StatusMessag
             color: "#991b1b",
           }}
         >
-          Something hiccupped. Hit Stumble again whenever you're ready.
+          Something hiccupped. Hit Surf again whenever you're ready.
         </p>
       </div>
     );

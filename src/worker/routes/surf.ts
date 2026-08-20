@@ -1,10 +1,10 @@
 /**
- * /api/stumble route — parses filter params, calls Stumble Engine,
+ * /api/surf route — parses filter params, calls Surf Engine,
  * returns the appropriate JSON response.
  */
 
 import { Hono } from "hono";
-import { stumble, type StumbleParams, type SiteRow } from "../engine/stumble";
+import { surf, type SurfParams, type SiteRow } from "../engine/surf";
 
 type Bindings = {
   DB: D1Database;
@@ -74,9 +74,9 @@ function transformSiteResponse(site: SiteRow) {
   };
 }
 
-export const stumbleRoute = new Hono<{ Bindings: Bindings }>();
+export const surfRoute = new Hono<{ Bindings: Bindings }>();
 
-stumbleRoute.get("/stumble", async (c) => {
+surfRoute.get("/surf", async (c) => {
   try {
     const mood = c.req.query("mood");
     const character = c.req.query("character");
@@ -85,8 +85,8 @@ stumbleRoute.get("/stumble", async (c) => {
     const staticOrDynamic = c.req.query("static_or_dynamic");
     const seen = c.req.query("seen");
 
-    // Build StumbleParams, ignoring invalid values
-    const params: StumbleParams = {};
+    // Build SurfParams, ignoring invalid values
+    const params: SurfParams = {};
 
     // Mood: validate against known values; invalid → treat as absent
     if (mood && VALID_MOODS.has(mood)) {
@@ -121,7 +121,7 @@ stumbleRoute.get("/stumble", async (c) => {
       params.seen = seenIds;
     }
 
-    const result = await stumble(c.env.DB, params);
+    const result = await surf(c.env.DB, params);
 
     if (result.status === "ok") {
       return c.json({

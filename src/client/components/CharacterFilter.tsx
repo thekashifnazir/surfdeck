@@ -18,7 +18,7 @@ export interface CharacterFilterProps {
  * - Clicking the already-selected character deselects it (sets null).
  * - At most one character is active at a time.
  * - No default selection.
- * - Selection persists across stumbles until the user explicitly changes it.
+ * - Selection persists across surfs until the user explicitly changes it.
  */
 export default function CharacterFilter({ selectedCharacter, onCharacterChange }: CharacterFilterProps) {
   function handleClick(value: string) {

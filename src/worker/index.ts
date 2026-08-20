@@ -1,10 +1,10 @@
 /**
- * Worker entry point — Hono app serving the Stumble and Filters API routes.
+ * Worker entry point — Hono app serving the Surf and Filters API routes.
  * Static assets + SPA fallback handled by Cloudflare Workers Assets (wrangler.jsonc config).
  */
 
 import { Hono } from "hono";
-import { stumbleRoute } from "./routes/stumble";
+import { surfRoute } from "./routes/surf";
 import { filtersRoute } from "./routes/filters";
 
 type Bindings = {
@@ -14,7 +14,7 @@ type Bindings = {
 const app = new Hono<{ Bindings: Bindings }>();
 
 // Mount API routes
-app.route("/api", stumbleRoute);
+app.route("/api", surfRoute);
 app.route("/api", filtersRoute);
 
 // Catch-all: unknown /api/* paths return 404 JSON (Req 9.4)

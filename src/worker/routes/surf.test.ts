@@ -1,5 +1,5 @@
 /**
- * Unit tests for /api/stumble route
+ * Unit tests for /api/surf route
  *
  * Feature: mvp-stumble, Task 5.1
  * Validates: Requirements 1.1, 1.4, 5.4, 10.5, 10.6, 11.1
@@ -7,8 +7,8 @@
 
 import { describe, it, expect } from "vitest";
 import { Hono } from "hono";
-import { stumbleRoute } from "./stumble.js";
-import type { SiteRow } from "../engine/stumble.js";
+import { surfRoute } from "./surf.js";
+import type { SiteRow } from "../engine/surf.js";
 
 type Bindings = {
   DB: D1Database;
@@ -21,10 +21,10 @@ type AnyJson = any;
 // Helpers
 // ---------------------------------------------------------------------------
 
-/** Create a test app with the stumble route mounted at /api */
+/** Create a test app with the surf route mounted at /api */
 function createApp(mockDb: D1Database) {
   const app = new Hono<{ Bindings: Bindings }>();
-  app.route("/api", stumbleRoute);
+  app.route("/api", surfRoute);
   return {
     fetch(url: string) {
       return app.request(url, {}, { DB: mockDb });
@@ -94,11 +94,11 @@ async function json(res: Response): Promise<AnyJson> {
 // Tests
 // ---------------------------------------------------------------------------
 
-describe("/api/stumble route", () => {
-  describe("successful stumble (status: ok)", () => {
+describe("/api/surf route", () => {
+  describe("successful surf (status: ok)", () => {
     it("returns site with correct shape when a site is found", async () => {
       const app = createApp(createMockD1({ count: 1, site: sampleSite }));
-      const res = await app.fetch("/api/stumble");
+      const res = await app.fetch("/api/surf");
 
       expect(res.status).toBe(200);
       const body = await json(res);
@@ -119,7 +119,7 @@ describe("/api/stumble route", () => {
     it("transforms mood_tags from semicolon-separated string to array", async () => {
       const site = { ...sampleSite, mood_tags: "useful;think;waste_time" };
       const app = createApp(createMockD1({ count: 1, site }));
-      const res = await app.fetch("/api/stumble");
+      const res = await app.fetch("/api/surf");
 
       const body = await json(res);
       expect(body.site.mood_tags).toEqual(["useful", "think", "waste_time"]);
@@ -128,7 +128,7 @@ describe("/api/stumble route", () => {
     it("returns null for blank provenance fields", async () => {
       const site = { ...sampleSite, stack: null, host: null, static_or_dynamic: null };
       const app = createApp(createMockD1({ count: 1, site }));
-      const res = await app.fetch("/api/stumble");
+      const res = await app.fetch("/api/surf");
 
       const body = await json(res);
       expect(body.site.stack).toBeNull();
@@ -138,7 +138,7 @@ describe("/api/stumble route", () => {
 
     it("does not include tier, added_at, nsfw, or source in response", async () => {
       const app = createApp(createMockD1({ count: 1, site: sampleSite }));
-      const res = await app.fetch("/api/stumble");
+      const res = await app.fetch("/api/surf");
 
       const body = await json(res);
       expect(body.site).not.toHaveProperty("tier");
@@ -151,7 +151,7 @@ describe("/api/stumble route", () => {
   describe("no_match response", () => {
     it("returns no_match when count is 0", async () => {
       const app = createApp(createMockD1({ count: 0 }));
-      const res = await app.fetch("/api/stumble?character=old_web");
+      const res = await app.fetch("/api/surf?character=old_web");
 
       expect(res.status).toBe(200);
       const body = await json(res);
@@ -163,7 +163,7 @@ describe("/api/stumble route", () => {
     it("returns exhausted when pool exists but all seen", async () => {
       // Mock: count=1 (pool exists), but site query returns null (all seen)
       const app = createApp(createMockD1({ count: 1, site: null }));
-      const res = await app.fetch("/api/stumble?seen=1,2,3");
+      const res = await app.fetch("/api/surf?seen=1,2,3");
 
       expect(res.status).toBe(200);
       const body = await json(res);
@@ -174,7 +174,7 @@ describe("/api/stumble route", () => {
   describe("error handling", () => {
     it("returns 500 with JSON body on D1 errors", async () => {
       const app = createApp(createMockD1({ shouldThrow: true }));
-      const res = await app.fetch("/api/stumble");
+      const res = await app.fetch("/api/surf");
 
       expect(res.status).toBe(500);
       const body = await json(res);
@@ -185,7 +185,7 @@ describe("/api/stumble route", () => {
   describe("parameter validation", () => {
     it("ignores invalid mood values", async () => {
       const app = createApp(createMockD1({ count: 1, site: sampleSite }));
-      const res = await app.fetch("/api/stumble?mood=invalid_mood");
+      const res = await app.fetch("/api/surf?mood=invalid_mood");
 
       expect(res.status).toBe(200);
       const body = await json(res);
@@ -194,7 +194,7 @@ describe("/api/stumble route", () => {
 
     it("accepts valid mood values", async () => {
       const app = createApp(createMockD1({ count: 1, site: sampleSite }));
-      const res = await app.fetch("/api/stumble?mood=learn");
+      const res = await app.fetch("/api/surf?mood=learn");
 
       expect(res.status).toBe(200);
       const body = await json(res);
@@ -203,7 +203,7 @@ describe("/api/stumble route", () => {
 
     it("ignores invalid character values", async () => {
       const app = createApp(createMockD1({ count: 1, site: sampleSite }));
-      const res = await app.fetch("/api/stumble?character=nonsense");
+      const res = await app.fetch("/api/surf?character=nonsense");
 
       expect(res.status).toBe(200);
       const body = await json(res);
@@ -212,28 +212,28 @@ describe("/api/stumble route", () => {
 
     it("accepts valid character values", async () => {
       const app = createApp(createMockD1({ count: 1, site: sampleSite }));
-      const res = await app.fetch("/api/stumble?character=modern_indie");
+      const res = await app.fetch("/api/surf?character=modern_indie");
 
       expect(res.status).toBe(200);
     });
 
     it("parses comma-separated stack values", async () => {
       const app = createApp(createMockD1({ count: 1, site: sampleSite }));
-      const res = await app.fetch("/api/stumble?stack=nextjs,hugo");
+      const res = await app.fetch("/api/surf?stack=nextjs,hugo");
 
       expect(res.status).toBe(200);
     });
 
     it("parses comma-separated host values", async () => {
       const app = createApp(createMockD1({ count: 1, site: sampleSite }));
-      const res = await app.fetch("/api/stumble?host=vercel,netlify");
+      const res = await app.fetch("/api/surf?host=vercel,netlify");
 
       expect(res.status).toBe(200);
     });
 
     it("ignores invalid static_or_dynamic values", async () => {
       const app = createApp(createMockD1({ count: 1, site: sampleSite }));
-      const res = await app.fetch("/api/stumble?static_or_dynamic=maybe");
+      const res = await app.fetch("/api/surf?static_or_dynamic=maybe");
 
       expect(res.status).toBe(200);
       const body = await json(res);
@@ -242,21 +242,21 @@ describe("/api/stumble route", () => {
 
     it("accepts valid static_or_dynamic values", async () => {
       const app = createApp(createMockD1({ count: 1, site: sampleSite }));
-      const res = await app.fetch("/api/stumble?static_or_dynamic=static");
+      const res = await app.fetch("/api/surf?static_or_dynamic=static");
 
       expect(res.status).toBe(200);
     });
 
     it("parses seen IDs as positive integers, dropping invalid ones", async () => {
       const app = createApp(createMockD1({ count: 1, site: sampleSite }));
-      const res = await app.fetch("/api/stumble?seen=1,abc,-5,3,0,2.5");
+      const res = await app.fetch("/api/surf?seen=1,abc,-5,3,0,2.5");
 
       expect(res.status).toBe(200);
     });
 
     it("handles empty seen param gracefully", async () => {
       const app = createApp(createMockD1({ count: 1, site: sampleSite }));
-      const res = await app.fetch("/api/stumble?seen=");
+      const res = await app.fetch("/api/surf?seen=");
 
       expect(res.status).toBe(200);
       const body = await json(res);
@@ -265,7 +265,7 @@ describe("/api/stumble route", () => {
 
     it("treats surprise mood as no mood filter", async () => {
       const app = createApp(createMockD1({ count: 1, site: sampleSite }));
-      const res = await app.fetch("/api/stumble?mood=surprise");
+      const res = await app.fetch("/api/surf?mood=surprise");
 
       expect(res.status).toBe(200);
       const body = await json(res);

@@ -1,17 +1,17 @@
 import { useState } from "react";
-import type { BuildFilterSelection, StatusKind, StumbleSite } from "../App";
+import type { BuildFilterSelection, StatusKind, SurfSite } from "../App";
 
 /** localStorage key for the seen-list. */
 const SEEN_KEY = "surfdeck_seen";
 
-/** Timeout in milliseconds for the stumble fetch request. */
+/** Timeout in milliseconds for the surf fetch request. */
 const FETCH_TIMEOUT_MS = 5000;
 
-export interface StumbleButtonProps {
+export interface SurfButtonProps {
   selectedMood: string | null;
   selectedCharacter: string | null;
   buildFilters: BuildFilterSelection;
-  onStumbleResult: (site: StumbleSite | null) => void;
+  onSurfResult: (site: SurfSite | null) => void;
   onStatusChange: (status: StatusKind) => void;
 }
 
@@ -45,7 +45,7 @@ function appendToSeenList(siteId: number): void {
 }
 
 /**
- * Builds the query string for the stumble API request.
+ * Builds the query string for the surf API request.
  */
 function buildQueryString(
   mood: string | null,
@@ -86,32 +86,32 @@ function buildQueryString(
 }
 
 /**
- * The main Stumble button. Handles the open-then-navigate pattern:
+ * The main Surf button. Handles the open-then-navigate pattern:
  * 1. Opens a blank tab synchronously within the click gesture.
- * 2. Fetches /api/stumble with current filters + seen-list.
+ * 2. Fetches /api/surf with current filters + seen-list.
  * 3. On success: navigates the pre-opened tab to the site URL.
  * 4. On failure/timeout: closes the blank tab and shows error state.
  * 5. If popup is blocked (window.open returns null): still fetches, updates
  *    seen-list and result, then sets popup_blocked so StatusMessage can link
  *    to the freshly fetched site.
  */
-export default function StumbleButton({
+export default function SurfButton({
   selectedMood,
   selectedCharacter,
   buildFilters,
-  onStumbleResult,
+  onSurfResult,
   onStatusChange,
-}: StumbleButtonProps) {
+}: SurfButtonProps) {
   const [isLoading, setIsLoading] = useState(false);
 
-  async function handleStumble() {
+  async function handleSurf() {
     // Open blank tab synchronously within the click gesture (required for Safari)
     const tab = window.open("about:blank", "_blank");
     const popupBlocked = !tab;
 
     setIsLoading(true);
     onStatusChange(null);
-    onStumbleResult(null);
+    onSurfResult(null);
 
     const seen = getSeenList();
     const queryString = buildQueryString(selectedMood, selectedCharacter, buildFilters, seen);
@@ -121,7 +121,7 @@ export default function StumbleButton({
     const timeoutId = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
 
     try {
-      const response = await fetch(`/api/stumble${queryString}`, {
+      const response = await fetch(`/api/surf${queryString}`, {
         signal: controller.signal,
       });
 
@@ -136,29 +136,29 @@ export default function StumbleButton({
 
       const data = (await response.json()) as {
         status?: string;
-        site?: StumbleSite;
+        site?: SurfSite;
       };
 
       if (data.status === "ok" && data.site) {
         if (popupBlocked) {
           // Popup was blocked — update state so StatusMessage shows a link to the fresh site
           appendToSeenList(data.site.id);
-          onStumbleResult(data.site);
+          onSurfResult(data.site);
           onStatusChange("popup_blocked");
         } else {
           // Navigate the pre-opened tab to the site URL
           tab.location.href = data.site.url;
           appendToSeenList(data.site.id);
-          onStumbleResult(data.site);
+          onSurfResult(data.site);
           onStatusChange("ok");
         }
       } else if (data.status === "no_match") {
         tab?.close();
-        onStumbleResult(null);
+        onSurfResult(null);
         onStatusChange("no_match");
       } else if (data.status === "exhausted") {
         tab?.close();
-        onStumbleResult(null);
+        onSurfResult(null);
         onStatusChange("exhausted");
       } else {
         // Unexpected response shape
@@ -179,7 +179,7 @@ export default function StumbleButton({
     <div>
       <button
         type="button"
-        onClick={handleStumble}
+        onClick={handleSurf}
         disabled={isLoading}
         aria-busy={isLoading}
         style={{
@@ -194,7 +194,7 @@ export default function StumbleButton({
           transition: "background 0.15s ease",
         }}
       >
-        {isLoading ? "Stumbling\u2026" : "Stumble"}
+        {isLoading ? "Surfing\u2026" : "Surf"}
       </button>
     </div>
   );

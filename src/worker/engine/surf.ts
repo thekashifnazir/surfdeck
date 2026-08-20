@@ -1,13 +1,13 @@
 /**
- * Stumble Engine — core query builder and executor.
+ * Surf Engine — core query builder and executor.
  *
  * Selects one random site matching the given filters, excludes NSFW sites,
  * excludes already-seen sites via inlined integer literals in a NOT IN clause,
  * and distinguishes zero-match from exhausted states.
  */
 
-/** Filter parameters for a stumble request. */
-export interface StumbleParams {
+/** Filter parameters for a surf request. */
+export interface SurfParams {
   /** One of: useful, learn, waste_time, beautiful, think, surprise. Omit or "surprise" = no mood filter. */
   mood?: string;
   /** One of: modern_indie, old_web, retro_personal, minimal_static. */
@@ -39,8 +39,8 @@ export interface SiteRow {
   added_at: string;
 }
 
-/** Stumble result — one of three outcomes. */
-export type StumbleResult =
+/** Surf result — one of three outcomes. */
+export type SurfResult =
   | { status: "ok"; site: SiteRow }
   | { status: "no_match" }
   | { status: "exhausted" };
@@ -49,7 +49,7 @@ export type StumbleResult =
  * Build the WHERE clause conditions and bindings from the given filter params.
  * Always includes nsfw = 0 as the first condition.
  */
-function buildFilterConditions(params: StumbleParams): {
+function buildFilterConditions(params: SurfParams): {
   conditions: string[];
   bindings: unknown[];
 } {
@@ -110,7 +110,7 @@ function validateSeenIds(seen: number[] | undefined): number[] {
 }
 
 /**
- * Execute a stumble query against D1.
+ * Execute a surf query against D1.
  *
  * Strategy:
  * 1. Build filter conditions (always excludes NSFW).
@@ -120,10 +120,10 @@ function validateSeenIds(seen: number[] | undefined): number[] {
  * 5. If seen-list excludes everything → return "exhausted".
  * 6. Otherwise return the random site.
  */
-export async function stumble(
+export async function surf(
   db: D1Database,
-  params: StumbleParams
-): Promise<StumbleResult> {
+  params: SurfParams
+): Promise<SurfResult> {
   const { conditions, bindings } = buildFilterConditions(params);
   const validSeen = validateSeenIds(params.seen);
 

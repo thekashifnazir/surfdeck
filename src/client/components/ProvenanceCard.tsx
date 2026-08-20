@@ -1,7 +1,7 @@
-import type { StumbleSite } from "../App";
+import type { SurfSite } from "../App";
 
 export interface ProvenanceCardProps {
-  site: StumbleSite;
+  site: SurfSite;
 }
 
 /**
@@ -16,7 +16,7 @@ function isDisplayable(value: string | null | undefined): value is string {
 }
 
 /**
- * ProvenanceCard displays how a stumbled site was built.
+ * ProvenanceCard displays how a surfed site was built.
  *
  * - Shows non-blank provenance fields (stack, host, static_or_dynamic) with labels.
  * - Omits any field whose value is null, empty, or "unknown".

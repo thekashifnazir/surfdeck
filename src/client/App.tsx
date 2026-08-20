@@ -2,12 +2,12 @@ import { useEffect, useState } from "react";
 import MoodSelector from "./components/MoodSelector";
 import CharacterFilter from "./components/CharacterFilter";
 import BuildFilter from "./components/BuildFilter";
-import StumbleButton from "./components/StumbleButton";
+import SurfButton from "./components/SurfButton";
 import ProvenanceCard from "./components/ProvenanceCard";
 import StatusMessage from "./components/StatusMessage";
 
-/** Shape of a site returned by the /api/stumble endpoint. */
-export interface StumbleSite {
+/** Shape of a site returned by the /api/surf endpoint. */
+export interface SurfSite {
   id: number;
   url: string;
   title: string;
@@ -33,7 +33,7 @@ export interface BuildFilterSelection {
   static_or_dynamic: string[];
 }
 
-/** Possible status messages surfaced after a stumble attempt. */
+/** Possible status messages surfaced after a surf attempt. */
 export type StatusKind =
   | "ok"
   | "no_match"
@@ -62,8 +62,8 @@ export default function App() {
     static_or_dynamic: [],
   });
 
-  // Stumble result state
-  const [lastStumbleResult, setLastStumbleResult] = useState<StumbleSite | null>(null);
+  // Surf result state
+  const [lastSurfResult, setLastSurfResult] = useState<SurfSite | null>(null);
   const [statusMessage, setStatusMessage] = useState<StatusKind>(null);
 
   // Fetch available filter values on mount
@@ -79,7 +79,7 @@ export default function App() {
           setAvailableFilters(data);
         }
       } catch {
-        // Silently ignore — filters will remain empty, stumble still works unfiltered
+        // Silently ignore — filters will remain empty, surf still works unfiltered
       }
     }
 
@@ -104,7 +104,7 @@ export default function App() {
   function handleReset() {
     localStorage.removeItem(SEEN_KEY);
     setStatusMessage(null);
-    setLastStumbleResult(null);
+    setLastSurfResult(null);
   }
 
   return (
@@ -128,27 +128,27 @@ export default function App() {
         />
       </section>
 
-      {/* Stumble button */}
-      <section aria-label="Stumble action">
-        <StumbleButton
+      {/* Surf button */}
+      <section aria-label="Surf action">
+        <SurfButton
           selectedMood={selectedMood}
           selectedCharacter={selectedCharacter}
           buildFilters={buildFilters}
-          onStumbleResult={setLastStumbleResult}
+          onSurfResult={setLastSurfResult}
           onStatusChange={setStatusMessage}
         />
       </section>
 
       {/* Provenance card */}
       <section aria-label="Provenance card">
-        {lastStumbleResult && <ProvenanceCard site={lastStumbleResult} />}
+        {lastSurfResult && <ProvenanceCard site={lastSurfResult} />}
       </section>
 
       {/* Status message area */}
       <section aria-label="Status message">
         <StatusMessage
           status={statusMessage}
-          siteUrl={lastStumbleResult?.url ?? null}
+          siteUrl={lastSurfResult?.url ?? null}
           onReset={handleReset}
         />
       </section>
