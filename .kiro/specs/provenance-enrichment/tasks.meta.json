@@ -81,6 +81,37 @@
         "chatSessionId": "sess_982798fd-c495-4bae-9687-d5658b377f79",
         "timestamp": 1787238055073
       }
+    ],
+    "4.1 Modify `scripts/seed-logic.ts` — switch `seedRowToSQL` to UPSERT pattern": [
+      {
+        "executionId": "61bc4331-7e76-4577-84bb-f79b39e1cd9a",
+        "chatSessionId": "sess_cdee5ccb-827f-4c74-aa49-1bdf174a6a02",
+        "timestamp": 1787238343557
+      },
+      {
+        "executionId": "61bc4331-7e76-4577-84bb-f79b39e1cd9a",
+        "chatSessionId": "sess_cdee5ccb-827f-4c74-aa49-1bdf174a6a02",
+        "timestamp": 1787238506966
+      }
+    ],
+    "4.2 Write UPSERT tests (additions to `scripts/seed-logic.test.ts`)": [
+      {
+        "executionId": "4e473086-7148-42cb-8e50-4bdea52ceba1",
+        "chatSessionId": "sess_d63c4937-4824-4e70-85b2-4b58ea890424",
+        "timestamp": 1787238541493
+      },
+      {
+        "executionId": "4e473086-7148-42cb-8e50-4bdea52ceba1",
+        "chatSessionId": "sess_d63c4937-4824-4e70-85b2-4b58ea890424",
+        "timestamp": 1787238709587
+      }
+    ],
+    "4. Seed UPSERT migration": [
+      {
+        "executionId": "4e473086-7148-42cb-8e50-4bdea52ceba1",
+        "chatSessionId": "sess_d63c4937-4824-4e70-85b2-4b58ea890424",
+        "timestamp": 1787238709638
+      }
     ]
   }
 }

@@ -58,8 +58,8 @@ Populate the currently-blank `stack`, `host`, and `static_or_dynamic` columns fo
     - Write `data/provenance-report.md` with summary stats + markdown table
     - _Requirements: 1.1–1.4, 2.1–2.5, 3.1–3.3, 7.4–7.5, 8.1–8.6_
 
-- [ ] 4. Seed UPSERT migration
-  - [ ] 4.1 Modify `scripts/seed-logic.ts` — switch `seedRowToSQL` to UPSERT pattern
+- [x] 4. Seed UPSERT migration
+  - [x] 4.1 Modify `scripts/seed-logic.ts` — switch `seedRowToSQL` to UPSERT pattern
     - Change `INSERT OR IGNORE` to `INSERT INTO sites (...) VALUES (...) ON CONFLICT(url) DO UPDATE SET`
     - UPDATE SET clause includes: `title`, `mood_tags`, `character`, `stack`, `host`, `static_or_dynamic`, `why_note`, `nsfw`, `source`
     - UPDATE SET clause does NOT include: `id`, `added_at`, `tier`, `vibecoded`
@@ -67,7 +67,7 @@ Populate the currently-blank `stack`, `host`, and `static_or_dynamic` columns fo
     - Wait — actually do NOT include `vibecoded` in the INSERT list; let the DEFAULT 0 handle new rows. The UPSERT's UPDATE SET also omits it. This ensures it's never touched by the seed.
     - _Requirements: 10.1–10.5_
 
-  - [ ] 4.2 Write UPSERT tests (additions to `scripts/seed-logic.test.ts`)
+  - [x] 4.2 Write UPSERT tests (additions to `scripts/seed-logic.test.ts`)
     - Test: UPSERT updates provenance — insert with blank stack, re-insert with stack=`nextjs` → row has `nextjs`, same `added_at`, same `id`, one row total
     - Test: UPSERT preserves `added_at` — original timestamp survives re-seed
     - Test: Idempotency — running UPSERT N times produces same DB state as once

@@ -144,7 +144,9 @@ export function csvRowToSeedRow(
 }
 
 /**
- * Converts a SeedRow into a SQL INSERT OR IGNORE statement.
+ * Converts a SeedRow into a SQL UPSERT statement.
+ * On conflict (same URL), updates content columns while preserving
+ * id, added_at, tier, and vibecoded.
  */
 export function seedRowToSQL(row: SeedRow): string {
   const stackVal = row.stack ? `'${sqlEscape(row.stack)}'` : "NULL";
@@ -153,7 +155,7 @@ export function seedRowToSQL(row: SeedRow): string {
     ? `'${sqlEscape(row.static_or_dynamic)}'`
     : "NULL";
 
-  return `INSERT OR IGNORE INTO sites (url, title, mood_tags, character, stack, host, static_or_dynamic, why_note, nsfw, source, tier, added_at) VALUES ('${sqlEscape(row.url)}', '${sqlEscape(row.title)}', '${sqlEscape(row.mood_tags)}', '${sqlEscape(row.character)}', ${stackVal}, ${hostVal}, ${staticOrDynamicVal}, '${sqlEscape(row.why_note)}', ${row.nsfw}, '${sqlEscape(row.source)}', '${sqlEscape(row.tier)}', '${sqlEscape(row.added_at)}');`;
+  return `INSERT INTO sites (url, title, mood_tags, character, stack, host, static_or_dynamic, why_note, nsfw, source, tier, added_at) VALUES ('${sqlEscape(row.url)}', '${sqlEscape(row.title)}', '${sqlEscape(row.mood_tags)}', '${sqlEscape(row.character)}', ${stackVal}, ${hostVal}, ${staticOrDynamicVal}, '${sqlEscape(row.why_note)}', ${row.nsfw}, '${sqlEscape(row.source)}', '${sqlEscape(row.tier)}', '${sqlEscape(row.added_at)}') ON CONFLICT(url) DO UPDATE SET title = excluded.title, mood_tags = excluded.mood_tags, character = excluded.character, stack = excluded.stack, host = excluded.host, static_or_dynamic = excluded.static_or_dynamic, why_note = excluded.why_note, nsfw = excluded.nsfw, source = excluded.source;`;
 }
 
 /**

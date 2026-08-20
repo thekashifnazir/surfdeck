@@ -101,9 +101,10 @@ describe("Property 8: Seed import idempotency", () => {
   /**
    * **Validates: Requirements 8.4**
    *
-   * Running the import N times produces the same set of INSERT OR IGNORE
-   * statements as once. Since INSERT OR IGNORE uses url as the UNIQUE key,
-   * duplicate executions will not create duplicate rows.
+   * Running the import N times produces the same set of UPSERT
+   * statements as once. Since the UPSERT uses ON CONFLICT(url) DO UPDATE SET,
+   * duplicate executions will not create duplicate rows and will produce
+   * identical final state.
    */
   it("running import N times produces same SQL statements as running once", () => {
     fc.assert(
@@ -123,9 +124,9 @@ describe("Property 8: Seed import idempotency", () => {
             expect(statementsAgain).toEqual(statementsOnce);
           }
 
-          // All statements use INSERT OR IGNORE for idempotency
+          // All statements use UPSERT pattern for idempotency
           for (const stmt of statementsOnce) {
-            expect(stmt).toContain("INSERT OR IGNORE");
+            expect(stmt).toContain("ON CONFLICT(url) DO UPDATE SET");
           }
         }
       ),
@@ -146,12 +147,12 @@ describe("Property 8: Seed import idempotency", () => {
 
           const statements = csvToInsertStatements(csv, addedAt);
 
-          // All statements target the same URL — INSERT OR IGNORE means
-          // only the first will succeed at DB level. The function generates
-          // one statement per CSV row, but they're all INSERT OR IGNORE
-          // so DB-level idempotency is guaranteed.
+          // All statements target the same URL — UPSERT means
+          // the final DB state is always one row per unique URL.
+          // The function generates one statement per CSV row, but
+          // ON CONFLICT(url) DO UPDATE SET ensures DB-level idempotency.
           for (const stmt of statements) {
-            expect(stmt).toContain("INSERT OR IGNORE");
+            expect(stmt).toContain("ON CONFLICT(url) DO UPDATE SET");
             expect(stmt).toContain(rowRecord.url);
           }
         }
@@ -300,13 +301,10 @@ describe("Property 10: Blanks preserved as NULL", () => {
 
             // The SQL should use NULL literal, not a quoted empty string
             const sql = seedRowToSQL(seedRow);
-            // Check that provenance positions contain NULL not ''
-            // The VALUES clause order is: url, title, mood_tags, character, stack, host, static_or_dynamic, ...
-            // After character comes stack, host, static_or_dynamic
-            const valuesMatch = sql.match(/VALUES \((.+)\);$/);
+            // Extract the VALUES clause from the UPSERT statement
+            const valuesMatch = sql.match(/VALUES \((.+?)\) ON CONFLICT/);
             expect(valuesMatch).not.toBeNull();
             const values = valuesMatch![1];
-            // Split carefully — find NULL tokens for provenance fields
             // Since stack/host/static_or_dynamic are null, they should appear as NULL in the SQL
             expect(values).toContain("NULL");
           }
