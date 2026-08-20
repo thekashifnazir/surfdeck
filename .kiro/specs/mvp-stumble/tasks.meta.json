@@ -324,6 +324,13 @@
         "chatSessionId": "sess_3f7fbe81-0e31-489f-8e6e-ab68fe3c657e",
         "timestamp": 1787216269763
       }
+    ],
+    "12.2 Run seed import against production D1": [
+      {
+        "executionId": "88f2c44f-4506-4462-920f-1e759259763a",
+        "chatSessionId": "sess_577d415d-b437-46b8-aad1-61b1148db9be",
+        "timestamp": 1787217100489
+      }
     ]
   }
 }

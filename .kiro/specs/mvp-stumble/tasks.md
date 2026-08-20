@@ -195,7 +195,7 @@ Implement Surfdeck's core stumble interaction as a single Cloudflare Worker (Hon
     - Apply `schema.sql` to production D1 via `wrangler d1 execute --remote`
     - _Requirements: 8.1_
 
-  - [ ] 12.2 Run seed import against production D1
+  - [x] 12.2 Run seed import against production D1
     - Execute the seed script targeting the production (remote) D1 database
     - Verify 288 rows imported with correct tier/added_at values and NULL preservation
     - _Requirements: 8.1, 8.2, 8.3, 8.4_
