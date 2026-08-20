@@ -176,7 +176,7 @@ Add a curated "Vibecoded Corner" — a distinct surf mode for AI-built sites spa
     - _Requirements: 12.4_
 
 - [ ] 7. Vetting gate + initial pool
-  - [ ] 7.1 Vet seed list via Playwright MCP
+  - [x] 7.1 Vet seed list via Playwright MCP
     - For each of the ~51 seed list URLs: navigate, confirm renders & is live, capture screenshot
     - Note observable AI-build signals (builder badges, meta tags, domain patterns) as evidence
     - Also render JS-heavy galleries: vibecoding.gallery, v0.app/gallery, framer.com/gallery — add strong new candidates
