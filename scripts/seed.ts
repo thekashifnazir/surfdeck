@@ -47,8 +47,10 @@ function main(): void {
   stack TEXT,
   host TEXT,
   static_or_dynamic TEXT,
+  built_with TEXT,
   why_note TEXT NOT NULL,
   nsfw INTEGER NOT NULL DEFAULT 0,
+  vibecoded INTEGER NOT NULL DEFAULT 0,
   source TEXT NOT NULL,
   tier TEXT NOT NULL DEFAULT 'featured',
   added_at TEXT NOT NULL

@@ -313,6 +313,39 @@
         "chatSessionId": "sess_a540f307-2d50-4fb0-b558-b876198b146e",
         "timestamp": 1787266981949
       }
+    ],
+    "7.2 Write approved rows to CSV (AFTER human approval only)": [
+      {
+        "executionId": "78726ae0-3a95-4e9c-bd63-eaeec887a54c",
+        "chatSessionId": "sess_a540f307-2d50-4fb0-b558-b876198b146e",
+        "timestamp": 1787268677710
+      }
+    ],
+    "7. Vetting gate + initial pool": [
+      {
+        "executionId": "78726ae0-3a95-4e9c-bd63-eaeec887a54c",
+        "chatSessionId": "sess_a540f307-2d50-4fb0-b558-b876198b146e",
+        "timestamp": 1787268677761
+      }
+    ],
+    "8.1 Reseed local D1 and run full test suite": [
+      {
+        "executionId": "dcb9d959-57af-448c-808d-f6cf777504f5",
+        "chatSessionId": "sess_bef8da41-3255-4633-81a7-708461f863ea",
+        "timestamp": 1787268708305
+      },
+      {
+        "executionId": "dcb9d959-57af-448c-808d-f6cf777504f5",
+        "chatSessionId": "sess_bef8da41-3255-4633-81a7-708461f863ea",
+        "timestamp": 1787269367363
+      }
+    ],
+    "8. Reseed + checkpoint": [
+      {
+        "executionId": "dcb9d959-57af-448c-808d-f6cf777504f5",
+        "chatSessionId": "sess_bef8da41-3255-4633-81a7-708461f863ea",
+        "timestamp": 1787269367434
+      }
     ]
   }
 }

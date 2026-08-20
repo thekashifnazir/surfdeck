@@ -175,7 +175,7 @@ Add a curated "Vibecoded Corner" — a distinct surf mode for AI-built sites spa
     - Network behind the fetch seam, tested with fixtures only
     - _Requirements: 12.4_
 
-- [ ] 7. Vetting gate + initial pool
+- [x] 7. Vetting gate + initial pool
   - [x] 7.1 Vet seed list via Playwright MCP
     - For each of the ~51 seed list URLs: navigate, confirm renders & is live, capture screenshot
     - Note observable AI-build signals (builder badges, meta tags, domain patterns) as evidence
@@ -184,7 +184,7 @@ Add a curated "Vibecoded Corner" — a distinct surf mode for AI-built sites spa
     - STOP and present report for human review
     - _Requirements: 11.1, 11.2, 11.3, 11.4_
 
-  - [ ] 7.2 Write approved rows to CSV (AFTER human approval only)
+  - [x] 7.2 Write approved rows to CSV (AFTER human approval only)
     - Only write rows explicitly approved by reviewer (~50-60 sites)
     - Set `built_with` and `vibecoded=1` for each approved row
     - Surfdeck row: url=/ouroboros, built_with=cloudflare_workers, vibecoded=1
@@ -192,8 +192,8 @@ Add a curated "Vibecoded Corner" — a distinct surf mode for AI-built sites spa
     - Never write unapproved candidates — false label is worse than omitting
     - _Requirements: 11.5, 11.6, 11.7_
 
-- [ ] 8. Reseed + checkpoint
-  - [ ] 8.1 Reseed local D1 and run full test suite
+- [x] 8. Reseed + checkpoint
+  - [x] 8.1 Reseed local D1 and run full test suite
     - Run `npx tsx scripts/seed.ts` to UPSERT all rows including new corner sites
     - Run `npx tsc --noEmit` — show output
     - Run `npm test` — show output (all engine, label, ouroboros, sampler tests must pass)
