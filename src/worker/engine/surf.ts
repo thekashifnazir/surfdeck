@@ -6,6 +6,8 @@
  * and distinguishes zero-match from exhausted states.
  */
 
+import { expandTiers } from "./tier-map";
+
 /** Filter parameters for a surf request. */
 export interface SurfParams {
   /** One of: useful, learn, waste_time, beautiful, think, surprise. Omit or "surprise" = no mood filter. */
@@ -20,6 +22,10 @@ export interface SurfParams {
   staticOrDynamic?: string;
   /** Site IDs already seen this session. */
   seen?: number[];
+  /** true = corner mode (vibecoded=1 only); false/absent = open web (vibecoded=0). */
+  vibecoded?: boolean;
+  /** Tier numbers to filter within the corner. Ignored when vibecoded is not true. */
+  tiers?: number[];
 }
 
 /** A single site row from D1. */
@@ -32,8 +38,10 @@ export interface SiteRow {
   stack: string | null;
   host: string | null;
   static_or_dynamic: string | null;
+  built_with: string | null;
   why_note: string;
   nsfw: number;
+  vibecoded: number;
   source: string;
   tier: string;
   added_at: string;
@@ -91,6 +99,26 @@ function buildFilterConditions(params: SurfParams): {
   if (params.staticOrDynamic) {
     conditions.push("static_or_dynamic = ?");
     bindings.push(params.staticOrDynamic);
+  }
+
+  // Vibecoded partition — always applied
+  if (params.vibecoded) {
+    conditions.push("vibecoded = 1");
+  } else {
+    conditions.push("vibecoded = 0");
+  }
+
+  // Tier filter (only meaningful in corner mode)
+  if (params.vibecoded && params.tiers && params.tiers.length > 0) {
+    const builtWithValues = expandTiers(params.tiers);
+    if (builtWithValues.length > 0) {
+      const placeholders = builtWithValues.map(() => "?").join(",");
+      conditions.push(`built_with IN (${placeholders})`);
+      bindings.push(...builtWithValues);
+    } else {
+      // All requested tiers are unknown — no rows can match
+      conditions.push("1 = 0");
+    }
   }
 
   return { conditions, bindings };

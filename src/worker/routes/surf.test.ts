@@ -42,8 +42,10 @@ const sampleSite: SiteRow = {
   stack: "nextjs",
   host: "vercel",
   static_or_dynamic: "dynamic",
+  built_with: null,
   why_note: "A cool site about things",
   nsfw: 0,
+  vibecoded: 0,
   source: "manual",
   tier: "featured",
   added_at: "2024-01-01T00:00:00.000Z",
@@ -113,6 +115,7 @@ describe("/api/surf route", () => {
         stack: "nextjs",
         host: "vercel",
         static_or_dynamic: "dynamic",
+        built_with: null,
       });
     });
 

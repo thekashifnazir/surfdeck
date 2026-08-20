@@ -50,8 +50,10 @@ const siteRowArb = (id: number): fc.Arbitrary<SiteRow> =>
     stack: nullableStackArb,
     host: nullableHostArb,
     static_or_dynamic: nullableStaticOrDynamicArb,
+    built_with: fc.constant(null),
     why_note: fc.constant("A cool site"),
     nsfw: fc.constantFrom(0, 0, 0, 0, 1) as fc.Arbitrary<number>, // 20% chance NSFW
+    vibecoded: fc.constant(0),
     source: fc.constant("manual"),
     tier: fc.constant("featured"),
     added_at: fc.constant("2024-01-01T00:00:00.000Z"),
@@ -108,6 +110,9 @@ const surfParamsArb: fc.Arbitrary<SurfParams> = fc.record({
  * - If stacks: stack IN (?,?,...) — N bindings
  * - If hosts: host IN (?,?,...) — N bindings
  * - If staticOrDynamic: static_or_dynamic = ? — 1 binding
+ * - vibecoded = 0 or vibecoded = 1 (literal, no binding)
+ * - If tier filter in corner: built_with IN (?,?,...) — N bindings
+ * - If unknown tiers: 1 = 0 (force no-match, no binding)
  * - Seen-list is inlined as integers, not bound: id NOT IN (1,2,3,...)
  */
 function createMockD1(corpus: SiteRow[]): D1Database {
@@ -117,12 +122,22 @@ function createMockD1(corpus: SiteRow[]): D1Database {
   }
 
   function filterSites(sql: string, bindings: unknown[]): SiteRow[] {
+    // Force no-match condition
+    if (sql.includes("1 = 0")) {
+      return [];
+    }
+
     // Determine which filters are active by examining the SQL
     const hasMoodFilter = sql.includes("mood_tags = ?");
     const hasCharFilter = sql.includes("character = ?");
     const hasStackFilter = sql.includes("stack IN");
     const hasHostFilter = sql.includes("host IN");
     const hasStaticDynFilter = /static_or_dynamic = \?/.test(sql);
+    const hasBuiltWithFilter = sql.includes("built_with IN");
+
+    // Vibecoded filter (literal in SQL, no binding)
+    const requiresVibecoded1 = sql.includes("vibecoded = 1");
+    const requiresVibecoded0 = sql.includes("vibecoded = 0");
 
     // Count stack placeholders
     let stackCount = 0;
@@ -142,6 +157,15 @@ function createMockD1(corpus: SiteRow[]): D1Database {
       }
     }
 
+    // Count built_with placeholders
+    let builtWithCount = 0;
+    if (hasBuiltWithFilter) {
+      const builtWithMatch = sql.match(/built_with IN \(([^)]+)\)/);
+      if (builtWithMatch) {
+        builtWithCount = builtWithMatch[1].split(",").length;
+      }
+    }
+
     // Extract bindings in order
     let idx = 0;
     let moodValue: string | null = null;
@@ -149,6 +173,7 @@ function createMockD1(corpus: SiteRow[]): D1Database {
     let stackValues: string[] = [];
     let hostValues: string[] = [];
     let staticDynValue: string | null = null;
+    let builtWithValues: string[] = [];
 
     if (hasMoodFilter) {
       moodValue = bindings[idx] as string;
@@ -170,6 +195,11 @@ function createMockD1(corpus: SiteRow[]): D1Database {
       staticDynValue = bindings[idx] as string;
       idx += 1;
     }
+    // vibecoded = 0/1 is literal — no binding consumed
+    if (hasBuiltWithFilter) {
+      builtWithValues = bindings.slice(idx, idx + builtWithCount) as string[];
+      idx += builtWithCount;
+    }
 
     // Extract inlined seen-list
     let seenIds: number[] = [];
@@ -181,6 +211,10 @@ function createMockD1(corpus: SiteRow[]): D1Database {
     return corpus.filter((site) => {
       // nsfw = 0
       if (site.nsfw !== 0) return false;
+
+      // Vibecoded partition filter
+      if (requiresVibecoded1 && site.vibecoded !== 1) return false;
+      if (requiresVibecoded0 && site.vibecoded !== 0) return false;
 
       // Mood filter
       if (moodValue !== null) {
@@ -205,6 +239,11 @@ function createMockD1(corpus: SiteRow[]): D1Database {
       // Static/dynamic filter
       if (staticDynValue !== null) {
         if (site.static_or_dynamic !== staticDynValue) return false;
+      }
+
+      // Built_with filter (tier expansion)
+      if (builtWithValues.length > 0) {
+        if (site.built_with === null || !builtWithValues.includes(site.built_with)) return false;
       }
 
       // Seen-list exclusion
@@ -254,6 +293,13 @@ function computeMatchingPool(corpus: SiteRow[], params: SurfParams): SiteRow[] {
   return corpus.filter((site) => {
     // NSFW exclusion
     if (site.nsfw !== 0) return false;
+
+    // Vibecoded partition
+    if (params.vibecoded) {
+      if (site.vibecoded !== 1) return false;
+    } else {
+      if (site.vibecoded !== 0) return false;
+    }
 
     // Mood filter (skip if absent or "surprise")
     if (params.mood && params.mood !== "surprise") {
@@ -383,8 +429,10 @@ describe("Property 2: NSFW exclusion", () => {
               stack: nullableStackArb,
               host: nullableHostArb,
               static_or_dynamic: nullableStaticOrDynamicArb,
+              built_with: fc.constant(null),
               why_note: fc.constant("A cool site"),
               nsfw: fc.constantFrom(0, 1) as fc.Arbitrary<number>, // 50% NSFW
+              vibecoded: fc.constant(0),
               source: fc.constant("manual"),
               tier: fc.constant("featured"),
               added_at: fc.constant("2024-01-01T00:00:00.000Z"),
@@ -519,8 +567,10 @@ describe("Property 4: Mood filter semicolon parsing", () => {
             stack: null,
             host: null,
             static_or_dynamic: null,
+            built_with: null,
             why_note: "test",
             nsfw: 0,
+            vibecoded: 0,
             source: "manual",
             tier: "featured",
             added_at: "2024-01-01T00:00:00.000Z",
@@ -537,8 +587,10 @@ describe("Property 4: Mood filter semicolon parsing", () => {
             stack: null,
             host: null,
             static_or_dynamic: null,
+            built_with: null,
             why_note: "test",
             nsfw: 0,
+            vibecoded: 0,
             source: "manual",
             tier: "featured",
             added_at: "2024-01-01T00:00:00.000Z",
@@ -778,6 +830,416 @@ describe("Property 7: Zero-match vs exhausted distinction", () => {
           expect(result.status).toBe("ok");
         }
       }),
+      { numRuns: 100 }
+    );
+  });
+});
+
+
+// ---------------------------------------------------------------------------
+// Vibecoded Corner — Engine Tests (Task 3.4)
+// Feature: vibecoded-corner, Validates: Requirements 12.1
+// ---------------------------------------------------------------------------
+
+/** Built_with values by tier for corner site generators */
+const t2BuiltWith = ["lovable", "v0", "bolt", "replit"] as const;
+const t3BuiltWith = ["claude_code", "cursor", "kiro", "github_copilot"] as const;
+const t4BuiltWith = ["cloudflare_workers", "fly"] as const;
+const allCornerBuiltWith = [...t2BuiltWith, ...t3BuiltWith, ...t4BuiltWith] as const;
+
+/** Generate a vibecoded=1 site row with a valid built_with value */
+const cornerSiteRowArb = (id: number): fc.Arbitrary<SiteRow> =>
+  fc.record({
+    id: fc.constant(id),
+    url: fc.constant(`https://corner-${id}.example.com`),
+    title: fc.constant(`Corner Site ${id}`),
+    mood_tags: moodTagsArb,
+    character: fc.constantFrom(...validCharacters),
+    stack: nullableStackArb,
+    host: nullableHostArb,
+    static_or_dynamic: nullableStaticOrDynamicArb,
+    built_with: fc.constantFrom(...allCornerBuiltWith) as fc.Arbitrary<string | null>,
+    why_note: fc.constant("An AI-built site"),
+    nsfw: fc.constant(0),
+    vibecoded: fc.constant(1),
+    source: fc.constant("manual"),
+    tier: fc.constant("featured"),
+    added_at: fc.constant("2024-01-01T00:00:00.000Z"),
+  });
+
+/** Generate a mixed corpus with both open-web (vibecoded=0) and corner (vibecoded=1) sites */
+const mixedCorpusArb = fc
+  .tuple(
+    fc.integer({ min: 3, max: 10 }),
+    fc.integer({ min: 3, max: 10 })
+  )
+  .chain(([openCount, cornerCount]) =>
+    fc.tuple(
+      fc.tuple(...Array.from({ length: openCount }, (_, i) => siteRowArb(i + 1))),
+      fc.tuple(...Array.from({ length: cornerCount }, (_, i) => cornerSiteRowArb(openCount + i + 1)))
+    )
+  )
+  .map(([openRows, cornerRows]) => [
+    ...(openRows as unknown as SiteRow[]),
+    ...(cornerRows as unknown as SiteRow[]),
+  ]);
+
+// ---------------------------------------------------------------------------
+// Test: Default surf (no vibecoded param) excludes vibecoded=1 rows
+// ---------------------------------------------------------------------------
+
+describe("Vibecoded Corner: Default surf excludes vibecoded=1 rows", () => {
+  /**
+   * **Validates: Requirements 12.1**
+   *
+   * When the vibecoded param is absent (default open-web surf),
+   * the engine only returns sites with vibecoded=0 — corner sites are excluded.
+   */
+  it("surf without vibecoded param never returns vibecoded=1 rows", async () => {
+    await fc.assert(
+      fc.asyncProperty(mixedCorpusArb, async (corpus) => {
+        const db = createMockD1(corpus);
+        const result = await surf(db, {}); // No vibecoded param
+
+        if (result.status === "ok") {
+          expect(result.site.vibecoded).toBe(0);
+        }
+      }),
+      { numRuns: 100 }
+    );
+  });
+
+  it("surf with vibecoded=false never returns vibecoded=1 rows", async () => {
+    await fc.assert(
+      fc.asyncProperty(mixedCorpusArb, async (corpus) => {
+        const db = createMockD1(corpus);
+        const result = await surf(db, { vibecoded: false });
+
+        if (result.status === "ok") {
+          expect(result.site.vibecoded).toBe(0);
+        }
+      }),
+      { numRuns: 100 }
+    );
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Test: Corner mode (vibecoded=true) returns only vibecoded=1 rows
+// ---------------------------------------------------------------------------
+
+describe("Vibecoded Corner: Corner mode returns only vibecoded=1 rows", () => {
+  /**
+   * **Validates: Requirements 12.1**
+   *
+   * When vibecoded=true, the engine only returns sites with vibecoded=1.
+   */
+  it("surf with vibecoded=true only returns vibecoded=1 rows", async () => {
+    await fc.assert(
+      fc.asyncProperty(mixedCorpusArb, async (corpus) => {
+        const db = createMockD1(corpus);
+        const result = await surf(db, { vibecoded: true });
+
+        if (result.status === "ok") {
+          expect(result.site.vibecoded).toBe(1);
+          expect(result.site.built_with).not.toBeNull();
+        }
+      }),
+      { numRuns: 100 }
+    );
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Test: tier=[2] in corner returns only T2 built_with rows
+// ---------------------------------------------------------------------------
+
+describe("Vibecoded Corner: Tier filter narrows within corner", () => {
+  /**
+   * **Validates: Requirements 12.1**
+   *
+   * When tier=[2] is active in corner mode, only sites whose built_with
+   * maps to tier 2 are returned.
+   */
+  it("tier=[2] returns only T2 built_with values", async () => {
+    await fc.assert(
+      fc.asyncProperty(mixedCorpusArb, async (corpus) => {
+        const db = createMockD1(corpus);
+        const result = await surf(db, { vibecoded: true, tiers: [2] });
+
+        if (result.status === "ok") {
+          expect(result.site.vibecoded).toBe(1);
+          expect(t2BuiltWith as readonly string[]).toContain(result.site.built_with);
+        }
+      }),
+      { numRuns: 100 }
+    );
+  });
+
+  it("tier=[3] returns only T3 built_with values", async () => {
+    await fc.assert(
+      fc.asyncProperty(mixedCorpusArb, async (corpus) => {
+        const db = createMockD1(corpus);
+        const result = await surf(db, { vibecoded: true, tiers: [3] });
+
+        if (result.status === "ok") {
+          expect(result.site.vibecoded).toBe(1);
+          expect(t3BuiltWith as readonly string[]).toContain(result.site.built_with);
+        }
+      }),
+      { numRuns: 100 }
+    );
+  });
+
+  it("tier=[2,3] returns only T2 or T3 built_with values", async () => {
+    const t2t3 = [...t2BuiltWith, ...t3BuiltWith];
+    await fc.assert(
+      fc.asyncProperty(mixedCorpusArb, async (corpus) => {
+        const db = createMockD1(corpus);
+        const result = await surf(db, { vibecoded: true, tiers: [2, 3] });
+
+        if (result.status === "ok") {
+          expect(result.site.vibecoded).toBe(1);
+          expect(t2t3 as string[]).toContain(result.site.built_with);
+        }
+      }),
+      { numRuns: 100 }
+    );
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Test: tier=[4] in corner with no T4 rows returns no_match
+// ---------------------------------------------------------------------------
+
+describe("Vibecoded Corner: Tier with no matching rows returns no_match", () => {
+  /**
+   * **Validates: Requirements 12.1**
+   *
+   * When filtering by a tier that has no sites in the corner pool,
+   * the engine returns no_match.
+   */
+  it("tier=[4] with only T2 corner sites returns no_match", async () => {
+    await fc.assert(
+      fc.asyncProperty(
+        fc.integer({ min: 3, max: 8 }),
+        async (openCount) => {
+          // Build a corpus with open-web sites and T2-only corner sites (no T4)
+          const openSites: SiteRow[] = Array.from({ length: openCount }, (_, i) => ({
+            id: i + 1,
+            url: `https://open-${i + 1}.example.com`,
+            title: `Open Site ${i + 1}`,
+            mood_tags: "useful",
+            character: "modern_indie" as const,
+            stack: null,
+            host: null,
+            static_or_dynamic: null,
+            built_with: null,
+            why_note: "A site",
+            nsfw: 0,
+            vibecoded: 0,
+            source: "manual",
+            tier: "featured",
+            added_at: "2024-01-01T00:00:00.000Z",
+          }));
+
+          const cornerSites: SiteRow[] = [
+            {
+              id: openCount + 1,
+              url: "https://lovable-app.example.com",
+              title: "Lovable App",
+              mood_tags: "useful",
+              character: "modern_indie",
+              stack: "nextjs",
+              host: "vercel",
+              static_or_dynamic: "dynamic",
+              built_with: "lovable",
+              why_note: "Built with Lovable",
+              nsfw: 0,
+              vibecoded: 1,
+              source: "manual",
+              tier: "featured",
+              added_at: "2024-01-01T00:00:00.000Z",
+            },
+            {
+              id: openCount + 2,
+              url: "https://bolt-app.example.com",
+              title: "Bolt App",
+              mood_tags: "learn",
+              character: "modern_indie",
+              stack: null,
+              host: "netlify",
+              static_or_dynamic: "static",
+              built_with: "bolt",
+              why_note: "Built with Bolt",
+              nsfw: 0,
+              vibecoded: 1,
+              source: "manual",
+              tier: "featured",
+              added_at: "2024-01-01T00:00:00.000Z",
+            },
+          ];
+
+          const corpus = [...openSites, ...cornerSites];
+          const db = createMockD1(corpus);
+          const result = await surf(db, { vibecoded: true, tiers: [4] });
+
+          // No T4 sites exist — should be no_match
+          expect(result.status).toBe("no_match");
+        }
+      ),
+      { numRuns: 50 }
+    );
+  });
+
+  it("tier=[99] (unknown) returns no_match due to 1=0 fallback", async () => {
+    await fc.assert(
+      fc.asyncProperty(mixedCorpusArb, async (corpus) => {
+        const db = createMockD1(corpus);
+        const result = await surf(db, { vibecoded: true, tiers: [99] });
+
+        // Unknown tier → expandTiers returns [] → 1=0 → no_match
+        expect(result.status).toBe("no_match");
+      }),
+      { numRuns: 50 }
+    );
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Test: Seen-list exhausts the corner pool → returns exhausted
+// ---------------------------------------------------------------------------
+
+describe("Vibecoded Corner: Seen-list exhaustion", () => {
+  /**
+   * **Validates: Requirements 12.1**
+   *
+   * When all corner sites have been seen, the engine returns exhausted
+   * (not no_match, since the pool exists).
+   */
+  it("seen-list containing all corner IDs returns exhausted", async () => {
+    await fc.assert(
+      fc.asyncProperty(mixedCorpusArb, async (corpus) => {
+        // Mark all corner sites as seen
+        const cornerIds = corpus
+          .filter((s) => s.vibecoded === 1 && s.nsfw === 0)
+          .map((s) => s.id);
+
+        if (cornerIds.length === 0) return; // Skip if no corner sites
+
+        const db = createMockD1(corpus);
+        const result = await surf(db, { vibecoded: true, seen: cornerIds });
+
+        expect(result.status).toBe("exhausted");
+      }),
+      { numRuns: 100 }
+    );
+  });
+
+  it("seen-list with some corner IDs still returns ok for unseen sites", async () => {
+    await fc.assert(
+      fc.asyncProperty(mixedCorpusArb, async (corpus) => {
+        const cornerSites = corpus.filter((s) => s.vibecoded === 1 && s.nsfw === 0);
+        if (cornerSites.length <= 1) return; // Need at least 2 to see some but not all
+
+        // See only the first corner site
+        const seen = [cornerSites[0].id];
+
+        const db = createMockD1(corpus);
+        const result = await surf(db, { vibecoded: true, seen });
+
+        if (result.status === "ok") {
+          expect(result.site.vibecoded).toBe(1);
+          expect(seen).not.toContain(result.site.id);
+        }
+      }),
+      { numRuns: 100 }
+    );
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Test: Existing open-web seen/no_match/exhausted still work with vibecoded=0
+// ---------------------------------------------------------------------------
+
+describe("Vibecoded Corner: Open-web behaviour preserved", () => {
+  /**
+   * **Validates: Requirements 12.1**
+   *
+   * The existing open-web surf behaviours (seen-list, no_match, exhausted)
+   * are unaffected by the vibecoded partition.
+   */
+  it("open-web surf with all IDs seen returns exhausted", async () => {
+    await fc.assert(
+      fc.asyncProperty(mixedCorpusArb, async (corpus) => {
+        const openIds = corpus
+          .filter((s) => s.vibecoded === 0 && s.nsfw === 0)
+          .map((s) => s.id);
+
+        if (openIds.length === 0) return;
+
+        const db = createMockD1(corpus);
+        const result = await surf(db, { seen: openIds });
+
+        expect(result.status).toBe("exhausted");
+      }),
+      { numRuns: 100 }
+    );
+  });
+
+  it("open-web surf with impossible filter returns no_match", async () => {
+    await fc.assert(
+      fc.asyncProperty(mixedCorpusArb, async (corpus) => {
+        // Force all open-web sites to one character, filter for another
+        const tweaked = corpus.map((s) =>
+          s.vibecoded === 0 ? { ...s, character: "modern_indie" } : s
+        );
+        const db = createMockD1(tweaked);
+        const result = await surf(db, { character: "old_web" });
+
+        expect(result.status).toBe("no_match");
+      }),
+      { numRuns: 100 }
+    );
+  });
+
+  it("open-web seen-list exclusion still works in mixed corpus", async () => {
+    await fc.assert(
+      fc.asyncProperty(mixedCorpusArb, async (corpus) => {
+        const openSites = corpus.filter((s) => s.vibecoded === 0 && s.nsfw === 0);
+        if (openSites.length <= 1) return;
+
+        // See only the first open-web site
+        const seen = [openSites[0].id];
+
+        const db = createMockD1(corpus);
+        const result = await surf(db, { seen });
+
+        if (result.status === "ok") {
+          expect(result.site.vibecoded).toBe(0);
+          expect(seen).not.toContain(result.site.id);
+        }
+      }),
+      { numRuns: 100 }
+    );
+  });
+
+  it("corner sites never leak into open-web results in mixed corpus", async () => {
+    await fc.assert(
+      fc.asyncProperty(
+        mixedCorpusArb,
+        surfParamsArb,
+        async (corpus, params) => {
+          // Ensure no vibecoded param (open-web mode)
+          const openParams = { ...params, vibecoded: undefined, tiers: undefined };
+          const db = createMockD1(corpus);
+          const result = await surf(db, openParams);
+
+          if (result.status === "ok") {
+            expect(result.site.vibecoded).toBe(0);
+          }
+        }
+      ),
       { numRuns: 100 }
     );
   });

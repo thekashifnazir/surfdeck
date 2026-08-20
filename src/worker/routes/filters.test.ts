@@ -20,6 +20,7 @@ function createMockD1(data: {
   stacks: string[];
   hosts: string[];
   static_or_dynamic: string[];
+  corner_built_with?: string[];
 }): D1Database {
   return {
     prepare(sql: string) {
@@ -37,6 +38,10 @@ function createMockD1(data: {
           } else if (sql.includes("DISTINCT static_or_dynamic")) {
             results = data.static_or_dynamic.map((s) => ({
               static_or_dynamic: s,
+            }));
+          } else if (sql.includes("DISTINCT built_with")) {
+            results = (data.corner_built_with ?? []).map((b) => ({
+              built_with: b,
             }));
           }
 
@@ -61,11 +66,12 @@ function createApp(db: D1Database) {
 }
 
 describe("/api/filters route", () => {
-  it("returns distinct non-null values for all three dimensions", async () => {
+  it("returns distinct non-null values for all three dimensions plus corner_tiers", async () => {
     const db = createMockD1({
       stacks: ["astro", "hugo", "nextjs"],
       hosts: ["cloudflare_pages", "neocities", "vercel"],
       static_or_dynamic: ["dynamic", "static"],
+      corner_built_with: ["lovable", "bolt", "cloudflare_workers"],
     });
 
     const { app } = createApp(db);
@@ -77,6 +83,7 @@ describe("/api/filters route", () => {
       stacks: ["astro", "hugo", "nextjs"],
       hosts: ["cloudflare_pages", "neocities", "vercel"],
       static_or_dynamic: ["dynamic", "static"],
+      corner_tiers: [2, 4],
     });
   });
 
@@ -85,6 +92,7 @@ describe("/api/filters route", () => {
       stacks: [],
       hosts: [],
       static_or_dynamic: [],
+      corner_built_with: [],
     });
 
     const { app } = createApp(db);
@@ -96,6 +104,7 @@ describe("/api/filters route", () => {
       stacks: [],
       hosts: [],
       static_or_dynamic: [],
+      corner_tiers: [],
     });
   });
 

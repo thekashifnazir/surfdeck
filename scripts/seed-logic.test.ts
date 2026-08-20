@@ -22,6 +22,7 @@ CREATE TABLE IF NOT EXISTS sites (
   stack TEXT,
   host TEXT,
   static_or_dynamic TEXT,
+  built_with TEXT,
   why_note TEXT NOT NULL,
   nsfw INTEGER NOT NULL DEFAULT 0,
   vibecoded INTEGER NOT NULL DEFAULT 0,
@@ -40,8 +41,10 @@ function makeRow(overrides: Partial<SeedRow> = {}): SeedRow {
     stack: null,
     host: null,
     static_or_dynamic: null,
+    built_with: null,
     why_note: "A great example site",
     nsfw: 0,
+    vibecoded: 0,
     source: "manual",
     tier: "featured",
     added_at: "2024-06-01T00:00:00.000Z",
@@ -144,7 +147,9 @@ describe("UPSERT integration tests", () => {
     expect(result.tier).toBe("featured");
     expect(result.added_at).toBe(row.added_at);
 
-    // vibecoded was never touched — still default 0
+    // vibecoded defaults to 0 (passed through from SeedRow)
     expect(result.vibecoded).toBe(0);
+    // built_with defaults to null
+    expect(result.built_with).toBeNull();
   });
 });

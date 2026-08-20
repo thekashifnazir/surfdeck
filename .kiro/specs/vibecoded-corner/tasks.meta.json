@@ -1,0 +1,165 @@
+{
+  "pbtResults": {},
+  "executionHistory": {
+    "1.1 Add `built_with TEXT` column to `schema.sql`": [
+      {
+        "executionId": "55a06d1e-4c1f-4f82-ab71-f3cbad4f6b2b",
+        "chatSessionId": "sess_765f4b2d-7171-4911-881d-91dce698c900",
+        "timestamp": 1787260215255
+      },
+      {
+        "executionId": "55a06d1e-4c1f-4f82-ab71-f3cbad4f6b2b",
+        "chatSessionId": "sess_765f4b2d-7171-4911-881d-91dce698c900",
+        "timestamp": 1787260303635
+      }
+    ],
+    "1.2 Update `scripts/seed-logic.ts` — add `built_with` and `vibecoded` to UPSERT": [
+      {
+        "executionId": "cdfb2c6e-023c-40b4-afe3-a8e615c0aa51",
+        "chatSessionId": "sess_6719523b-fb07-45b0-b241-86f5e45b60a7",
+        "timestamp": 1787260337985
+      },
+      {
+        "executionId": "cdfb2c6e-023c-40b4-afe3-a8e615c0aa51",
+        "chatSessionId": "sess_6719523b-fb07-45b0-b241-86f5e45b60a7",
+        "timestamp": 1787260537489
+      }
+    ],
+    "1.3 Update CSV in `data/featured-sites.csv` — add columns to header AND all data rows": [
+      {
+        "executionId": "7803ea9e-203c-4d05-a7ae-359522109e1f",
+        "chatSessionId": "sess_cb00632b-1610-49d0-984f-2950fa604817",
+        "timestamp": 1787260576390
+      },
+      {
+        "executionId": "7803ea9e-203c-4d05-a7ae-359522109e1f",
+        "chatSessionId": "sess_cb00632b-1610-49d0-984f-2950fa604817",
+        "timestamp": 1787260750925
+      }
+    ],
+    "1.4 Add `.vibecoded-cache/` to `.gitignore`": [
+      {
+        "executionId": "01060909-f4fc-4737-a353-48606a43a55a",
+        "chatSessionId": "sess_88c6de11-c0ee-4004-8874-de73ad5173dc",
+        "timestamp": 1787260778533
+      },
+      {
+        "executionId": "01060909-f4fc-4737-a353-48606a43a55a",
+        "chatSessionId": "sess_88c6de11-c0ee-4004-8874-de73ad5173dc",
+        "timestamp": 1787260805840
+      }
+    ],
+    "1. Schema + seed update": [
+      {
+        "executionId": "01060909-f4fc-4737-a353-48606a43a55a",
+        "chatSessionId": "sess_88c6de11-c0ee-4004-8874-de73ad5173dc",
+        "timestamp": 1787260805896
+      }
+    ],
+    "2.1 Create `src/shared/vibecoded-tiers.ts` — single source of truth": [
+      {
+        "executionId": "7aa8e4d6-70bb-46f5-baf7-93c5677ef418",
+        "chatSessionId": "sess_5fe1875c-397c-4885-a0e0-bd588d04fae8",
+        "timestamp": 1787261187264
+      },
+      {
+        "executionId": "7aa8e4d6-70bb-46f5-baf7-93c5677ef418",
+        "chatSessionId": "sess_5fe1875c-397c-4885-a0e0-bd588d04fae8",
+        "timestamp": 1787261292994
+      }
+    ],
+    "2.2 Create `src/client/vibecoded-labels.ts` — client display labels": [
+      {
+        "executionId": "fa397a26-105e-4870-aa14-c3a61f0c21c1",
+        "chatSessionId": "sess_9fd483f8-8c12-48ed-a58f-3cff46b7180a",
+        "timestamp": 1787261334282
+      },
+      {
+        "executionId": "fa397a26-105e-4870-aa14-c3a61f0c21c1",
+        "chatSessionId": "sess_9fd483f8-8c12-48ed-a58f-3cff46b7180a",
+        "timestamp": 1787261487014
+      }
+    ],
+    "2.3 Create `src/worker/engine/tier-map.ts` — server-side re-export": [
+      {
+        "executionId": "7d02ddee-d435-4b52-a786-3b474e247744",
+        "chatSessionId": "sess_45637dbf-1d04-4c18-a46e-74c881e13dd1",
+        "timestamp": 1787261530941
+      },
+      {
+        "executionId": "7d02ddee-d435-4b52-a786-3b474e247744",
+        "chatSessionId": "sess_45637dbf-1d04-4c18-a46e-74c881e13dd1",
+        "timestamp": 1787261591676
+      }
+    ],
+    "2.4 Write label/tier map tests (`src/client/vibecoded-labels.test.ts`)": [
+      {
+        "executionId": "6015ee60-1658-4b4a-a870-ac8c4ec3ec66",
+        "chatSessionId": "sess_29cb500a-8fa0-4932-825e-33cf0cae313e",
+        "timestamp": 1787261617302
+      },
+      {
+        "executionId": "6015ee60-1658-4b4a-a870-ac8c4ec3ec66",
+        "chatSessionId": "sess_29cb500a-8fa0-4932-825e-33cf0cae313e",
+        "timestamp": 1787261690721
+      }
+    ],
+    "2. Label & tier map": [
+      {
+        "executionId": "6015ee60-1658-4b4a-a870-ac8c4ec3ec66",
+        "chatSessionId": "sess_29cb500a-8fa0-4932-825e-33cf0cae313e",
+        "timestamp": 1787261690786
+      }
+    ],
+    "3.1 Extend `src/worker/engine/surf.ts` — vibecoded + tier filtering": [
+      {
+        "executionId": "f8424509-935e-4467-9008-4cbf2efe615d",
+        "chatSessionId": "sess_8b802ccc-1d7d-4d2a-807f-ea6cc4390575",
+        "timestamp": 1787262044219
+      }
+    ],
+    "3.2 Update `/api/surf` route — vibecoded + tier params": [
+      {
+        "executionId": "6348e55e-08a4-4dce-a041-15c432de5251",
+        "chatSessionId": "sess_ad2fefdc-c952-4f41-9525-b93b5a13dfef",
+        "timestamp": 1787262062042
+      },
+      {
+        "executionId": "6348e55e-08a4-4dce-a041-15c432de5251",
+        "chatSessionId": "sess_ad2fefdc-c952-4f41-9525-b93b5a13dfef",
+        "timestamp": 1787262195363
+      }
+    ],
+    "3.3 Update `/api/filters` route — expose corner tiers": [
+      {
+        "executionId": "1f8c5490-2cf5-4679-b604-0697a6898f07",
+        "chatSessionId": "sess_0ccf59f9-24ba-4953-b62d-3c29221f4f59",
+        "timestamp": 1787262211680
+      },
+      {
+        "executionId": "1f8c5490-2cf5-4679-b604-0697a6898f07",
+        "chatSessionId": "sess_0ccf59f9-24ba-4953-b62d-3c29221f4f59",
+        "timestamp": 1787262337396
+      }
+    ],
+    "3.4 Write engine tests — vibecoded + tier filtering": [
+      {
+        "executionId": "c04fbd9b-4608-4f51-b46a-7c6bf6f5d26b",
+        "chatSessionId": "sess_137f5e42-15a3-4a70-bc48-286d855b8f55",
+        "timestamp": 1787262366491
+      },
+      {
+        "executionId": "c04fbd9b-4608-4f51-b46a-7c6bf6f5d26b",
+        "chatSessionId": "sess_137f5e42-15a3-4a70-bc48-286d855b8f55",
+        "timestamp": 1787262607280
+      }
+    ],
+    "3. Engine + API": [
+      {
+        "executionId": "c04fbd9b-4608-4f51-b46a-7c6bf6f5d26b",
+        "chatSessionId": "sess_137f5e42-15a3-4a70-bc48-286d855b8f55",
+        "timestamp": 1787262607332
+      }
+    ]
+  }
+}

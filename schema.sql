@@ -1,5 +1,6 @@
--- One-time production migration (run manually against live D1):
+-- One-time production migrations (run manually against live D1):
 -- ALTER TABLE sites ADD COLUMN vibecoded INTEGER NOT NULL DEFAULT 0;
+-- ALTER TABLE sites ADD COLUMN built_with TEXT;
 
 CREATE TABLE IF NOT EXISTS sites (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -10,6 +11,7 @@ CREATE TABLE IF NOT EXISTS sites (
   stack TEXT,
   host TEXT,
   static_or_dynamic TEXT,
+  built_with TEXT,
   why_note TEXT NOT NULL,
   nsfw INTEGER NOT NULL DEFAULT 0,
   vibecoded INTEGER NOT NULL DEFAULT 0,

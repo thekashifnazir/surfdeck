@@ -20,7 +20,7 @@ import {
 // Arbitraries — generate realistic CSV data
 // ---------------------------------------------------------------------------
 
-const CSV_HEADER = "url,title,mood_tags,character,stack,host,static_or_dynamic,why_note,nsfw,source";
+const CSV_HEADER = "url,title,mood_tags,character,stack,host,static_or_dynamic,built_with,why_note,nsfw,vibecoded,source";
 
 const validMoods = ["useful", "learn", "waste_time", "beautiful", "think"];
 const validCharacters = ["modern_indie", "old_web", "retro_personal", "minimal_static"];
@@ -58,8 +58,10 @@ const csvRowRecordArb = fc.record({
   stack: stackArb,
   host: hostArb,
   static_or_dynamic: staticOrDynamicArb,
+  built_with: fc.constantFrom("", "lovable", "bolt", "cursor", "kiro", "cloudflare_workers"),
   why_note: safeCsvString,
   nsfw: fc.constantFrom("true", "false"),
+  vibecoded: fc.constantFrom("0", "1", ""),
   source: safeCsvString,
 });
 
@@ -83,8 +85,10 @@ function buildCsv(rows: Array<Record<string, string>>): string {
       row.stack,
       row.host,
       row.static_or_dynamic,
+      row.built_with,
       row.why_note,
       row.nsfw,
+      row.vibecoded,
       row.source,
     ];
     lines.push(fields.map(escapeCsvField).join(","));
@@ -212,8 +216,10 @@ describe("Property 9: No 'unknown' strings in provenance fields", () => {
             rowRecord.stack,
             rowRecord.host,
             rowRecord.static_or_dynamic,
+            rowRecord.built_with,
             rowRecord.why_note,
             rowRecord.nsfw,
+            rowRecord.vibecoded,
             rowRecord.source,
           ];
 
@@ -245,7 +251,7 @@ describe("Property 9: No 'unknown' strings in provenance fields", () => {
           // Provenance fields are explicitly blank
           const header = CSV_HEADER.split(",");
           const colIndex = buildColIndex(header);
-          const row = [url, title, moods, character, "", "", "", whyNote, "false", source];
+          const row = [url, title, moods, character, "", "", "", "", whyNote, "false", "0", source];
 
           const seedRow = csvRowToSeedRow(row, colIndex, "2024-01-01T00:00:00.000Z");
 
@@ -254,6 +260,7 @@ describe("Property 9: No 'unknown' strings in provenance fields", () => {
             expect(seedRow.stack).toBeNull();
             expect(seedRow.host).toBeNull();
             expect(seedRow.static_or_dynamic).toBeNull();
+            expect(seedRow.built_with).toBeNull();
           }
         }
       ),
@@ -289,7 +296,7 @@ describe("Property 10: Blanks preserved as NULL", () => {
         (url, title, moods, character, stack, host, staticDyn, whyNote, source) => {
           const header = CSV_HEADER.split(",");
           const colIndex = buildColIndex(header);
-          const row = [url, title, moods, character, stack, host, staticDyn, whyNote, "false", source];
+          const row = [url, title, moods, character, stack, host, staticDyn, "", whyNote, "false", "0", source];
 
           const seedRow = csvRowToSeedRow(row, colIndex, "2024-01-01T00:00:00.000Z");
 
@@ -298,6 +305,7 @@ describe("Property 10: Blanks preserved as NULL", () => {
             expect(seedRow.stack).toBeNull();
             expect(seedRow.host).toBeNull();
             expect(seedRow.static_or_dynamic).toBeNull();
+            expect(seedRow.built_with).toBeNull();
 
             // The SQL should use NULL literal, not a quoted empty string
             const sql = seedRowToSQL(seedRow);
@@ -305,7 +313,7 @@ describe("Property 10: Blanks preserved as NULL", () => {
             const valuesMatch = sql.match(/VALUES \((.+?)\) ON CONFLICT/);
             expect(valuesMatch).not.toBeNull();
             const values = valuesMatch![1];
-            // Since stack/host/static_or_dynamic are null, they should appear as NULL in the SQL
+            // Since stack/host/static_or_dynamic/built_with are null, they should appear as NULL in the SQL
             expect(values).toContain("NULL");
           }
         }
@@ -329,7 +337,7 @@ describe("Property 10: Blanks preserved as NULL", () => {
         (url, title, moods, character, stack, host, staticDyn, whyNote, source) => {
           const header = CSV_HEADER.split(",");
           const colIndex = buildColIndex(header);
-          const row = [url, title, moods, character, stack, host, staticDyn, whyNote, "false", source];
+          const row = [url, title, moods, character, stack, host, staticDyn, "", whyNote, "false", "0", source];
 
           const seedRow = csvRowToSeedRow(row, colIndex, "2024-01-01T00:00:00.000Z");
 
@@ -366,7 +374,7 @@ describe("Property 10: Blanks preserved as NULL", () => {
         (url, title, moods, character, stack, host, staticDyn, whyNote, source) => {
           const header = CSV_HEADER.split(",");
           const colIndex = buildColIndex(header);
-          const row = [url, title, moods, character, stack, host, staticDyn, whyNote, "false", source];
+          const row = [url, title, moods, character, stack, host, staticDyn, "", whyNote, "false", "0", source];
 
           const seedRow = csvRowToSeedRow(row, colIndex, "2024-01-01T00:00:00.000Z");
 

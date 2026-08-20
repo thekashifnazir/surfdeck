@@ -71,6 +71,7 @@ function transformSiteResponse(site: SiteRow) {
     stack: site.stack ?? null,
     host: site.host ?? null,
     static_or_dynamic: site.static_or_dynamic ?? null,
+    built_with: site.built_with ?? null,
   };
 }
 
@@ -119,6 +120,26 @@ surfRoute.get("/surf", async (c) => {
     const seenIds = parseSeenIds(seen);
     if (seenIds.length > 0) {
       params.seen = seenIds;
+    }
+
+    // Vibecoded: "1" activates corner mode
+    const vibecodedParam = c.req.query("vibecoded");
+    if (vibecodedParam === "1") {
+      params.vibecoded = true;
+    }
+
+    // Tier: comma-separated integers, only relevant in corner mode
+    if (params.vibecoded) {
+      const tierParam = c.req.query("tier");
+      if (tierParam) {
+        const tiers = tierParam
+          .split(",")
+          .map((s) => Number(s.trim()))
+          .filter((n) => Number.isInteger(n) && n >= 1 && n <= 4);
+        if (tiers.length > 0) {
+          params.tiers = tiers;
+        }
+      }
     }
 
     const result = await surf(c.env.DB, params);

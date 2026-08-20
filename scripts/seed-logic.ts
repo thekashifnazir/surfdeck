@@ -87,8 +87,10 @@ export interface SeedRow {
   stack: string | null;
   host: string | null;
   static_or_dynamic: string | null;
+  built_with: string | null;
   why_note: string;
   nsfw: number;
+  vibecoded: number;
   source: string;
   tier: string;
   added_at: string;
@@ -120,12 +122,17 @@ export function csvRowToSeedRow(
   const stack = get("stack") || null;
   const host = get("host") || null;
   const staticOrDynamic = get("static_or_dynamic") || null;
+  const builtWith = get("built_with") || null;
   const whyNote = get("why_note");
   const nsfwRaw = get("nsfw").toLowerCase();
+  const vibecodedRaw = get("vibecoded");
   const source = get("source");
 
   // Map nsfw: 'true' → 1, anything else → 0
   const nsfw = nsfwRaw === "true" ? 1 : 0;
+
+  // Map vibecoded: '1' → 1, anything else (blank, '0', etc.) → 0
+  const vibecoded = vibecodedRaw === "1" ? 1 : 0;
 
   return {
     url,
@@ -135,8 +142,10 @@ export function csvRowToSeedRow(
     stack,
     host,
     static_or_dynamic: staticOrDynamic,
+    built_with: builtWith,
     why_note: whyNote,
     nsfw,
+    vibecoded,
     source,
     tier: "featured",
     added_at: addedAt,
@@ -146,7 +155,7 @@ export function csvRowToSeedRow(
 /**
  * Converts a SeedRow into a SQL UPSERT statement.
  * On conflict (same URL), updates content columns while preserving
- * id, added_at, tier, and vibecoded.
+ * id, added_at, and tier.
  */
 export function seedRowToSQL(row: SeedRow): string {
   const stackVal = row.stack ? `'${sqlEscape(row.stack)}'` : "NULL";
@@ -154,8 +163,11 @@ export function seedRowToSQL(row: SeedRow): string {
   const staticOrDynamicVal = row.static_or_dynamic
     ? `'${sqlEscape(row.static_or_dynamic)}'`
     : "NULL";
+  const builtWithVal = row.built_with
+    ? `'${sqlEscape(row.built_with)}'`
+    : "NULL";
 
-  return `INSERT INTO sites (url, title, mood_tags, character, stack, host, static_or_dynamic, why_note, nsfw, source, tier, added_at) VALUES ('${sqlEscape(row.url)}', '${sqlEscape(row.title)}', '${sqlEscape(row.mood_tags)}', '${sqlEscape(row.character)}', ${stackVal}, ${hostVal}, ${staticOrDynamicVal}, '${sqlEscape(row.why_note)}', ${row.nsfw}, '${sqlEscape(row.source)}', '${sqlEscape(row.tier)}', '${sqlEscape(row.added_at)}') ON CONFLICT(url) DO UPDATE SET title = excluded.title, mood_tags = excluded.mood_tags, character = excluded.character, stack = excluded.stack, host = excluded.host, static_or_dynamic = excluded.static_or_dynamic, why_note = excluded.why_note, nsfw = excluded.nsfw, source = excluded.source;`;
+  return `INSERT INTO sites (url, title, mood_tags, character, stack, host, static_or_dynamic, built_with, why_note, nsfw, vibecoded, source, tier, added_at) VALUES ('${sqlEscape(row.url)}', '${sqlEscape(row.title)}', '${sqlEscape(row.mood_tags)}', '${sqlEscape(row.character)}', ${stackVal}, ${hostVal}, ${staticOrDynamicVal}, ${builtWithVal}, '${sqlEscape(row.why_note)}', ${row.nsfw}, ${row.vibecoded}, '${sqlEscape(row.source)}', '${sqlEscape(row.tier)}', '${sqlEscape(row.added_at)}') ON CONFLICT(url) DO UPDATE SET title = excluded.title, mood_tags = excluded.mood_tags, character = excluded.character, stack = excluded.stack, host = excluded.host, static_or_dynamic = excluded.static_or_dynamic, built_with = excluded.built_with, why_note = excluded.why_note, nsfw = excluded.nsfw, vibecoded = excluded.vibecoded, source = excluded.source;`;
 }
 
 /**
