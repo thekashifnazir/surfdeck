@@ -117,8 +117,8 @@ Populate the currently-blank `stack`, `host`, and `static_or_dynamic` columns fo
     - Do NOT proceed to CSV write until user approves
     - _Requirements: 1.4, 8.1_
 
-- [ ] 8. Write approved values to CSV and reseed (AFTER user approval only)
-  - [ ] 8.1 Write approved provenance values into `data/featured-sites.csv`
+- [x] 8. Write approved values to CSV and reseed (AFTER user approval only)
+  - [x] 8.1 Write approved provenance values into `data/featured-sites.csv`
     - Only write values the user explicitly approved from the report
     - Preserve all other CSV columns unchanged
     - Blank fields remain blank (never write "unknown")
@@ -126,7 +126,7 @@ Populate the currently-blank `stack`, `host`, and `static_or_dynamic` columns fo
     - Aim for coverage: several distinct stacks, several distinct hosts, both static and dynamic, at least one rare value enabling a zero-match state in the demo
     - _Requirements: 7.2, 13.1–13.6_
 
-  - [ ] 8.2 Reseed local D1 and verify
+  - [x] 8.2 Reseed local D1 and verify
     - Run `npx tsx scripts/seed.ts` to UPSERT enriched data into local D1
     - Run `npx tsc --noEmit` — show output
     - Run `npm test` — show output
