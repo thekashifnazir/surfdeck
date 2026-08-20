@@ -312,6 +312,18 @@
         "chatSessionId": "sess_753f3acd-56c7-4ad9-8ed5-4c3ccd44901e",
         "timestamp": 1787181942252
       }
+    ],
+    "12.1 Create production D1 database and apply schema": [
+      {
+        "executionId": "cc0e4094-51d2-4718-9a44-1a78bcf56905",
+        "chatSessionId": "sess_3f7fbe81-0e31-489f-8e6e-ab68fe3c657e",
+        "timestamp": 1787216205622
+      },
+      {
+        "executionId": "cc0e4094-51d2-4718-9a44-1a78bcf56905",
+        "chatSessionId": "sess_3f7fbe81-0e31-489f-8e6e-ab68fe3c657e",
+        "timestamp": 1787216269763
+      }
     ]
   }
 }

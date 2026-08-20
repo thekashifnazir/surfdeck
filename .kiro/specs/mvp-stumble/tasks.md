@@ -190,7 +190,7 @@ Implement Surfdeck's core stumble interaction as a single Cloudflare Worker (Hon
   - Ensure all tests pass, ask the user if questions arise.
 
 - [ ] 12. Production deployment
-  - [ ] 12.1 Create production D1 database and apply schema
+  - [x] 12.1 Create production D1 database and apply schema
     - Create the production D1 database via `wrangler d1 create`
     - Apply `schema.sql` to production D1 via `wrangler d1 execute --remote`
     - _Requirements: 8.1_
