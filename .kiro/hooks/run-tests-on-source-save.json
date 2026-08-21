@@ -4,11 +4,12 @@
     {
       "name": "Run tests on source save",
       "trigger": "PostFileSave",
-      "matcher": "src/.*\\.tsx?$",
       "action": {
         "type": "command",
         "command": "npx vitest run"
-      }
+      },
+      "matcher": "src/.*\\.tsx?$",
+      "enabled": true
     }
   ]
 }
