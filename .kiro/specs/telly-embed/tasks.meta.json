@@ -1,0 +1,53 @@
+{
+  "pbtResults": {},
+  "executionHistory": {
+    "1. Bug fix: move press-note outside `.scene` flex row": [
+      {
+        "executionId": "b6f28986-8b04-4173-a9cd-9c2a3c5c2b68",
+        "chatSessionId": "sess_895ee24f-e2ec-436b-9f70-84d5b9a2c39b",
+        "timestamp": 1787341692874
+      },
+      {
+        "executionId": "b6f28986-8b04-4173-a9cd-9c2a3c5c2b68",
+        "chatSessionId": "sess_895ee24f-e2ec-436b-9f70-84d5b9a2c39b",
+        "timestamp": 1787341796407
+      }
+    ],
+    "2. Bug fix: first-press card delay is positive": [
+      {
+        "executionId": "5061af68-0564-4174-b7b1-8e9226b6df88",
+        "chatSessionId": "sess_226128f7-e0bf-4417-a519-9378a73423ad",
+        "timestamp": 1787341811101
+      },
+      {
+        "executionId": "5061af68-0564-4174-b7b1-8e9226b6df88",
+        "chatSessionId": "sess_226128f7-e0bf-4417-a519-9378a73423ad",
+        "timestamp": 1787341864472
+      }
+    ],
+    "3. Bug fix: LCD shows channel number when tuned with mood selected": [
+      {
+        "executionId": "737cf661-d886-4a04-ab4a-f7376798f460",
+        "chatSessionId": "sess_a52fc2af-bb59-48f8-a192-b055126953cd",
+        "timestamp": 1787341885586
+      },
+      {
+        "executionId": "737cf661-d886-4a04-ab4a-f7376798f460",
+        "chatSessionId": "sess_a52fc2af-bb59-48f8-a192-b055126953cd",
+        "timestamp": 1787341955156
+      }
+    ],
+    "4. Tests for bug fixes": [
+      {
+        "executionId": "63b0fa4d-91ff-4819-a045-f723a0296758",
+        "chatSessionId": "sess_ad4c9d9e-db7f-4a1d-94f8-453e23cd05ca",
+        "timestamp": 1787342031210
+      },
+      {
+        "executionId": "63b0fa4d-91ff-4819-a045-f723a0296758",
+        "chatSessionId": "sess_ad4c9d9e-db7f-4a1d-94f8-453e23cd05ca",
+        "timestamp": 1787342382391
+      }
+    ]
+  }
+}
