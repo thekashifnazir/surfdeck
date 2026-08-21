@@ -1,4 +1,5 @@
-import type { ZapState } from "../App";
+import type { ZapState, BuildFilterSelection, AvailableFilters } from "../App";
+import TuneFlyout from "./TuneFlyout";
 
 /** Mood key definitions — short keycap + full frozen label + API value */
 const MOOD_KEYS: { keycap: string; label: string; value: string | null }[] = [
@@ -15,11 +16,21 @@ export interface RemoteProps {
   onMoodChange: (mood: string | null) => void;
   cornerMode: boolean;
   onCornerToggle: () => void;
+  tuneOpen: boolean;
+  onTuneToggle: () => void;
   onSurf: () => void;
   isLoading: boolean;
   zapState: ZapState;
   isFirstSurf: boolean;
   lcdText: string;
+  selectedCharacter: string | null;
+  onCharacterChange: (character: string | null) => void;
+  buildFilters: BuildFilterSelection;
+  onSelectionChange: (selection: BuildFilterSelection) => void;
+  availableFilters: AvailableFilters;
+  selectedTiers: number[];
+  onTierChange: (tiers: number[]) => void;
+  onClearAll: () => void;
 }
 
 /**
@@ -31,11 +42,21 @@ export default function Remote({
   onMoodChange,
   cornerMode,
   onCornerToggle,
+  tuneOpen,
+  onTuneToggle,
   onSurf,
   isLoading,
   zapState,
   isFirstSurf,
   lcdText,
+  selectedCharacter,
+  onCharacterChange,
+  buildFilters,
+  onSelectionChange,
+  availableFilters,
+  selectedTiers,
+  onTierChange,
+  onClearAll,
 }: RemoteProps) {
   function handleMoodClick(value: string | null) {
     if (value === null) {
@@ -119,6 +140,32 @@ export default function Remote({
       >
         {cornerMode ? "INPUT: VIBECODED" : "INPUT: OPEN WEB"}
       </button>
+
+      {/* TUNE Key */}
+      <button
+        type="button"
+        className={`tune-key${tuneOpen ? " tune-key--active" : ""}`}
+        onClick={onTuneToggle}
+        aria-pressed={tuneOpen}
+        aria-expanded={tuneOpen}
+        aria-label={tuneOpen ? "Close filter panel" : "Open filter panel"}
+      >
+        {tuneOpen ? "TUNE \u25B4" : "TUNE \u25BE"}
+      </button>
+
+      {/* TUNE Flyout */}
+      <TuneFlyout
+        open={tuneOpen}
+        cornerMode={cornerMode}
+        selectedCharacter={selectedCharacter}
+        onCharacterChange={onCharacterChange}
+        buildFilters={buildFilters}
+        onSelectionChange={onSelectionChange}
+        availableFilters={availableFilters}
+        selectedTiers={selectedTiers}
+        onTierChange={onTierChange}
+        onClearAll={onClearAll}
+      />
     </div>
   );
 }

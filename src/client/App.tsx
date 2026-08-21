@@ -3,9 +3,6 @@ import Remote from "./components/Remote";
 import Telly from "./components/Telly";
 import CardSlot from "./components/CardSlot";
 import ProvenanceCard from "./components/ProvenanceCard";
-import CharacterFilter from "./components/CharacterFilter";
-import BuildFilter from "./components/BuildFilter";
-import CornerTierFilter from "./components/CornerTierFilter";
 import StatusMessage from "./components/StatusMessage";
 import { useSurf } from "./hooks/useSurf";
 import { computeLcdText } from "./lcd-text";
@@ -69,6 +66,7 @@ export default function App() {
 
   // Corner mode state
   const [cornerMode, setCornerMode] = useState(false);
+  const [tuneOpen, setTuneOpen] = useState(false);
   const [selectedTiers, setSelectedTiers] = useState<number[]>([]);
 
   // Available filter options (fetched from API)
@@ -241,6 +239,13 @@ export default function App() {
     setCardVisible(false);
   }
 
+  /** Clear all secondary filters (character, build filters, tiers). */
+  function handleClearAllFilters() {
+    setSelectedCharacter(null);
+    setBuildFilters({ stacks: [], hosts: [], static_or_dynamic: [] });
+    setSelectedTiers([]);
+  }
+
   // Compute LCD text (logic lives in lcd-text.ts)
   const lcdText = computeLcdText({
     statusMessage,
@@ -249,6 +254,9 @@ export default function App() {
     channelCounter,
     channelNumber,
     cornerMode,
+    selectedCharacter,
+    buildFilters,
+    selectedTiers,
   });
 
   return (
@@ -268,11 +276,21 @@ export default function App() {
           onMoodChange={setSelectedMood}
           cornerMode={cornerMode}
           onCornerToggle={handleCornerToggle}
+          tuneOpen={tuneOpen}
+          onTuneToggle={() => setTuneOpen((prev) => !prev)}
           onSurf={handleSurf}
           isLoading={isLoading}
           zapState={zapState}
           isFirstSurf={isFirstSurf}
           lcdText={lcdText}
+          selectedCharacter={selectedCharacter}
+          onCharacterChange={setSelectedCharacter}
+          buildFilters={buildFilters}
+          onSelectionChange={setBuildFilters}
+          availableFilters={availableFilters}
+          selectedTiers={selectedTiers}
+          onTierChange={setSelectedTiers}
+          onClearAll={handleClearAllFilters}
         />
 
         <div className="telly-container">
@@ -301,32 +319,6 @@ export default function App() {
         {pressCount === 1 && "channel and card stay up — press again whenever"}
         {pressCount >= 2 && "quick blip; the card reprints with each catch"}
       </p>
-
-      {/* Filters below the scene */}
-      <section className="filters" aria-label="Filters">
-        <CharacterFilter
-          selectedCharacter={selectedCharacter}
-          onCharacterChange={setSelectedCharacter}
-        />
-
-        {/* Build filters — hidden in corner mode */}
-        {!cornerMode && (
-          <BuildFilter
-            available={availableFilters}
-            selected={buildFilters}
-            onSelectionChange={setBuildFilters}
-          />
-        )}
-
-        {/* Tier filter — visible only in corner mode */}
-        {cornerMode && (
-          <CornerTierFilter
-            availableTiers={availableFilters.corner_tiers}
-            selectedTiers={selectedTiers}
-            onTierChange={setSelectedTiers}
-          />
-        )}
-      </section>
 
       {/* Status message */}
       <StatusMessage

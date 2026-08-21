@@ -50,7 +50,7 @@ Tasks are sequenced so the cycle has a shippable checkpoint after task 12. Bug f
 
 ## Phase B: Filter Consolidation (tasks 5–8)
 
-- [ ] 5. Add TUNE key to Remote
+- [x] 5. Add TUNE key to Remote
   - **Files:** `src/client/components/Remote.tsx`, `src/client/surfdeck.css`
   - **Changes:**
     - Add a new `<button className="tune-key">TUNE ▾</button>` below the INPUT key in Remote.tsx.
@@ -60,7 +60,7 @@ Tasks are sequenced so the cycle has a shippable checkpoint after task 12. Bug f
   - **Done when:** TUNE key appears below INPUT on the remote. Clicking it toggles between ▾/▴ and default/coral styling. Tests pass.
   - _Requirements: 5.1–5.2_
 
-- [ ] 6. Create TuneFlyout component
+- [x] 6. Create TuneFlyout component
   - **Files:** new `src/client/components/TuneFlyout.tsx`, `src/client/surfdeck.css`
   - **Changes:**
     - Component accepts: `open`, `cornerMode`, `selectedCharacter`, `onCharacterChange`, `buildFilters`, `onSelectionChange`, `availableFilters`, `selectedTiers`, `onTierChange`, `onClearAll`.
@@ -72,7 +72,7 @@ Tasks are sequenced so the cycle has a shippable checkpoint after task 12. Bug f
   - **Done when:** Component renders correct filter sets based on mode. Clear-all resets all secondary filters. Flyout animates open/closed. Tests pass.
   - _Requirements: 5.3–5.5, 5.8_
 
-- [ ] 7. Wire TUNE flyout into Remote and App; remove standalone filters section
+- [x] 7. Wire TUNE flyout into Remote and App; remove standalone filters section
   - **Files:** `src/client/App.tsx`, `src/client/components/Remote.tsx`
   - **Changes:**
     - App.tsx: add `const [tuneOpen, setTuneOpen] = useState(false);` state.
@@ -83,7 +83,7 @@ Tasks are sequenced so the cycle has a shippable checkpoint after task 12. Bug f
   - **Done when:** Filters section below the scene is gone. All filter chips live inside the TUNE flyout on the remote. Filter functionality (selecting character, stack, etc.) still works. Tests pass.
   - _Requirements: 5.6–5.7_
 
-- [ ] 8. LCD summary of active filters + tests
+- [x] 8. LCD summary of active filters + tests
   - **Files:** `src/client/App.tsx`, new or extended test file
   - **Changes:**
     - Extend the LCD logic for `tuned` state to append active secondary filter info:

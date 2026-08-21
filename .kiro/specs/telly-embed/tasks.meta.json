@@ -48,6 +48,54 @@
         "chatSessionId": "sess_ad4c9d9e-db7f-4a1d-94f8-453e23cd05ca",
         "timestamp": 1787342382391
       }
+    ],
+    "5. Add TUNE key to Remote": [
+      {
+        "executionId": "07f47ead-bb96-4681-91d3-03b49567c2aa",
+        "chatSessionId": "sess_16a16f2f-1ff5-47e0-acf0-c646a8f8ddd4",
+        "timestamp": 1787345120520
+      },
+      {
+        "executionId": "07f47ead-bb96-4681-91d3-03b49567c2aa",
+        "chatSessionId": "sess_16a16f2f-1ff5-47e0-acf0-c646a8f8ddd4",
+        "timestamp": 1787345333027
+      }
+    ],
+    "6. Create TuneFlyout component": [
+      {
+        "executionId": "a8053871-a3fd-4d6d-8139-0193af4b3675",
+        "chatSessionId": "sess_6ab1c41a-a859-4136-b234-bc2fe9334f92",
+        "timestamp": 1787345468946
+      },
+      {
+        "executionId": "a8053871-a3fd-4d6d-8139-0193af4b3675",
+        "chatSessionId": "sess_6ab1c41a-a859-4136-b234-bc2fe9334f92",
+        "timestamp": 1787345848374
+      }
+    ],
+    "7. Wire TUNE flyout into Remote and App; remove standalone filters section": [
+      {
+        "executionId": "88069d22-9625-4fe9-b5d0-8c1418e48ee4",
+        "chatSessionId": "sess_412a5526-a0d3-45eb-9c9e-f57f1b64a267",
+        "timestamp": 1787345884444
+      },
+      {
+        "executionId": "88069d22-9625-4fe9-b5d0-8c1418e48ee4",
+        "chatSessionId": "sess_412a5526-a0d3-45eb-9c9e-f57f1b64a267",
+        "timestamp": 1787346054174
+      }
+    ],
+    "8. LCD summary of active filters + tests": [
+      {
+        "executionId": "41b50858-cc41-4232-b868-cae56213b39d",
+        "chatSessionId": "sess_904a5902-6969-4b7d-94fd-765ef3341a4a",
+        "timestamp": 1787346080318
+      },
+      {
+        "executionId": "41b50858-cc41-4232-b868-cae56213b39d",
+        "chatSessionId": "sess_904a5902-6969-4b7d-94fd-765ef3341a4a",
+        "timestamp": 1787346373244
+      }
     ]
   }
 }

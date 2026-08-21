@@ -1,4 +1,4 @@
-import type { ZapState, StatusKind } from "./App";
+import type { ZapState, StatusKind, BuildFilterSelection } from "./App";
 
 /** Frozen mood labels — displayed on the LCD when a mood is selected. */
 export const MOOD_LABELS: Record<string, string> = {
@@ -16,6 +16,44 @@ export interface LcdTextOpts {
   channelCounter: number;
   channelNumber: number | null;
   cornerMode: boolean;
+  selectedCharacter?: string | null;
+  buildFilters?: BuildFilterSelection;
+  selectedTiers?: number[];
+}
+
+/**
+ * Collects all active secondary filter values into a single LCD-friendly string.
+ *
+ * - 0 active filters → null
+ * - 1 active filter  → "VALUE" (uppercased)
+ * - 2+ active filters → "FIRST_VALUE +{n-1}"
+ */
+export function getActiveFilterSummary(
+  selectedCharacter: string | null | undefined,
+  buildFilters: BuildFilterSelection | undefined,
+  selectedTiers: number[] | undefined
+): string | null {
+  const values: string[] = [];
+
+  if (selectedCharacter) {
+    values.push(selectedCharacter);
+  }
+
+  if (buildFilters) {
+    values.push(...buildFilters.stacks);
+    values.push(...buildFilters.hosts);
+    values.push(...buildFilters.static_or_dynamic);
+  }
+
+  if (selectedTiers && selectedTiers.length > 0) {
+    for (const tier of selectedTiers) {
+      values.push(`TIER ${tier}`);
+    }
+  }
+
+  if (values.length === 0) return null;
+  if (values.length === 1) return values[0].toUpperCase();
+  return `${values[0].toUpperCase()} +${values.length - 1}`;
 }
 
 /**
@@ -24,23 +62,42 @@ export interface LcdTextOpts {
  * Priority order:
  *  1. no_match status → fixed string
  *  2. zapping → "TUNING > CH {n}"
- *  3. tuned + mood → "CH {n} · MOOD"
- *  4. idle + mood → full mood label
- *  5. else → mode label with optional channel
+ *  3. tuned + mood + filters → "CH {n} · MOOD · FILTER_SUMMARY"
+ *  4. tuned + mood, no filters → "CH {n} · MOOD"
+ *  5. tuned + no mood + filters → "CH {n} - MODE · FILTER_SUMMARY"
+ *  6. idle + mood → full mood label
+ *  7. else → mode label with optional channel
  */
 export function computeLcdText(opts: LcdTextOpts): string {
-  const { statusMessage, zapState, selectedMood, channelCounter, channelNumber, cornerMode } = opts;
+  const {
+    statusMessage,
+    zapState,
+    selectedMood,
+    channelCounter,
+    channelNumber,
+    cornerMode,
+    selectedCharacter,
+    buildFilters,
+    selectedTiers,
+  } = opts;
+
+  const filterSummary = getActiveFilterSummary(selectedCharacter, buildFilters, selectedTiers);
 
   if (statusMessage === "no_match") {
     return "NOTHING IN THAT CORNER RIGHT NOW";
   } else if (zapState === "zapping") {
     return `TUNING > CH ${channelCounter}`;
   } else if (zapState === "tuned" && selectedMood && MOOD_LABELS[selectedMood]) {
-    return `CH ${channelCounter} · ${selectedMood.toUpperCase()}`;
+    const base = `CH ${channelCounter} · ${selectedMood.toUpperCase()}`;
+    return filterSummary ? `${base} · ${filterSummary}` : base;
   } else if (selectedMood && MOOD_LABELS[selectedMood]) {
     return MOOD_LABELS[selectedMood];
   } else {
     const modeLabel = cornerMode ? "VIBECODED" : "OPEN WEB";
-    return channelNumber ? `CH ${channelCounter} - ${modeLabel}` : modeLabel;
+    if (channelNumber) {
+      const base = `CH ${channelCounter} - ${modeLabel}`;
+      return (zapState === "tuned" && filterSummary) ? `${base} · ${filterSummary}` : base;
+    }
+    return modeLabel;
   }
 }
