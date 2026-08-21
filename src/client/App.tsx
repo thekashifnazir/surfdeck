@@ -8,6 +8,8 @@ import BuildFilter from "./components/BuildFilter";
 import CornerTierFilter from "./components/CornerTierFilter";
 import StatusMessage from "./components/StatusMessage";
 import { useSurf } from "./hooks/useSurf";
+import { computeLcdText } from "./lcd-text";
+import { getZapTimings } from "./zap-timings";
 
 /** Shape of a site returned by the /api/surf endpoint. */
 export interface SurfSite {
@@ -50,14 +52,7 @@ export type StatusKind =
 /** Animation phase for the zap sequence. */
 export type ZapState = "idle" | "zapping" | "tuned";
 
-/** Frozen mood labels — displayed on the LCD when a mood is selected. */
-const MOOD_LABELS: Record<string, string> = {
-  useful: "Show me something useful",
-  learn: "Teach me something",
-  waste_time: "Waste my time",
-  beautiful: "Show me something beautiful",
-  think: "Make me think",
-};
+// MOOD_LABELS imported from ./lcd-text
 
 /** localStorage key for the seen-list. */
 const SEEN_KEY = "surfdeck_seen";
@@ -150,8 +145,7 @@ export default function App() {
   // Watch for surf results to drive the zap animation
   useEffect(() => {
     if (lastSurfResult && zapState === "zapping") {
-      const staticDuration = isFirstSurf ? 800 : 400;
-      const cardDelay = isFirstSurf ? 600 : 500;
+      const { staticDuration, cardDelay } = getZapTimings(isFirstSurf);
 
       // Timer: static → tuned
       zapTimerRef.current = setTimeout(() => {
@@ -247,21 +241,15 @@ export default function App() {
     setCardVisible(false);
   }
 
-  // Compute LCD text
-  let lcdText: string;
-  if (zapState === "zapping") {
-    lcdText = `TUNING > CH ${channelCounter}`;
-  } else if (selectedMood && MOOD_LABELS[selectedMood]) {
-    lcdText = MOOD_LABELS[selectedMood];
-  } else {
-    const modeLabel = cornerMode ? "VIBECODED" : "OPEN WEB";
-    lcdText = isFirstSurf ? modeLabel : `CH ${channelCounter} - ${modeLabel}`;
-  }
-
-  // LCD shows no-match message when applicable
-  if (statusMessage === "no_match") {
-    lcdText = "NOTHING IN THAT CORNER RIGHT NOW";
-  }
+  // Compute LCD text (logic lives in lcd-text.ts)
+  const lcdText = computeLcdText({
+    statusMessage,
+    zapState,
+    selectedMood,
+    channelCounter,
+    channelNumber,
+    cornerMode,
+  });
 
   return (
     <main className="page">
@@ -305,13 +293,14 @@ export default function App() {
           </CardSlot>
         </div>
 
-        {/* Press-note — evolving hint below the telly */}
-        <p className="press-note">
-          {pressCount === 0 && "press SURF — zap, then the card prints"}
-          {pressCount === 1 && "channel and card stay up — press again whenever"}
-          {pressCount >= 2 && "quick blip; the card reprints with each catch"}
-        </p>
       </div>
+
+      {/* Press-note — evolving hint below the telly */}
+      <p className="press-note">
+        {pressCount === 0 && "press SURF — zap, then the card prints"}
+        {pressCount === 1 && "channel and card stay up — press again whenever"}
+        {pressCount >= 2 && "quick blip; the card reprints with each catch"}
+      </p>
 
       {/* Filters below the scene */}
       <section className="filters" aria-label="Filters">
