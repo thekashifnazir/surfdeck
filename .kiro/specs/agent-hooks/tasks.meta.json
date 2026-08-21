@@ -1,0 +1,282 @@
+{
+  "pbtResults": {},
+  "executionHistory": {
+    "1.1 Confirm `tsx` is already a pinned devDependency": [
+      {
+        "executionId": "ae7da729-d149-48f1-b022-d25a96abe195",
+        "chatSessionId": "sess_a5f3da18-2e4b-4fc3-868a-25b2f10ac607",
+        "timestamp": 1787337067231
+      },
+      {
+        "executionId": "ae7da729-d149-48f1-b022-d25a96abe195",
+        "chatSessionId": "sess_a5f3da18-2e4b-4fc3-868a-25b2f10ac607",
+        "timestamp": 1787337109516
+      }
+    ],
+    "1.2 Create directory scaffold": [
+      {
+        "executionId": "d8d2caa2-c10c-4cfb-b14f-24fd5142e4d2",
+        "chatSessionId": "sess_e33b04d4-6316-4d56-ad87-b2a4dac653e1",
+        "timestamp": 1787337141875
+      },
+      {
+        "executionId": "d8d2caa2-c10c-4cfb-b14f-24fd5142e4d2",
+        "chatSessionId": "sess_e33b04d4-6316-4d56-ad87-b2a4dac653e1",
+        "timestamp": 1787337398299
+      }
+    ],
+    "1. Add dependency and create directory structure": [
+      {
+        "executionId": "d8d2caa2-c10c-4cfb-b14f-24fd5142e4d2",
+        "chatSessionId": "sess_e33b04d4-6316-4d56-ad87-b2a4dac653e1",
+        "timestamp": 1787337398344
+      }
+    ],
+    "2.1 Implement `scripts/lib/validate-csv.ts` — structural checks": [
+      {
+        "executionId": "5d5268e3-f2c2-4cba-b5fe-1a3953bd202f",
+        "chatSessionId": "sess_4ebf7eba-14fc-46b5-bb2b-0cdf8b76de40",
+        "timestamp": 1787337437668
+      },
+      {
+        "executionId": "5d5268e3-f2c2-4cba-b5fe-1a3953bd202f",
+        "chatSessionId": "sess_4ebf7eba-14fc-46b5-bb2b-0cdf8b76de40",
+        "timestamp": 1787337516273
+      }
+    ],
+    "2.2 Implement `scripts/lib/validate-csv.ts` — required fields and URL format": [
+      {
+        "executionId": "e131698e-7d32-4b82-8859-0350b83fba1f",
+        "chatSessionId": "sess_cf1f30d0-ad49-4748-82cd-d9e9ffeae0b6",
+        "timestamp": 1787337548065
+      },
+      {
+        "executionId": "e131698e-7d32-4b82-8859-0350b83fba1f",
+        "chatSessionId": "sess_cf1f30d0-ad49-4748-82cd-d9e9ffeae0b6",
+        "timestamp": 1787337748997
+      }
+    ],
+    "2.3 Implement `scripts/lib/validate-csv.ts` — enum constraints": [
+      {
+        "executionId": "81441287-d863-41b6-a1b5-0acb0805b2ce",
+        "chatSessionId": "sess_520ea379-e3c3-4c12-b795-45e17f72a913",
+        "timestamp": 1787339374569
+      },
+      {
+        "executionId": "81441287-d863-41b6-a1b5-0acb0805b2ce",
+        "chatSessionId": "sess_520ea379-e3c3-4c12-b795-45e17f72a913",
+        "timestamp": 1787339543262
+      }
+    ],
+    "2.4 Implement `scripts/lib/validate-csv.ts` — provenance conventions": [
+      {
+        "executionId": "9c69c409-cdae-40e9-b767-a8ed51eba9a2",
+        "chatSessionId": "sess_47f83cb8-1cd9-4f24-af78-f681dce5408d",
+        "timestamp": 1787339560576
+      },
+      {
+        "executionId": "9c69c409-cdae-40e9-b767-a8ed51eba9a2",
+        "chatSessionId": "sess_47f83cb8-1cd9-4f24-af78-f681dce5408d",
+        "timestamp": 1787339785330
+      }
+    ],
+    "2. Implement CSV validation logic": [
+      {
+        "executionId": "9c69c409-cdae-40e9-b767-a8ed51eba9a2",
+        "chatSessionId": "sess_47f83cb8-1cd9-4f24-af78-f681dce5408d",
+        "timestamp": 1787339785386
+      }
+    ],
+    "3.1 Implement `scripts/validate-seed.ts`": [
+      {
+        "executionId": "2aaff26b-49e8-49c7-8974-9768d84f282a",
+        "chatSessionId": "sess_e99004e4-ceb4-42ff-bb28-ceb4dadd9ce2",
+        "timestamp": 1787339947671
+      },
+      {
+        "executionId": "2aaff26b-49e8-49c7-8974-9768d84f282a",
+        "chatSessionId": "sess_e99004e4-ceb4-42ff-bb28-ceb4dadd9ce2",
+        "timestamp": 1787340190313
+      }
+    ],
+    "3. Implement CLI entry point": [
+      {
+        "executionId": "2aaff26b-49e8-49c7-8974-9768d84f282a",
+        "chatSessionId": "sess_e99004e4-ceb4-42ff-bb28-ceb4dadd9ce2",
+        "timestamp": 1787340190441
+      }
+    ],
+    "4.1 Write pass-case test": [
+      {
+        "executionId": "3761b476-a7ca-4d9e-bd8d-5c7a47441196",
+        "chatSessionId": "sess_e25118ca-66ed-4eab-9a1c-42c0a3f9948e",
+        "timestamp": 1787340232567
+      },
+      {
+        "executionId": "3761b476-a7ca-4d9e-bd8d-5c7a47441196",
+        "chatSessionId": "sess_e25118ca-66ed-4eab-9a1c-42c0a3f9948e",
+        "timestamp": 1787340311941
+      }
+    ],
+    "4.2 Write structural failure tests": [
+      {
+        "executionId": "a84d8025-0c28-4a36-ac13-08d2eaf09657",
+        "chatSessionId": "sess_5b934de4-7d35-48d6-ae72-d747284e212c",
+        "timestamp": 1787340329410
+      },
+      {
+        "executionId": "a84d8025-0c28-4a36-ac13-08d2eaf09657",
+        "chatSessionId": "sess_5b934de4-7d35-48d6-ae72-d747284e212c",
+        "timestamp": 1787340397379
+      }
+    ],
+    "4.3 Write required-field and URL tests": [
+      {
+        "executionId": "187c64e2-c4cc-4d9d-8abb-f9f41c1dde8c",
+        "chatSessionId": "sess_33383ada-a3f7-4a88-b906-23f8636b42b4",
+        "timestamp": 1787340418530
+      },
+      {
+        "executionId": "187c64e2-c4cc-4d9d-8abb-f9f41c1dde8c",
+        "chatSessionId": "sess_33383ada-a3f7-4a88-b906-23f8636b42b4",
+        "timestamp": 1787340488227
+      }
+    ],
+    "4.4 Write enum constraint tests": [
+      {
+        "executionId": "962c7b7e-07dc-49f3-b0b1-981de45272ba",
+        "chatSessionId": "sess_d73731ba-0923-4bd5-95f6-8c75b1dc5474",
+        "timestamp": 1787340513648
+      },
+      {
+        "executionId": "962c7b7e-07dc-49f3-b0b1-981de45272ba",
+        "chatSessionId": "sess_d73731ba-0923-4bd5-95f6-8c75b1dc5474",
+        "timestamp": 1787340578000
+      }
+    ],
+    "4.5 Write provenance convention tests": [
+      {
+        "executionId": "ee8002ab-6857-4f51-8326-6621892cdd48",
+        "chatSessionId": "sess_f9bf87c4-4a18-427e-aa83-f81bca809e4f",
+        "timestamp": 1787340599804
+      },
+      {
+        "executionId": "ee8002ab-6857-4f51-8326-6621892cdd48",
+        "chatSessionId": "sess_f9bf87c4-4a18-427e-aa83-f81bca809e4f",
+        "timestamp": 1787340698806
+      }
+    ],
+    "4. Implement validator tests": [
+      {
+        "executionId": "ee8002ab-6857-4f51-8326-6621892cdd48",
+        "chatSessionId": "sess_f9bf87c4-4a18-427e-aa83-f81bca809e4f",
+        "timestamp": 1787340698853
+      }
+    ],
+    "5.1 Run `tsc --noEmit` — expect zero errors": [
+      {
+        "executionId": "cb2d5bc9-49ba-49d4-a838-55784072b945",
+        "chatSessionId": "sess_59772b90-5e9a-4976-aa05-02b3157516b0",
+        "timestamp": 1787340718814
+      },
+      {
+        "executionId": "cb2d5bc9-49ba-49d4-a838-55784072b945",
+        "chatSessionId": "sess_59772b90-5e9a-4976-aa05-02b3157516b0",
+        "timestamp": 1787340755333
+      }
+    ],
+    "5.2 Run `npx vitest run` — all tests pass (original 115 + new validator tests)": [
+      {
+        "executionId": "ff9b2f39-a66f-43a5-9291-4791d97e3325",
+        "chatSessionId": "sess_14b215f2-bfa7-4471-978c-e9fbcca274f8",
+        "timestamp": 1787340777016
+      },
+      {
+        "executionId": "ff9b2f39-a66f-43a5-9291-4791d97e3325",
+        "chatSessionId": "sess_14b215f2-bfa7-4471-978c-e9fbcca274f8",
+        "timestamp": 1787340820693
+      }
+    ],
+    "5. Verify full test suite still passes": [
+      {
+        "executionId": "ff9b2f39-a66f-43a5-9291-4791d97e3325",
+        "chatSessionId": "sess_14b215f2-bfa7-4471-978c-e9fbcca274f8",
+        "timestamp": 1787340820729
+      }
+    ],
+    "6.1 Create `.kiro/hooks/seed-data-gate.json`": [
+      {
+        "executionId": "bcade7c7-d191-4fb2-915f-b79886a60305",
+        "chatSessionId": "sess_cbc8fe69-dafa-4118-ac30-36d9ea5e25a1",
+        "timestamp": 1787341109971
+      },
+      {
+        "executionId": "bcade7c7-d191-4fb2-915f-b79886a60305",
+        "chatSessionId": "sess_cbc8fe69-dafa-4118-ac30-36d9ea5e25a1",
+        "timestamp": 1787341146372
+      }
+    ],
+    "6.2 Create `.kiro/hooks/test-on-save.json`": [
+      {
+        "executionId": "cb7a8329-953e-4fe9-a089-1d42a7496464",
+        "chatSessionId": "sess_88cb7b41-a3ba-40a0-b425-043c2830b76f",
+        "timestamp": 1787341167999
+      },
+      {
+        "executionId": "cb7a8329-953e-4fe9-a089-1d42a7496464",
+        "chatSessionId": "sess_88cb7b41-a3ba-40a0-b425-043c2830b76f",
+        "timestamp": 1787341198361
+      }
+    ],
+    "6. Register hooks": [
+      {
+        "executionId": "cb7a8329-953e-4fe9-a089-1d42a7496464",
+        "chatSessionId": "sess_88cb7b41-a3ba-40a0-b425-043c2830b76f",
+        "timestamp": 1787341198407
+      }
+    ],
+    "7.1 Introduce a deliberate CSV error": [
+      {
+        "executionId": "3e8eea4b-816c-4f20-be01-317c16301341",
+        "chatSessionId": "sess_6ad752ee-defb-43f0-b327-13a484923c03",
+        "timestamp": 1787341220169
+      },
+      {
+        "executionId": "3e8eea4b-816c-4f20-be01-317c16301341",
+        "chatSessionId": "sess_6ad752ee-defb-43f0-b327-13a484923c03",
+        "timestamp": 1787341296720
+      }
+    ],
+    "7.2 Revert the CSV to its original state": [
+      {
+        "executionId": "289c6a7b-b9b5-4a3a-aeea-ccd3e6373ed1",
+        "chatSessionId": "sess_0789c459-c359-4cb9-a593-d31aac641346",
+        "timestamp": 1787341315143
+      },
+      {
+        "executionId": "289c6a7b-b9b5-4a3a-aeea-ccd3e6373ed1",
+        "chatSessionId": "sess_0789c459-c359-4cb9-a593-d31aac641346",
+        "timestamp": 1787341363145
+      }
+    ],
+    "7.3 Final verification": [
+      {
+        "executionId": "c0b9e881-8a9d-441d-a8d6-799f7ed3ee4f",
+        "chatSessionId": "sess_cd2c7892-4cf2-419b-90a7-ad1a1785e46b",
+        "timestamp": 1787341378694
+      },
+      {
+        "executionId": "c0b9e881-8a9d-441d-a8d6-799f7ed3ee4f",
+        "chatSessionId": "sess_cd2c7892-4cf2-419b-90a7-ad1a1785e46b",
+        "timestamp": 1787341465091
+      }
+    ],
+    "7. Demonstration — seed-data-gate catches a broken row": [
+      {
+        "executionId": "c0b9e881-8a9d-441d-a8d6-799f7ed3ee4f",
+        "chatSessionId": "sess_cd2c7892-4cf2-419b-90a7-ad1a1785e46b",
+        "timestamp": 1787341465139
+      }
+    ]
+  }
+}

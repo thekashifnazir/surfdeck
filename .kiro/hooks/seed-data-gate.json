@@ -1,0 +1,14 @@
+{
+  "version": "v1",
+  "hooks": [
+    {
+      "name": "Validate CSV on save",
+      "trigger": "PostFileSave",
+      "matcher": "data/featured-sites\\.csv$",
+      "action": {
+        "type": "command",
+        "command": "npx tsx scripts/validate-seed.ts"
+      }
+    }
+  ]
+}
