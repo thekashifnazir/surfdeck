@@ -22,14 +22,8 @@ export interface BuildFilterProps {
 }
 
 /**
- * Renders three build filter groups (stack, host, static_or_dynamic) with
- * multi-select toggle behaviour within each group.
- *
- * - Values are populated from the /api/filters response (passed as `available`).
- * - Clicking an unselected value adds it to the selection (OR within dimension).
- * - Clicking a selected value removes it from the selection.
- * - All deselected = no build filter constraint for that dimension.
- * - Blank/empty values are never displayed.
+ * Renders three build filter groups (stack, host, static_or_dynamic) as chip rows.
+ * Multi-select toggle within each group.
  */
 export default function BuildFilter({ available, selected, onSelectionChange }: BuildFilterProps) {
   function handleToggle(dimension: keyof BuildFilterSelection, value: string) {
@@ -41,7 +35,6 @@ export default function BuildFilter({ available, selected, onSelectionChange }: 
     onSelectionChange({ ...selected, [dimension]: next });
   }
 
-  /** Maps an BuildFilterAvailable key to its corresponding BuildFilterSelection key. */
   const dimensions: { availableKey: keyof BuildFilterAvailable; selectionKey: keyof BuildFilterSelection }[] = [
     { availableKey: "stacks", selectionKey: "stacks" },
     { availableKey: "hosts", selectionKey: "hosts" },
@@ -51,20 +44,13 @@ export default function BuildFilter({ available, selected, onSelectionChange }: 
   return (
     <div role="group" aria-label="Build filters">
       {dimensions.map(({ availableKey, selectionKey }) => {
-        // Filter out blank/empty values
         const values = available[availableKey].filter((v) => v !== "" && v != null);
-
         if (values.length === 0) return null;
 
         return (
-          <fieldset
-            key={selectionKey}
-            style={{ border: "none", padding: 0, margin: "0.5rem 0" }}
-          >
-            <legend style={{ fontWeight: 600, marginBottom: "0.25rem" }}>
-              {DIMENSION_LABELS[selectionKey]}
-            </legend>
-            <div>
+          <div key={selectionKey} className="filters__group">
+            <div className="filters__label">{DIMENSION_LABELS[selectionKey]}</div>
+            <div className="chip-row">
               {values.map((value) => {
                 const isSelected = selected[selectionKey].includes(value);
 
@@ -72,25 +58,16 @@ export default function BuildFilter({ available, selected, onSelectionChange }: 
                   <button
                     key={value}
                     type="button"
+                    className={`chip${isSelected ? " chip--active" : ""}`}
                     aria-pressed={isSelected}
                     onClick={() => handleToggle(selectionKey, value)}
-                    style={{
-                      margin: "0.25rem",
-                      padding: "0.5rem 1rem",
-                      border: isSelected ? "2px solid #1a73e8" : "2px solid #ccc",
-                      borderRadius: "6px",
-                      background: isSelected ? "#e8f0fe" : "#fff",
-                      color: isSelected ? "#1a73e8" : "#333",
-                      fontWeight: isSelected ? 600 : 400,
-                      cursor: "pointer",
-                    }}
                   >
                     {getProvenanceLabel(value)}
                   </button>
                 );
               })}
             </div>
-          </fieldset>
+          </div>
         );
       })}
     </div>

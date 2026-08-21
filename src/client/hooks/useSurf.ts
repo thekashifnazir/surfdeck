@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import type { BuildFilterSelection, StatusKind, SurfSite } from "../App";
 
 /** localStorage key for the seen-list. */
@@ -7,7 +7,7 @@ const SEEN_KEY = "surfdeck_seen";
 /** Timeout in milliseconds for the surf fetch request. */
 const FETCH_TIMEOUT_MS = 5000;
 
-export interface SurfButtonProps {
+export interface UseSurfOptions {
   selectedMood: string | null;
   selectedCharacter: string | null;
   buildFilters: BuildFilterSelection;
@@ -15,6 +15,11 @@ export interface SurfButtonProps {
   selectedTiers: number[];
   onSurfResult: (site: SurfSite | null) => void;
   onStatusChange: (status: StatusKind) => void;
+}
+
+export interface UseSurfReturn {
+  handleSurf: () => void;
+  isLoading: boolean;
 }
 
 /**
@@ -59,27 +64,21 @@ function buildQueryString(
 ): string {
   const params = new URLSearchParams();
 
-  // Vibecoded corner mode
   if (cornerMode) {
     params.set("vibecoded", "1");
-
-    // Tier filter (only in corner mode)
     if (selectedTiers.length > 0) {
       params.set("tier", selectedTiers.join(","));
     }
   }
 
-  // Mood: only send if a real mood is selected (not null / not "surprise")
   if (mood) {
     params.set("mood", mood);
   }
 
-  // Character
   if (character) {
     params.set("character", character);
   }
 
-  // Build filters
   if (buildFilters.stacks.length > 0) {
     params.set("stack", buildFilters.stacks.join(","));
   }
@@ -90,7 +89,6 @@ function buildQueryString(
     params.set("static_or_dynamic", buildFilters.static_or_dynamic.join(","));
   }
 
-  // Seen-list
   if (seen.length > 0) {
     params.set("seen", seen.join(","));
   }
@@ -100,16 +98,10 @@ function buildQueryString(
 }
 
 /**
- * The main Surf button. Handles the open-then-navigate pattern:
- * 1. Opens a blank tab synchronously within the click gesture.
- * 2. Fetches /api/surf with current filters + seen-list.
- * 3. On success: navigates the pre-opened tab to the site URL.
- * 4. On failure/timeout: closes the blank tab and shows error state.
- * 5. If popup is blocked (window.open returns null): still fetches, updates
- *    seen-list and result, then sets popup_blocked so StatusMessage can link
- *    to the freshly fetched site.
+ * Hook that encapsulates all surf logic: fetch, tab opening, seen-list, and status.
+ * Extracted from the old SurfButton component to decouple behaviour from UI.
  */
-export default function SurfButton({
+export function useSurf({
   selectedMood,
   selectedCharacter,
   buildFilters,
@@ -117,10 +109,10 @@ export default function SurfButton({
   selectedTiers,
   onSurfResult,
   onStatusChange,
-}: SurfButtonProps) {
+}: UseSurfOptions): UseSurfReturn {
   const [isLoading, setIsLoading] = useState(false);
 
-  async function handleSurf() {
+  const handleSurf = useCallback(async () => {
     // Open blank tab synchronously within the click gesture (required for Safari)
     const tab = window.open("about:blank", "_blank");
     const popupBlocked = !tab;
@@ -132,7 +124,6 @@ export default function SurfButton({
     const seen = getSeenList();
     const queryString = buildQueryString(selectedMood, selectedCharacter, buildFilters, seen, cornerMode, selectedTiers);
 
-    // AbortController with 5-second timeout
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
 
@@ -144,7 +135,6 @@ export default function SurfButton({
       clearTimeout(timeoutId);
 
       if (!response.ok) {
-        // Server error (500, etc.)
         tab?.close();
         onStatusChange("error");
         return;
@@ -157,12 +147,10 @@ export default function SurfButton({
 
       if (data.status === "ok" && data.site) {
         if (popupBlocked) {
-          // Popup was blocked — update state so StatusMessage shows a link to the fresh site
           appendToSeenList(data.site.id);
           onSurfResult(data.site);
           onStatusChange("popup_blocked");
         } else {
-          // Navigate the pre-opened tab to the site URL
           tab.location.href = data.site.url;
           appendToSeenList(data.site.id);
           onSurfResult(data.site);
@@ -177,41 +165,17 @@ export default function SurfButton({
         onSurfResult(null);
         onStatusChange("exhausted");
       } else {
-        // Unexpected response shape
         tab?.close();
         onStatusChange("error");
       }
     } catch {
-      // Network error or timeout (AbortError)
       clearTimeout(timeoutId);
       tab?.close();
       onStatusChange("error");
     } finally {
       setIsLoading(false);
     }
-  }
+  }, [selectedMood, selectedCharacter, buildFilters, cornerMode, selectedTiers, onSurfResult, onStatusChange]);
 
-  return (
-    <div>
-      <button
-        type="button"
-        onClick={handleSurf}
-        disabled={isLoading}
-        aria-busy={isLoading}
-        style={{
-          padding: "0.75rem 2rem",
-          fontSize: "1.1rem",
-          fontWeight: 700,
-          border: "none",
-          borderRadius: "8px",
-          background: isLoading ? "#94a3b8" : "#1a73e8",
-          color: "#fff",
-          cursor: isLoading ? "not-allowed" : "pointer",
-          transition: "background 0.15s ease",
-        }}
-      >
-        {isLoading ? "Surfing\u2026" : "Surf"}
-      </button>
-    </div>
-  );
+  return { handleSurf, isLoading };
 }

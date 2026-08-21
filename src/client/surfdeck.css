@@ -1,0 +1,758 @@
+/* ============================================================
+   Surfdeck — Remote + Card Printer
+   A TV remote for the hand-made web.
+   ============================================================ */
+
+/* 1. @font-face declarations
+   ------------------------------------------------------------ */
+@font-face {
+  font-family: 'Familjen Grotesk';
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: swap;
+  src: url('/fonts/familjen-grotesk-latin.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Doto';
+  font-style: normal;
+  font-weight: 900;
+  font-display: swap;
+  src: url('/fonts/doto-900.woff') format('woff');
+}
+
+@font-face {
+  font-family: 'Special Elite';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/fonts/special-elite-400.woff2') format('woff2');
+}
+
+/* 2. CSS Custom Properties
+   ------------------------------------------------------------ */
+:root {
+  /* Palette */
+  --bg: #F2F0E9;
+  --card-white: #FFFFFF;
+  --ink: #26262A;
+  --body-grey: #6E6A5E;
+  --caption-grey: #8A867A;
+  --key-shadow: #B8B4A8;
+  --device-charcoal: #2B2B2E;
+  --screen: #191916;
+  --lcd-bg: #1A241A;
+  --deep-shadow-1: #141416;
+  --deep-shadow-2: #17171A;
+  --coral: #E8542F;
+  --coral-pressed: #A33417;
+  --lcd-green: #9FE870;
+  --led-off: #4A4A50;
+  --tv-body: #26262A;
+
+  /* Typography */
+  --font-body: 'Familjen Grotesk', 'Trebuchet MS', sans-serif;
+  --font-lcd: 'Doto', 'Courier New', monospace;
+  --font-card: 'Special Elite', 'Courier New', monospace;
+
+  /* Timing */
+  --zap-full: 2000ms;
+  --zap-compressed: 1000ms;
+  --static-full: 800ms;
+  --static-compressed: 400ms;
+  --card-delay-full: 1000ms;
+  --card-delay-compressed: 500ms;
+  --card-slide: 300ms;
+}
+
+/* 3. Reset / Base
+   ------------------------------------------------------------ */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-weight: 400;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* 4. Layout — Scene
+   ------------------------------------------------------------ */
+.page {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem;
+}
+
+.hero {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.hero__wordmark {
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: 1.5rem;
+  color: var(--ink);
+  margin: 0 0 0.25rem;
+  letter-spacing: -0.01em;
+}
+
+.hero__headline {
+  font-size: 1rem;
+  color: var(--body-grey);
+  margin: 0;
+  font-weight: 400;
+}
+
+.scene {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-end;
+  gap: 2rem;
+  margin-bottom: 2rem;
+}
+
+/* 5. Remote
+   ------------------------------------------------------------ */
+.remote {
+  width: 240px;
+  min-width: 240px;
+  background: var(--device-charcoal);
+  border-radius: 22px;
+  padding: 16px 18px 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  box-shadow: 0 8px 0 #17171A;
+  position: relative;
+}
+
+/* IR LED */
+.ir-led {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: #4A4A50;
+  position: absolute;
+  top: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  transition: background 0.1s;
+}
+
+.ir-led--blip {
+  animation: led-blip-3 0.9s ease-out;
+}
+
+.ir-led--blip-fast {
+  animation: led-blip-2 0.6s ease-out;
+}
+
+/* LCD Readout */
+.lcd {
+  width: 100%;
+  background: var(--lcd-bg);
+  border-radius: 8px;
+  padding: 8px 10px;
+  display: flex;
+  align-items: center;
+}
+
+.lcd__text {
+  font-family: var(--font-lcd);
+  font-weight: 900;
+  font-size: 10px;
+  color: var(--lcd-green);
+  line-height: 17px;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.lcd--flicker {
+  animation: lcd-flicker 0.5s steps(3);
+}
+
+/* SURF Key */
+.surf-key {
+  width: 116px;
+  height: 116px;
+  border-radius: 50%;
+  padding: 0;
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: 23px;
+  text-transform: uppercase;
+  color: #fff;
+  background: var(--coral);
+  border: 3px solid #17171A;
+  cursor: pointer;
+  position: relative;
+  transform: translateY(0);
+  box-shadow: 0 7px 0 #A33417;
+  transition: transform 0.08s ease, box-shadow 0.08s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.surf-key:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 9px 0 #A33417;
+}
+
+.surf-key:active,
+.surf-key--pressed {
+  transform: translateY(5px);
+  box-shadow: 0 1px 0 #A33417;
+}
+
+.surf-key:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+/* Mood Keys */
+.mood-keys {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  width: 100%;
+}
+
+.mood-key {
+  padding: 0.5rem 0.25rem;
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 10.5px;
+  text-transform: uppercase;
+  color: #26262A;
+  background: #F2F0E9;
+  border: none;
+  border-radius: 9px;
+  cursor: pointer;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 3px 0 #B8B4A8;
+  transition: background 0.1s, color 0.1s, box-shadow 0.1s, transform 0.08s;
+}
+
+.mood-key:hover {
+  background: #E8E6DF;
+  color: #26262A;
+}
+
+.mood-key:active {
+  transform: translateY(2px);
+  box-shadow: 0 1px 0 #B8B4A8;
+}
+
+.mood-key--active {
+  background: var(--coral);
+  color: #fff;
+  box-shadow: 0 3px 0 #A33417;
+}
+
+.mood-key--active:active {
+  box-shadow: 0 1px 0 #A33417;
+}
+
+/* INPUT Key */
+.input-key {
+  width: 100%;
+  padding: 0.5rem;
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 10.5px;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: var(--ink);
+  background: #F2F0E9;
+  border: none;
+  border-radius: 9px;
+  cursor: pointer;
+  min-height: 44px;
+  box-shadow: 0 3px 0 #B8B4A8;
+  transition: background 0.15s, color 0.15s, transform 0.1s, box-shadow 0.1s;
+}
+
+.input-key:hover {
+  background: #E8E6DF;
+}
+
+.input-key:active {
+  transform: translateY(2px);
+  box-shadow: 0 1px 0 #B8B4A8;
+}
+
+.input-key--active {
+  background: var(--coral);
+  color: #fff;
+  box-shadow: 0 3px 0 #A33417;
+}
+
+.input-key--active:active {
+  box-shadow: 0 1px 0 #A33417;
+}
+
+/* 6. Telly
+   ------------------------------------------------------------ */
+.telly-container {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.telly {
+  background: #26262A;
+  border-radius: 14px;
+  padding: 12px;
+  box-shadow: 0 6px 0 #141416;
+}
+
+.telly__screen {
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  min-height: 158px;
+  background: var(--screen);
+  border-radius: 6px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Telly states */
+.telly__screen--idle {
+  /* Dark, off */
+}
+
+.telly__screen--static {
+  /* Pixel-dot fuzz — animation applied via shared rule below */
+}
+
+.telly__screen--static-fast {
+  /* Pixel-dot fuzz — same pattern, shared rule below */
+}
+
+.telly__screen--tuned {
+  background: #F2F0E9;
+  animation: tune-in .3s steps(2);
+}
+
+.telly__screen--tuned-fast {
+  background: #F2F0E9;
+  animation: tune-in .15s steps(2);
+}
+
+.telly__screen--exhausted {
+  /* Pixel-dot fuzz — looping, shared rule below */
+}
+
+/* Channel display */
+.telly__channel {
+  font-family: var(--font-lcd);
+  font-weight: 900;
+  font-size: 20px;
+  color: #26262A;
+  text-align: center;
+  line-height: 1.1;
+}
+
+.telly__subtitle {
+  font-family: var(--font-body);
+  font-size: 11px;
+  color: var(--body-grey);
+  margin-top: 0.5rem;
+  text-align: center;
+}
+
+.telly__no-signal {
+  font-family: var(--font-lcd);
+  font-weight: 900;
+  font-size: 1.5rem;
+  color: #fff;
+}
+
+/* TV Stand */
+.telly__stand {
+  width: 55%;
+  height: 10px;
+  background: #141416;
+  border-radius: 0 0 8px 8px;
+  margin: 0 auto;
+}
+
+/* Press-note — evolving hint under the telly */
+.press-note {
+  font-style: italic;
+  color: #8A867A;
+  font-size: 12px;
+  text-align: center;
+  margin-top: 8px;
+}
+
+/* 7. Card Slot
+   ------------------------------------------------------------ */
+.card-slot {
+  overflow: hidden;
+  max-height: 0;
+  padding: 0 14px;
+  transition: max-height .3s ease-out;
+}
+
+.card-slot--visible,
+.card-slot--reprint {
+  max-height: 190px;
+}
+
+.card-slot__inner {
+  transform: translateY(-105%);
+}
+
+.card-slot--visible .card-slot__inner {
+  animation: firstprint 0.9s cubic-bezier(0.22, 0.61, 0.36, 1) forwards;
+}
+
+.card-slot--reprint .card-slot__inner {
+  animation: reprint 1.2s cubic-bezier(0.22, 0.61, 0.36, 1) forwards;
+}
+
+@keyframes firstprint {
+  0%, 20% { transform: translateY(-105%); }
+  100% { transform: translateY(0); }
+}
+
+@keyframes reprint {
+  0% { transform: translateY(0); }
+  30% { transform: translateY(-105%); }
+  60% { transform: translateY(-105%); }
+  100% { transform: translateY(0); }
+}
+
+/* 8. Provenance Card
+   ------------------------------------------------------------ */
+.prov-card {
+  background: var(--card-white);
+  border: 2px solid #26262A;
+  border-top: none;
+  border-radius: 0 0 12px 12px;
+  padding: 16px 20px 14px;
+  font-family: var(--font-card);
+  position: relative;
+  box-shadow: 0 4px 8px rgba(38, 38, 42, 0.12);
+}
+
+.prov-card__heading {
+  padding-right: 90px;
+  font-family: var(--font-body);
+  font-size: 0.65rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--caption-grey);
+  margin: 0 0 0.75rem;
+}
+
+.prov-card__body {
+  font-size: 1rem;
+  color: var(--ink);
+  margin: 0 0 0.75rem;
+  line-height: 1.5;
+}
+
+.prov-card__body--fallback {
+  font-style: italic;
+  color: var(--body-grey);
+}
+
+.prov-card__footer {
+  font-family: var(--font-body);
+  font-size: 0.75rem;
+  color: var(--caption-grey);
+  margin: 0;
+  font-style: italic;
+}
+
+.prov-card__stamp {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  font-family: var(--font-body);
+  font-size: 0.55rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--coral);
+  border: 1.5px solid var(--coral);
+  padding: 2px 6px;
+  border-radius: 3px;
+  transform: rotate(-4deg);
+}
+
+/* 9. Filters (chip rows below scene)
+   ------------------------------------------------------------ */
+.filters {
+  margin-bottom: 1.5rem;
+}
+
+.filters__group {
+  margin-bottom: 0.75rem;
+}
+
+.filters__label {
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--caption-grey);
+  margin-bottom: 0.4rem;
+}
+
+.chip-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.chip {
+  padding: 0.4rem 0.75rem;
+  font-family: var(--font-body);
+  font-size: 0.75rem;
+  font-weight: 400;
+  color: var(--body-grey);
+  background: var(--card-white);
+  border: 1px solid var(--key-shadow);
+  border-radius: 100px;
+  cursor: pointer;
+  transition: background 0.12s, color 0.12s, border-color 0.12s;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+}
+
+.chip:hover {
+  border-color: var(--body-grey);
+  color: var(--ink);
+}
+
+.chip--active {
+  background: var(--coral);
+  color: #fff;
+  border-color: var(--coral);
+  font-weight: 600;
+}
+
+.chip--active:hover {
+  background: #d94a28;
+  border-color: #d94a28;
+  color: #fff;
+}
+
+/* 10. Status line
+   ------------------------------------------------------------ */
+.status-line {
+  text-align: center;
+  padding: 1rem 0;
+}
+
+.status-line__text {
+  font-size: 0.9rem;
+  color: var(--body-grey);
+  margin: 0 0 0.5rem;
+}
+
+.status-line__sub {
+  font-size: 0.8rem;
+  color: var(--caption-grey);
+  margin: 0;
+}
+
+.status-line__link {
+  color: var(--coral);
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.status-line__link:hover {
+  color: var(--coral-pressed);
+}
+
+.reset-btn {
+  margin-top: 0.75rem;
+  padding: 0.5rem 1.25rem;
+  font-family: var(--font-body);
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #fff;
+  background: var(--coral);
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.12s;
+}
+
+.reset-btn:hover {
+  background: var(--coral-pressed);
+}
+
+/* 11. Keyframe Animations
+   ------------------------------------------------------------ */
+
+/* Pixel-dot fuzz effect */
+@keyframes fuzz {
+  0% { background-position: 0 0; }
+  33% { background-position: -1px 1px; }
+  66% { background-position: 1px -1px; }
+  100% { background-position: 0 0; }
+}
+
+.telly__screen--static,
+.telly__screen--static-fast,
+.telly__screen--exhausted {
+  background-image: radial-gradient(rgba(242, 240, 233, .7) 0.6px, transparent 0.6px);
+  background-size: 3px 3px;
+  background-color: var(--screen);
+  opacity: .45;
+  animation: fuzz .4s steps(3) infinite;
+}
+
+/* LED blip — 3 pulses (full ceremony) */
+@keyframes led-blip-3 {
+  0%, 100% { background: var(--deep-shadow-1); }
+  10%, 20% { background: var(--coral); box-shadow: 0 0 6px var(--coral); }
+  30%, 40% { background: var(--deep-shadow-1); }
+  43%, 53% { background: var(--coral); box-shadow: 0 0 6px var(--coral); }
+  63%, 73% { background: var(--deep-shadow-1); }
+  76%, 86% { background: var(--coral); box-shadow: 0 0 6px var(--coral); }
+}
+
+/* LED blip — 2 pulses (compressed) */
+@keyframes led-blip-2 {
+  0%, 100% { background: var(--deep-shadow-1); }
+  15%, 30% { background: var(--coral); box-shadow: 0 0 6px var(--coral); }
+  45%, 60% { background: var(--deep-shadow-1); }
+  65%, 80% { background: var(--coral); box-shadow: 0 0 6px var(--coral); }
+}
+
+/* LCD flicker */
+@keyframes lcd-flicker {
+  0% { opacity: 1; }
+  33% { opacity: 0.3; }
+  66% { opacity: 0.8; }
+  100% { opacity: 1; }
+}
+
+/* Tune-in snap (CRT channel switch) */
+@keyframes tune-in {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+/* 12. @media (prefers-reduced-motion: reduce)
+   ------------------------------------------------------------ */
+@media (prefers-reduced-motion: reduce) {
+  .ir-led--blip,
+  .ir-led--blip-fast {
+    animation: none;
+  }
+
+  .lcd--flicker {
+    animation: none;
+  }
+
+  .telly__screen--static,
+  .telly__screen--static-fast {
+    animation: none;
+    opacity: 0;
+  }
+
+  .telly__screen--exhausted {
+    animation: none;
+    opacity: 0;
+  }
+
+  .telly__screen--tuned,
+  .telly__screen--tuned-fast {
+    opacity: 1;
+    animation: none;
+  }
+
+  .telly__tuned-overlay {
+    opacity: 1;
+    animation: none;
+  }
+
+  .card-slot {
+    max-height: 190px;
+    transition: none;
+  }
+
+  .card-slot__inner {
+    transform: translateY(0);
+    animation: none;
+  }
+
+  .card-slot--visible .card-slot__inner,
+  .card-slot--reprint .card-slot__inner {
+    transform: translateY(0);
+    animation: none;
+  }
+
+  .surf-key:active,
+  .surf-key--pressed {
+    transform: none;
+    box-shadow: 0 7px 0 #A33417;
+    background: var(--coral-pressed);
+  }
+}
+
+/* 13. @media responsive — phone
+   ------------------------------------------------------------ */
+@media (max-width: 768px) {
+  .scene {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .remote {
+    width: 100%;
+    min-width: unset;
+    border-radius: 20px;
+    padding: 1.25rem 1rem 1.5rem;
+  }
+
+  .page {
+    padding: 1.5rem 1rem;
+  }
+}
+
+@media (max-width: 430px) {
+  .hero__wordmark {
+    font-size: 1.25rem;
+  }
+
+  .hero__headline {
+    font-size: 0.9rem;
+  }
+
+  .prov-card {
+    padding: 12px 16px 10px;
+  }
+}

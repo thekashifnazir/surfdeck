@@ -1,11 +1,13 @@
-import { useEffect, useState } from "react";
-import MoodSelector from "./components/MoodSelector";
+import { useEffect, useState, useCallback, useRef } from "react";
+import Remote from "./components/Remote";
+import Telly from "./components/Telly";
+import CardSlot from "./components/CardSlot";
+import ProvenanceCard from "./components/ProvenanceCard";
 import CharacterFilter from "./components/CharacterFilter";
 import BuildFilter from "./components/BuildFilter";
 import CornerTierFilter from "./components/CornerTierFilter";
-import SurfButton from "./components/SurfButton";
-import ProvenanceCard from "./components/ProvenanceCard";
 import StatusMessage from "./components/StatusMessage";
+import { useSurf } from "./hooks/useSurf";
 
 /** Shape of a site returned by the /api/surf endpoint. */
 export interface SurfSite {
@@ -45,6 +47,21 @@ export type StatusKind =
   | "error"
   | null;
 
+/** Animation phase for the zap sequence. */
+export type ZapState = "idle" | "zapping" | "tuned";
+
+/** Frozen mood labels — displayed on the LCD when a mood is selected. */
+const MOOD_LABELS: Record<string, string> = {
+  useful: "Show me something useful",
+  learn: "Teach me something",
+  waste_time: "Waste my time",
+  beautiful: "Show me something beautiful",
+  think: "Make me think",
+};
+
+/** localStorage key for the seen-list. */
+const SEEN_KEY = "surfdeck_seen";
+
 export default function App() {
   // Filter state
   const [selectedMood, setSelectedMood] = useState<string | null>(null);
@@ -59,9 +76,6 @@ export default function App() {
   const [cornerMode, setCornerMode] = useState(false);
   const [selectedTiers, setSelectedTiers] = useState<number[]>([]);
 
-  /** localStorage key for the seen-list. */
-  const SEEN_KEY = "surfdeck_seen";
-
   // Available filter options (fetched from API)
   const [availableFilters, setAvailableFilters] = useState<AvailableFilters>({
     stacks: [],
@@ -73,6 +87,34 @@ export default function App() {
   // Surf result state
   const [lastSurfResult, setLastSurfResult] = useState<SurfSite | null>(null);
   const [statusMessage, setStatusMessage] = useState<StatusKind>(null);
+
+  // Zap animation state
+  const [zapState, setZapState] = useState<ZapState>("idle");
+  const [isFirstSurf, setIsFirstSurf] = useState(true);
+  const [channelNumber, setChannelNumber] = useState<number | null>(null);
+  const [cardVisible, setCardVisible] = useState(false);
+  const [isReprint, setIsReprint] = useState(false);
+
+  // Rolling TV channel counter (decoupled from site ID)
+  const [channelCounter, setChannelCounter] = useState(217);
+
+  // Press count for press-note text
+  const [pressCount, setPressCount] = useState(0);
+
+  // Refs for timeout cleanup
+  const zapTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const cardTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Surf hook
+  const { handleSurf: doSurf, isLoading } = useSurf({
+    selectedMood,
+    selectedCharacter,
+    buildFilters,
+    cornerMode,
+    selectedTiers,
+    onSurfResult: setLastSurfResult,
+    onStatusChange: setStatusMessage,
+  });
 
   // Fetch available filter values on mount
   useEffect(() => {
@@ -92,13 +134,10 @@ export default function App() {
     }
 
     fetchFilters();
-
-    return () => {
-      cancelled = true;
-    };
+    return () => { cancelled = true; };
   }, []);
 
-  // Clear status message when user changes any filter (Req 6.4)
+  // Clear status message when user changes any filter
   useEffect(() => {
     setStatusMessage((prev) => {
       if (prev === "no_match" || prev === "error") {
@@ -108,124 +147,204 @@ export default function App() {
     });
   }, [selectedMood, selectedCharacter, buildFilters, selectedTiers, cornerMode]);
 
-  /** Clears the seen-list from localStorage and re-enables stumbling (Req 11.3). */
+  // Watch for surf results to drive the zap animation
+  useEffect(() => {
+    if (lastSurfResult && zapState === "zapping") {
+      const staticDuration = isFirstSurf ? 800 : 400;
+      const cardDelay = isFirstSurf ? 600 : 500;
+
+      // Timer: static → tuned
+      zapTimerRef.current = setTimeout(() => {
+        setZapState("tuned");
+
+        // Timer: card print
+        cardTimerRef.current = setTimeout(() => {
+          setCardVisible(true);
+          setIsReprint(false);
+        }, cardDelay - staticDuration);
+      }, staticDuration);
+    }
+  }, [lastSurfResult, zapState, isFirstSurf]);
+
+  // Cleanup timers on unmount
+  useEffect(() => {
+    return () => {
+      if (zapTimerRef.current) clearTimeout(zapTimerRef.current);
+      if (cardTimerRef.current) clearTimeout(cardTimerRef.current);
+    };
+  }, []);
+
+  /** Handle SURF press — trigger zap animation + actual surf. */
+  const handleSurf = useCallback(() => {
+    // If a card is currently showing, mark as reprint
+    if (cardVisible) {
+      setIsReprint(true);
+    }
+
+    // Clear previous timers
+    if (zapTimerRef.current) clearTimeout(zapTimerRef.current);
+    if (cardTimerRef.current) clearTimeout(cardTimerRef.current);
+
+    // Compute next rolling channel counter BEFORE entering zapping state
+    // so the LCD always has a value (never null/"TUNING...")
+    const next = channelCounter + 1 + (channelCounter % 5);
+    const nextChannel = next > 999 ? 7 : next;
+    setChannelCounter(nextChannel);
+    setChannelNumber(nextChannel);
+
+    // Start zap animation
+    setZapState("zapping");
+
+    // Increment press count for press-note
+    setPressCount((c) => c + 1);
+
+    // Fire the actual surf (opens tab immediately — never gated on animation)
+    doSurf();
+
+    // Mark subsequent surfs as compressed
+    if (isFirstSurf) {
+      setIsFirstSurf(false);
+    }
+  }, [doSurf, isFirstSurf, cardVisible, channelCounter]);
+
+  /** Handle status changes that affect telly (e.g. exhausted, no_match) */
+  useEffect(() => {
+    if (statusMessage === "exhausted") {
+      setZapState("idle");
+      setChannelNumber(null);
+      setCardVisible(false);
+    } else if (statusMessage === "no_match" || statusMessage === "error") {
+      setZapState("idle");
+    }
+  }, [statusMessage]);
+
+  /** Reset: clears seen-list, restores first-press ceremony. */
   function handleReset() {
     localStorage.removeItem(SEEN_KEY);
     setStatusMessage(null);
     setLastSurfResult(null);
+    setZapState("idle");
+    setChannelNumber(null);
+    setChannelCounter(217);
+    setCardVisible(false);
+    setIsReprint(false);
+    setIsFirstSurf(true);
+    setPressCount(0);
   }
 
-  /** Enter the Vibecoded Corner. */
-  function enterCorner() {
-    setCornerMode(true);
+  /** Toggle corner mode. */
+  function handleCornerToggle() {
+    if (cornerMode) {
+      setCornerMode(false);
+      setSelectedTiers([]);
+    } else {
+      setCornerMode(true);
+    }
     setLastSurfResult(null);
     setStatusMessage(null);
+    setZapState("idle");
+    setChannelNumber(null);
+    setCardVisible(false);
   }
 
-  /** Exit corner mode and return to open-web surf. */
-  function exitCorner() {
-    setCornerMode(false);
-    setSelectedTiers([]);
-    setLastSurfResult(null);
-    setStatusMessage(null);
+  // Compute LCD text
+  let lcdText: string;
+  if (zapState === "zapping") {
+    lcdText = `TUNING > CH ${channelCounter}`;
+  } else if (selectedMood && MOOD_LABELS[selectedMood]) {
+    lcdText = MOOD_LABELS[selectedMood];
+  } else {
+    const modeLabel = cornerMode ? "VIBECODED" : "OPEN WEB";
+    lcdText = isFirstSurf ? modeLabel : `CH ${channelCounter} - ${modeLabel}`;
+  }
+
+  // LCD shows no-match message when applicable
+  if (statusMessage === "no_match") {
+    lcdText = "NOTHING IN THAT CORNER RIGHT NOW";
   }
 
   return (
-    <main>
-      {/* Corner mode toggle */}
-      <section aria-label="Surf mode">
-        {cornerMode ? (
-          <button
-            type="button"
-            onClick={exitCorner}
-            style={{
-              padding: "0.5rem 1rem",
-              border: "none",
-              background: "transparent",
-              color: "#1a73e8",
-              cursor: "pointer",
-              fontWeight: 600,
-            }}
-          >
-            &larr; Back to open-web surf
-          </button>
-        ) : (
-          <button
-            type="button"
-            onClick={enterCorner}
-            style={{
-              padding: "0.5rem 1rem",
-              border: "2px solid #7c3aed",
-              borderRadius: "6px",
-              background: "#f5f3ff",
-              color: "#7c3aed",
-              cursor: "pointer",
-              fontWeight: 600,
-            }}
-          >
-            Enter the Vibecoded Corner
-          </button>
-        )}
-      </section>
+    <main className="page">
+      {/* Hero */}
+      <header className="hero">
+        <h1 className="hero__wordmark">Surfdeck</h1>
+        <p className="hero__headline">
+          Every catch prints a card worth keeping.
+        </p>
+      </header>
 
-      {/* Mood selector */}
-      <section aria-label="Mood selector">
-        <MoodSelector selectedMood={selectedMood} onMoodChange={setSelectedMood} />
-      </section>
+      {/* Scene: Remote + Telly */}
+      <div className="scene">
+        <Remote
+          selectedMood={selectedMood}
+          onMoodChange={setSelectedMood}
+          cornerMode={cornerMode}
+          onCornerToggle={handleCornerToggle}
+          onSurf={handleSurf}
+          isLoading={isLoading}
+          zapState={zapState}
+          isFirstSurf={isFirstSurf}
+          lcdText={lcdText}
+        />
 
-      {/* Character filter */}
-      <section aria-label="Character filter">
-        <CharacterFilter selectedCharacter={selectedCharacter} onCharacterChange={setSelectedCharacter} />
-      </section>
+        <div className="telly-container">
+          <Telly
+            zapState={zapState}
+            isFirstSurf={isFirstSurf}
+            channelNumber={channelNumber}
+            status={statusMessage}
+          />
 
-      {/* Build filters — hidden in corner mode (Req 7.6) */}
-      {!cornerMode && (
-        <section aria-label="Build filters">
+          <div className="telly__stand" aria-hidden="true" />
+
+          {/* Card Slot — below the telly */}
+          <CardSlot visible={cardVisible} reprint={isReprint}>
+            {lastSurfResult && (
+              <ProvenanceCard site={lastSurfResult} cornerMode={cornerMode} />
+            )}
+          </CardSlot>
+        </div>
+
+        {/* Press-note — evolving hint below the telly */}
+        <p className="press-note">
+          {pressCount === 0 && "press SURF — zap, then the card prints"}
+          {pressCount === 1 && "channel and card stay up — press again whenever"}
+          {pressCount >= 2 && "quick blip; the card reprints with each catch"}
+        </p>
+      </div>
+
+      {/* Filters below the scene */}
+      <section className="filters" aria-label="Filters">
+        <CharacterFilter
+          selectedCharacter={selectedCharacter}
+          onCharacterChange={setSelectedCharacter}
+        />
+
+        {/* Build filters — hidden in corner mode */}
+        {!cornerMode && (
           <BuildFilter
             available={availableFilters}
             selected={buildFilters}
             onSelectionChange={setBuildFilters}
           />
-        </section>
-      )}
+        )}
 
-      {/* Tier filter — visible only in corner mode (Req 7.2) */}
-      {cornerMode && (
-        <section aria-label="Tier filter">
+        {/* Tier filter — visible only in corner mode */}
+        {cornerMode && (
           <CornerTierFilter
             availableTiers={availableFilters.corner_tiers}
             selectedTiers={selectedTiers}
             onTierChange={setSelectedTiers}
           />
-        </section>
-      )}
-
-      {/* Surf button */}
-      <section aria-label="Surf action">
-        <SurfButton
-          selectedMood={selectedMood}
-          selectedCharacter={selectedCharacter}
-          buildFilters={buildFilters}
-          cornerMode={cornerMode}
-          selectedTiers={selectedTiers}
-          onSurfResult={setLastSurfResult}
-          onStatusChange={setStatusMessage}
-        />
+        )}
       </section>
 
-      {/* Provenance card */}
-      <section aria-label="Provenance card">
-        {lastSurfResult && <ProvenanceCard site={lastSurfResult} />}
-      </section>
-
-      {/* Status message area */}
-      <section aria-label="Status message">
-        <StatusMessage
-          status={statusMessage}
-          siteUrl={lastSurfResult?.url ?? null}
-          onReset={handleReset}
-        />
-      </section>
+      {/* Status message */}
+      <StatusMessage
+        status={statusMessage}
+        siteUrl={lastSurfResult?.url ?? null}
+        onReset={handleReset}
+      />
     </main>
   );
 }

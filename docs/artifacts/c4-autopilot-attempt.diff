@@ -1,0 +1,2531 @@
+diff --git a/index.html b/index.html
+index ec57117..378323d 100644
+--- a/index.html
++++ b/index.html
+@@ -3,6 +3,7 @@
+   <head>
+     <meta charset="UTF-8" />
+     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
++    <meta name="theme-color" content="#F2F0E9" />
+     <title>Surfdeck</title>
+   </head>
+   <body>
+diff --git a/src/client/App.tsx b/src/client/App.tsx
+index 521f5c1..37d907f 100644
+--- a/src/client/App.tsx
++++ b/src/client/App.tsx
+@@ -1,11 +1,13 @@
+-import { useEffect, useState } from "react";
+-import MoodSelector from "./components/MoodSelector";
++import { useEffect, useState, useCallback, useRef } from "react";
++import Remote from "./components/Remote";
++import Telly from "./components/Telly";
++import CardSlot from "./components/CardSlot";
++import ProvenanceCard from "./components/ProvenanceCard";
+ import CharacterFilter from "./components/CharacterFilter";
+ import BuildFilter from "./components/BuildFilter";
+ import CornerTierFilter from "./components/CornerTierFilter";
+-import SurfButton from "./components/SurfButton";
+-import ProvenanceCard from "./components/ProvenanceCard";
+ import StatusMessage from "./components/StatusMessage";
++import { useSurf } from "./hooks/useSurf";
+ 
+ /** Shape of a site returned by the /api/surf endpoint. */
+ export interface SurfSite {
+@@ -45,6 +47,21 @@ export type StatusKind =
+   | "error"
+   | null;
+ 
++/** Animation phase for the zap sequence. */
++export type ZapState = "idle" | "zapping" | "tuned";
++
++/** Frozen mood labels — displayed on the LCD when a mood is selected. */
++const MOOD_LABELS: Record<string, string> = {
++  useful: "Show me something useful",
++  learn: "Teach me something",
++  waste_time: "Waste my time",
++  beautiful: "Show me something beautiful",
++  think: "Make me think",
++};
++
++/** localStorage key for the seen-list. */
++const SEEN_KEY = "surfdeck_seen";
++
+ export default function App() {
+   // Filter state
+   const [selectedMood, setSelectedMood] = useState<string | null>(null);
+@@ -59,9 +76,6 @@ export default function App() {
+   const [cornerMode, setCornerMode] = useState(false);
+   const [selectedTiers, setSelectedTiers] = useState<number[]>([]);
+ 
+-  /** localStorage key for the seen-list. */
+-  const SEEN_KEY = "surfdeck_seen";
+-
+   // Available filter options (fetched from API)
+   const [availableFilters, setAvailableFilters] = useState<AvailableFilters>({
+     stacks: [],
+@@ -74,6 +88,28 @@ export default function App() {
+   const [lastSurfResult, setLastSurfResult] = useState<SurfSite | null>(null);
+   const [statusMessage, setStatusMessage] = useState<StatusKind>(null);
+ 
++  // Zap animation state
++  const [zapState, setZapState] = useState<ZapState>("idle");
++  const [isFirstSurf, setIsFirstSurf] = useState(true);
++  const [channelNumber, setChannelNumber] = useState<number | null>(null);
++  const [cardVisible, setCardVisible] = useState(false);
++  const [cardDucking, setCardDucking] = useState(false);
++
++  // Refs for timeout cleanup
++  const zapTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
++  const cardTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
++
++  // Surf hook
++  const { handleSurf: doSurf, isLoading } = useSurf({
++    selectedMood,
++    selectedCharacter,
++    buildFilters,
++    cornerMode,
++    selectedTiers,
++    onSurfResult: setLastSurfResult,
++    onStatusChange: setStatusMessage,
++  });
++
+   // Fetch available filter values on mount
+   useEffect(() => {
+     let cancelled = false;
+@@ -92,13 +128,10 @@ export default function App() {
+     }
+ 
+     fetchFilters();
+-
+-    return () => {
+-      cancelled = true;
+-    };
++    return () => { cancelled = true; };
+   }, []);
+ 
+-  // Clear status message when user changes any filter (Req 6.4)
++  // Clear status message when user changes any filter
+   useEffect(() => {
+     setStatusMessage((prev) => {
+       if (prev === "no_match" || prev === "error") {
+@@ -108,124 +141,186 @@ export default function App() {
+     });
+   }, [selectedMood, selectedCharacter, buildFilters, selectedTiers, cornerMode]);
+ 
+-  /** Clears the seen-list from localStorage and re-enables stumbling (Req 11.3). */
++  // Watch for surf results to drive the zap animation
++  useEffect(() => {
++    if (lastSurfResult && zapState === "zapping") {
++      const staticDuration = isFirstSurf ? 800 : 400;
++      const cardDelay = isFirstSurf ? 1000 : 500;
++
++      // Timer: static → tuned
++      zapTimerRef.current = setTimeout(() => {
++        setZapState("tuned");
++        setChannelNumber(lastSurfResult.id);
++
++        // Timer: card print
++        cardTimerRef.current = setTimeout(() => {
++          setCardVisible(true);
++          setCardDucking(false);
++        }, cardDelay - staticDuration);
++      }, staticDuration);
++    }
++  }, [lastSurfResult, zapState, isFirstSurf]);
++
++  // Cleanup timers on unmount
++  useEffect(() => {
++    return () => {
++      if (zapTimerRef.current) clearTimeout(zapTimerRef.current);
++      if (cardTimerRef.current) clearTimeout(cardTimerRef.current);
++    };
++  }, []);
++
++  /** Handle SURF press — trigger zap animation + actual surf. */
++  const handleSurf = useCallback(() => {
++    // If a card is currently showing, duck it first
++    if (cardVisible) {
++      setCardDucking(true);
++      setCardVisible(false);
++    }
++
++    // Clear previous timers
++    if (zapTimerRef.current) clearTimeout(zapTimerRef.current);
++    if (cardTimerRef.current) clearTimeout(cardTimerRef.current);
++
++    // Start zap animation
++    setZapState("zapping");
++
++    // Fire the actual surf (opens tab immediately — never gated on animation)
++    doSurf();
++
++    // Mark subsequent surfs as compressed
++    if (isFirstSurf) {
++      setIsFirstSurf(false);
++    }
++  }, [doSurf, isFirstSurf, cardVisible]);
++
++  /** Handle status changes that affect telly (e.g. exhausted, no_match) */
++  useEffect(() => {
++    if (statusMessage === "exhausted") {
++      setZapState("idle");
++      setChannelNumber(null);
++      setCardVisible(false);
++    } else if (statusMessage === "no_match" || statusMessage === "error") {
++      setZapState("idle");
++    }
++  }, [statusMessage]);
++
++  /** Reset: clears seen-list, restores first-press ceremony. */
+   function handleReset() {
+     localStorage.removeItem(SEEN_KEY);
+     setStatusMessage(null);
+     setLastSurfResult(null);
++    setZapState("idle");
++    setChannelNumber(null);
++    setCardVisible(false);
++    setCardDucking(false);
++    setIsFirstSurf(true);
+   }
+ 
+-  /** Enter the Vibecoded Corner. */
+-  function enterCorner() {
+-    setCornerMode(true);
++  /** Toggle corner mode. */
++  function handleCornerToggle() {
++    if (cornerMode) {
++      setCornerMode(false);
++      setSelectedTiers([]);
++    } else {
++      setCornerMode(true);
++    }
+     setLastSurfResult(null);
+     setStatusMessage(null);
++    setZapState("idle");
++    setChannelNumber(null);
++    setCardVisible(false);
+   }
+ 
+-  /** Exit corner mode and return to open-web surf. */
+-  function exitCorner() {
+-    setCornerMode(false);
+-    setSelectedTiers([]);
+-    setLastSurfResult(null);
+-    setStatusMessage(null);
++  // Compute LCD text
++  let lcdText: string;
++  if (zapState === "zapping") {
++    lcdText = channelNumber !== null
++      ? `TUNING > CH ${lastSurfResult?.id ?? "?"}`
++      : "TUNING...";
++  } else if (selectedMood && MOOD_LABELS[selectedMood]) {
++    lcdText = MOOD_LABELS[selectedMood];
++  } else {
++    lcdText = cornerMode ? "INPUT: VIBECODED" : "INPUT: OPEN WEB";
++  }
++
++  // LCD shows no-match message when applicable
++  if (statusMessage === "no_match") {
++    lcdText = "NOTHING IN THAT CORNER RIGHT NOW";
+   }
+ 
+   return (
+-    <main>
+-      {/* Corner mode toggle */}
+-      <section aria-label="Surf mode">
+-        {cornerMode ? (
+-          <button
+-            type="button"
+-            onClick={exitCorner}
+-            style={{
+-              padding: "0.5rem 1rem",
+-              border: "none",
+-              background: "transparent",
+-              color: "#1a73e8",
+-              cursor: "pointer",
+-              fontWeight: 600,
+-            }}
+-          >
+-            &larr; Back to open-web surf
+-          </button>
+-        ) : (
+-          <button
+-            type="button"
+-            onClick={enterCorner}
+-            style={{
+-              padding: "0.5rem 1rem",
+-              border: "2px solid #7c3aed",
+-              borderRadius: "6px",
+-              background: "#f5f3ff",
+-              color: "#7c3aed",
+-              cursor: "pointer",
+-              fontWeight: 600,
+-            }}
+-          >
+-            Enter the Vibecoded Corner
+-          </button>
+-        )}
+-      </section>
++    <main className="page">
++      {/* Hero */}
++      <header className="hero">
++        <h1 className="hero__wordmark">Surfdeck</h1>
++        <p className="hero__headline">
++          One press. One real site. New tab, across the room.
++        </p>
++      </header>
+ 
+-      {/* Mood selector */}
+-      <section aria-label="Mood selector">
+-        <MoodSelector selectedMood={selectedMood} onMoodChange={setSelectedMood} />
+-      </section>
++      {/* Scene: Remote + Telly */}
++      <div className="scene">
++        <Remote
++          selectedMood={selectedMood}
++          onMoodChange={setSelectedMood}
++          cornerMode={cornerMode}
++          onCornerToggle={handleCornerToggle}
++          onSurf={handleSurf}
++          isLoading={isLoading}
++          zapState={zapState}
++          isFirstSurf={isFirstSurf}
++          lcdText={lcdText}
++        />
+ 
+-      {/* Character filter */}
+-      <section aria-label="Character filter">
+-        <CharacterFilter selectedCharacter={selectedCharacter} onCharacterChange={setSelectedCharacter} />
+-      </section>
++        <div className="telly-container">
++          <Telly
++            zapState={zapState}
++            isFirstSurf={isFirstSurf}
++            channelNumber={channelNumber}
++            status={statusMessage}
++          />
+ 
+-      {/* Build filters — hidden in corner mode (Req 7.6) */}
+-      {!cornerMode && (
+-        <section aria-label="Build filters">
++          {/* Card Slot — below the telly */}
++          <CardSlot visible={cardVisible} ducking={cardDucking}>
++            {lastSurfResult && (
++              <ProvenanceCard site={lastSurfResult} cornerMode={cornerMode} />
++            )}
++          </CardSlot>
++        </div>
++      </div>
++
++      {/* Filters below the scene */}
++      <section className="filters" aria-label="Filters">
++        <CharacterFilter
++          selectedCharacter={selectedCharacter}
++          onCharacterChange={setSelectedCharacter}
++        />
++
++        {/* Build filters — hidden in corner mode */}
++        {!cornerMode && (
+           <BuildFilter
+             available={availableFilters}
+             selected={buildFilters}
+             onSelectionChange={setBuildFilters}
+           />
+-        </section>
+-      )}
++        )}
+ 
+-      {/* Tier filter — visible only in corner mode (Req 7.2) */}
+-      {cornerMode && (
+-        <section aria-label="Tier filter">
++        {/* Tier filter — visible only in corner mode */}
++        {cornerMode && (
+           <CornerTierFilter
+             availableTiers={availableFilters.corner_tiers}
+             selectedTiers={selectedTiers}
+             onTierChange={setSelectedTiers}
+           />
+-        </section>
+-      )}
+-
+-      {/* Surf button */}
+-      <section aria-label="Surf action">
+-        <SurfButton
+-          selectedMood={selectedMood}
+-          selectedCharacter={selectedCharacter}
+-          buildFilters={buildFilters}
+-          cornerMode={cornerMode}
+-          selectedTiers={selectedTiers}
+-          onSurfResult={setLastSurfResult}
+-          onStatusChange={setStatusMessage}
+-        />
+-      </section>
+-
+-      {/* Provenance card */}
+-      <section aria-label="Provenance card">
+-        {lastSurfResult && <ProvenanceCard site={lastSurfResult} />}
++        )}
+       </section>
+ 
+-      {/* Status message area */}
+-      <section aria-label="Status message">
+-        <StatusMessage
+-          status={statusMessage}
+-          siteUrl={lastSurfResult?.url ?? null}
+-          onReset={handleReset}
+-        />
+-      </section>
++      {/* Status message */}
++      <StatusMessage
++        status={statusMessage}
++        siteUrl={lastSurfResult?.url ?? null}
++        onReset={handleReset}
++      />
+     </main>
+   );
+ }
+diff --git a/src/client/components/BuildFilter.tsx b/src/client/components/BuildFilter.tsx
+index 2605b70..09d5624 100644
+--- a/src/client/components/BuildFilter.tsx
++++ b/src/client/components/BuildFilter.tsx
+@@ -22,14 +22,8 @@ export interface BuildFilterProps {
+ }
+ 
+ /**
+- * Renders three build filter groups (stack, host, static_or_dynamic) with
+- * multi-select toggle behaviour within each group.
+- *
+- * - Values are populated from the /api/filters response (passed as `available`).
+- * - Clicking an unselected value adds it to the selection (OR within dimension).
+- * - Clicking a selected value removes it from the selection.
+- * - All deselected = no build filter constraint for that dimension.
+- * - Blank/empty values are never displayed.
++ * Renders three build filter groups (stack, host, static_or_dynamic) as chip rows.
++ * Multi-select toggle within each group.
+  */
+ export default function BuildFilter({ available, selected, onSelectionChange }: BuildFilterProps) {
+   function handleToggle(dimension: keyof BuildFilterSelection, value: string) {
+@@ -41,7 +35,6 @@ export default function BuildFilter({ available, selected, onSelectionChange }:
+     onSelectionChange({ ...selected, [dimension]: next });
+   }
+ 
+-  /** Maps an BuildFilterAvailable key to its corresponding BuildFilterSelection key. */
+   const dimensions: { availableKey: keyof BuildFilterAvailable; selectionKey: keyof BuildFilterSelection }[] = [
+     { availableKey: "stacks", selectionKey: "stacks" },
+     { availableKey: "hosts", selectionKey: "hosts" },
+@@ -51,20 +44,13 @@ export default function BuildFilter({ available, selected, onSelectionChange }:
+   return (
+     <div role="group" aria-label="Build filters">
+       {dimensions.map(({ availableKey, selectionKey }) => {
+-        // Filter out blank/empty values
+         const values = available[availableKey].filter((v) => v !== "" && v != null);
+-
+         if (values.length === 0) return null;
+ 
+         return (
+-          <fieldset
+-            key={selectionKey}
+-            style={{ border: "none", padding: 0, margin: "0.5rem 0" }}
+-          >
+-            <legend style={{ fontWeight: 600, marginBottom: "0.25rem" }}>
+-              {DIMENSION_LABELS[selectionKey]}
+-            </legend>
+-            <div>
++          <div key={selectionKey} className="filters__group">
++            <div className="filters__label">{DIMENSION_LABELS[selectionKey]}</div>
++            <div className="chip-row">
+               {values.map((value) => {
+                 const isSelected = selected[selectionKey].includes(value);
+ 
+@@ -72,25 +58,16 @@ export default function BuildFilter({ available, selected, onSelectionChange }:
+                   <button
+                     key={value}
+                     type="button"
++                    className={`chip${isSelected ? " chip--active" : ""}`}
+                     aria-pressed={isSelected}
+                     onClick={() => handleToggle(selectionKey, value)}
+-                    style={{
+-                      margin: "0.25rem",
+-                      padding: "0.5rem 1rem",
+-                      border: isSelected ? "2px solid #1a73e8" : "2px solid #ccc",
+-                      borderRadius: "6px",
+-                      background: isSelected ? "#e8f0fe" : "#fff",
+-                      color: isSelected ? "#1a73e8" : "#333",
+-                      fontWeight: isSelected ? 600 : 400,
+-                      cursor: "pointer",
+-                    }}
+                   >
+                     {getProvenanceLabel(value)}
+                   </button>
+                 );
+               })}
+             </div>
+-          </fieldset>
++          </div>
+         );
+       })}
+     </div>
+diff --git a/src/client/components/CardSlot.tsx b/src/client/components/CardSlot.tsx
+new file mode 100644
+index 0000000..b2a31c9
+--- /dev/null
++++ b/src/client/components/CardSlot.tsx
+@@ -0,0 +1,31 @@
++import type { ReactNode } from "react";
++
++export interface CardSlotProps {
++  /** Whether the card should be visible (slid out) */
++  visible: boolean;
++  /** Whether the card is currently ducking back in before reprint */
++  ducking: boolean;
++  children: ReactNode;
++}
++
++/**
++ * CardSlot — the physical slot under the Telly from which
++ * the provenance card slides out. Manages the print/duck animation
++ * via CSS classes.
++ */
++export default function CardSlot({ visible, ducking, children }: CardSlotProps) {
++  let slotClass = "card-slot";
++  if (ducking) {
++    slotClass += " card-slot--ducking";
++  } else if (visible) {
++    slotClass += " card-slot--visible";
++  }
++
++  return (
++    <div className={slotClass} aria-label="Provenance card slot">
++      <div className="card-slot__inner">
++        {children}
++      </div>
++    </div>
++  );
++}
+diff --git a/src/client/components/CharacterFilter.tsx b/src/client/components/CharacterFilter.tsx
+index 61d5d7d..16dd945 100644
+--- a/src/client/components/CharacterFilter.tsx
++++ b/src/client/components/CharacterFilter.tsx
+@@ -12,18 +12,11 @@ export interface CharacterFilterProps {
+ }
+ 
+ /**
+- * Renders four character buttons with single-select toggle-off behaviour.
+- *
+- * - Clicking an unselected character activates it.
+- * - Clicking the already-selected character deselects it (sets null).
+- * - At most one character is active at a time.
+- * - No default selection.
+- * - Selection persists across surfs until the user explicitly changes it.
++ * Renders four character buttons as chips with single-select toggle-off behaviour.
+  */
+ export default function CharacterFilter({ selectedCharacter, onCharacterChange }: CharacterFilterProps) {
+   function handleClick(value: string) {
+     if (selectedCharacter === value) {
+-      // Toggle off: clicking the already-selected character deselects it
+       onCharacterChange(null);
+     } else {
+       onCharacterChange(value);
+@@ -31,31 +24,25 @@ export default function CharacterFilter({ selectedCharacter, onCharacterChange }
+   }
+ 
+   return (
+-    <div role="group" aria-label="Character filter">
+-      {CHARACTERS.map(({ label, value }) => {
+-        const isSelected = selectedCharacter === value;
++    <div className="filters__group">
++      <div className="filters__label">Character</div>
++      <div className="chip-row" role="group" aria-label="Character filter">
++        {CHARACTERS.map(({ label, value }) => {
++          const isSelected = selectedCharacter === value;
+ 
+-        return (
+-          <button
+-            key={value}
+-            type="button"
+-            aria-pressed={isSelected}
+-            onClick={() => handleClick(value)}
+-            style={{
+-              margin: "0.25rem",
+-              padding: "0.5rem 1rem",
+-              border: isSelected ? "2px solid #1a73e8" : "2px solid #ccc",
+-              borderRadius: "6px",
+-              background: isSelected ? "#e8f0fe" : "#fff",
+-              color: isSelected ? "#1a73e8" : "#333",
+-              fontWeight: isSelected ? 600 : 400,
+-              cursor: "pointer",
+-            }}
+-          >
+-            {label}
+-          </button>
+-        );
+-      })}
++          return (
++            <button
++              key={value}
++              type="button"
++              className={`chip${isSelected ? " chip--active" : ""}`}
++              aria-pressed={isSelected}
++              onClick={() => handleClick(value)}
++            >
++              {label}
++            </button>
++          );
++        })}
++      </div>
+     </div>
+   );
+ }
+diff --git a/src/client/components/CornerTierFilter.tsx b/src/client/components/CornerTierFilter.tsx
+index c650822..2a698bb 100644
+--- a/src/client/components/CornerTierFilter.tsx
++++ b/src/client/components/CornerTierFilter.tsx
+@@ -7,12 +7,8 @@ export interface CornerTierFilterProps {
+ }
+ 
+ /**
+- * Renders tier filter buttons for the Vibecoded Corner mode.
+- *
+- * - Only tiers present in `availableTiers` are rendered.
+- * - Buttons act as multi-select toggles: click to add/remove a tier.
+- * - The "YOLO" button clears the tier selection (surf all tiers).
+- * - YOLO appears active when no tiers are selected (i.e., no tier filter).
++ * Renders tier filter buttons as chips for the Vibecoded Corner mode.
++ * Multi-select toggles. YOLO clears selection (surf all tiers).
+  */
+ export default function CornerTierFilter({
+   availableTiers,
+@@ -34,51 +30,36 @@ export default function CornerTierFilter({
+   const isYoloActive = selectedTiers.length === 0;
+ 
+   return (
+-    <div role="group" aria-label="Tier filter">
+-      {availableTiers.map((tier) => {
+-        const label = TIER_LABELS[tier];
+-        if (!label) return null;
++    <div className="filters__group">
++      <div className="filters__label">Tier</div>
++      <div className="chip-row" role="group" aria-label="Tier filter">
++        {availableTiers.map((tier) => {
++          const label = TIER_LABELS[tier];
++          if (!label) return null;
+ 
+-        const isSelected = selectedTiers.includes(tier);
++          const isSelected = selectedTiers.includes(tier);
+ 
+-        return (
+-          <button
+-            key={tier}
+-            type="button"
+-            aria-pressed={isSelected}
+-            onClick={() => handleTierToggle(tier)}
+-            style={{
+-              margin: "0.25rem",
+-              padding: "0.5rem 1rem",
+-              border: isSelected ? "2px solid #1a73e8" : "2px solid #ccc",
+-              borderRadius: "6px",
+-              background: isSelected ? "#e8f0fe" : "#fff",
+-              color: isSelected ? "#1a73e8" : "#333",
+-              fontWeight: isSelected ? 600 : 400,
+-              cursor: "pointer",
+-            }}
+-          >
+-            {label}
+-          </button>
+-        );
+-      })}
+-      <button
+-        type="button"
+-        aria-pressed={isYoloActive}
+-        onClick={handleYolo}
+-        style={{
+-          margin: "0.25rem",
+-          padding: "0.5rem 1rem",
+-          border: isYoloActive ? "2px solid #1a73e8" : "2px solid #ccc",
+-          borderRadius: "6px",
+-          background: isYoloActive ? "#e8f0fe" : "#fff",
+-          color: isYoloActive ? "#1a73e8" : "#333",
+-          fontWeight: isYoloActive ? 600 : 400,
+-          cursor: "pointer",
+-        }}
+-      >
+-        YOLO — surf all tiers
+-      </button>
++          return (
++            <button
++              key={tier}
++              type="button"
++              className={`chip${isSelected ? " chip--active" : ""}`}
++              aria-pressed={isSelected}
++              onClick={() => handleTierToggle(tier)}
++            >
++              {label}
++            </button>
++          );
++        })}
++        <button
++          type="button"
++          className={`chip${isYoloActive ? " chip--active" : ""}`}
++          aria-pressed={isYoloActive}
++          onClick={handleYolo}
++        >
++          YOLO
++        </button>
++      </div>
+     </div>
+   );
+ }
+diff --git a/src/client/components/MoodSelector.tsx b/src/client/components/MoodSelector.tsx
+deleted file mode 100644
+index 01f3626..0000000
+--- a/src/client/components/MoodSelector.tsx
++++ /dev/null
+@@ -1,65 +0,0 @@
+-/** The six mood buttons in display order, with their API query values. */
+-const MOODS: { label: string; value: string | null }[] = [
+-  { label: "Show me something useful", value: "useful" },
+-  { label: "Teach me something", value: "learn" },
+-  { label: "Waste my time", value: "waste_time" },
+-  { label: "Show me something beautiful", value: "beautiful" },
+-  { label: "Make me think", value: "think" },
+-  { label: "Surprise me", value: null },
+-];
+-
+-export interface MoodSelectorProps {
+-  selectedMood: string | null;
+-  onMoodChange: (mood: string | null) => void;
+-}
+-
+-/**
+- * Renders six mood buttons with single-select toggle-off behaviour.
+- *
+- * - Clicking an unselected mood activates it (sets the query value).
+- * - Clicking the already-selected mood deselects it (sets null).
+- * - "Surprise me" always sets null (equivalent to no mood filter).
+- * - The selected button is visually distinguished via aria-pressed and styling.
+- */
+-export default function MoodSelector({ selectedMood, onMoodChange }: MoodSelectorProps) {
+-  function handleClick(value: string | null) {
+-    if (value === null) {
+-      // "Surprise me" always clears the mood filter
+-      onMoodChange(null);
+-    } else if (selectedMood === value) {
+-      // Toggle off: clicking the already-selected mood deselects it
+-      onMoodChange(null);
+-    } else {
+-      onMoodChange(value);
+-    }
+-  }
+-
+-  return (
+-    <div role="group" aria-label="Mood selector">
+-      {MOODS.map(({ label, value }) => {
+-        const isSelected = value !== null && selectedMood === value;
+-
+-        return (
+-          <button
+-            key={label}
+-            type="button"
+-            aria-pressed={isSelected}
+-            onClick={() => handleClick(value)}
+-            style={{
+-              margin: "0.25rem",
+-              padding: "0.5rem 1rem",
+-              border: isSelected ? "2px solid #1a73e8" : "2px solid #ccc",
+-              borderRadius: "6px",
+-              background: isSelected ? "#e8f0fe" : "#fff",
+-              color: isSelected ? "#1a73e8" : "#333",
+-              fontWeight: isSelected ? 600 : 400,
+-              cursor: "pointer",
+-            }}
+-          >
+-            {label}
+-          </button>
+-        );
+-      })}
+-    </div>
+-  );
+-}
+diff --git a/src/client/components/ProvenanceCard.tsx b/src/client/components/ProvenanceCard.tsx
+index 2a17c3d..3064054 100644
+--- a/src/client/components/ProvenanceCard.tsx
++++ b/src/client/components/ProvenanceCard.tsx
+@@ -4,6 +4,7 @@ import { getBuiltWithLabel, getBuiltWithTier, getTierLabel } from "../vibecoded-
+ 
+ export interface ProvenanceCardProps {
+   site: SurfSite;
++  cornerMode: boolean;
+ }
+ 
+ /**
+@@ -18,148 +19,59 @@ function isDisplayable(value: string | null | undefined): value is string {
+ }
+ 
+ /**
+- * Builds the tertiary "(runs: ...)" string from non-blank provenance fields.
+- * Returns null if no fields are displayable.
+- */
+-function buildRunsLine(site: SurfSite): string | null {
+-  const parts: string[] = [];
+-  if (isDisplayable(site.stack)) parts.push(getProvenanceLabel(site.stack));
+-  if (isDisplayable(site.host)) parts.push(getProvenanceLabel(site.host));
+-  if (isDisplayable(site.static_or_dynamic)) parts.push(getProvenanceLabel(site.static_or_dynamic));
+-  if (parts.length === 0) return null;
+-  return `(runs: ${parts.join(" · ")})`;
+-}
+-
+-/**
+- * ProvenanceCard displays how a surfed site was built.
++ * ProvenanceCard — the typed card that prints from the slot under the telly.
+  *
+- * For vibecoded sites (built_with is non-null):
+- *   - Primary: "Built with {label}"
+- *   - Secondary: "{TIER_LABELS[tier]} · Tier {N}"
+- *   - Tertiary: "(runs: {stack} · {host} · {static_or_dynamic})" — only non-blank values
++ * Design:
++ *   - Heading: HOW THIS SITE IS BUILT — CATCH № {n} OF 288
++ *   - Body: confident fields joined by · (open-web) or builder-first (corner)
++ *   - Footer: "Everyone's a builder. Learn from the sites you like."
++ *   - Stamp: OPENS IN NEW TAB (rotated)
+  *
+- * For open-web sites (built_with is null):
+- *   - Shows non-blank provenance fields (stack, host, static_or_dynamic) with labels.
+- *   - If all three fields are blank: shows "Hand-made on the open web."
+- *
+- * Never displays the literal string "unknown".
+- * Renders entirely from precomputed data — no network requests, no loading state.
++ * Never displays "unknown · unknown · unknown".
++ * All-blank fallback: "Hand-made on the open web."
+  */
+-export default function ProvenanceCard({ site }: ProvenanceCardProps) {
+-  // Vibecoded site with a known builder — builder-first layout
+-  if (isDisplayable(site.built_with)) {
+-    const tier = getBuiltWithTier(site.built_with);
+-    const tierLabel = tier !== null ? getTierLabel(tier) : null;
+-    const runsLine = buildRunsLine(site);
+-
+-    return (
+-      <div
+-        style={{
+-          marginTop: "1rem",
+-          padding: "0.75rem 1rem",
+-          borderRadius: "8px",
+-          background: "#f8fafc",
+-          border: "1px solid #e2e8f0",
+-        }}
+-      >
+-        {/* Primary: builder */}
+-        <p style={{ margin: 0, fontSize: "0.95rem", fontWeight: 600, color: "#1e293b" }}>
+-          Built with {getBuiltWithLabel(site.built_with)}
+-        </p>
+-
+-        {/* Secondary: tier label + number */}
+-        {tier !== null && tierLabel !== null && (
+-          <p style={{ margin: "0.25rem 0 0", fontSize: "0.85rem", color: "#64748b" }}>
+-            {tierLabel} &middot; Tier {tier}
+-          </p>
+-        )}
++export default function ProvenanceCard({ site, cornerMode }: ProvenanceCardProps) {
++  // Build body content
++  let bodyContent: string;
++  let isFallback = false;
+ 
+-        {/* Tertiary: runtime provenance (demoted) */}
+-        {runsLine && (
+-          <p
+-            style={{
+-              margin: "0.25rem 0 0",
+-              fontSize: "0.8rem",
+-              color: "#94a3b8",
+-              fontStyle: "italic",
+-            }}
+-          >
+-            {runsLine}
+-          </p>
+-        )}
+-      </div>
+-    );
+-  }
+-
+-  // Open-web site — existing behaviour
+-  const fields: { label: string; value: string }[] = [];
+-
+-  if (isDisplayable(site.stack)) {
+-    fields.push({ label: "Stack", value: getProvenanceLabel(site.stack) });
+-  }
+-  if (isDisplayable(site.host)) {
+-    fields.push({ label: "Hosted on", value: getProvenanceLabel(site.host) });
+-  }
+-  if (isDisplayable(site.static_or_dynamic)) {
+-    fields.push({ label: "Type", value: getProvenanceLabel(site.static_or_dynamic) });
+-  }
++  if (cornerMode && isDisplayable(site.built_with)) {
++    // Corner mode: builder-first
++    const tier = getBuiltWithTier(site.built_with);
++    const parts = [`Built with ${getBuiltWithLabel(site.built_with)}`];
++    if (tier !== null) {
++      parts.push(`Tier ${tier}`);
++    }
++    bodyContent = parts.join(" · ");
++  } else {
++    // Open-web mode: confident provenance fields
++    const parts: string[] = [];
++    if (isDisplayable(site.stack)) parts.push(getProvenanceLabel(site.stack));
++    if (isDisplayable(site.host)) parts.push(getProvenanceLabel(site.host));
++    if (isDisplayable(site.static_or_dynamic)) parts.push(getProvenanceLabel(site.static_or_dynamic));
+ 
+-  // All three provenance fields are blank — show the quiet fallback line
+-  if (fields.length === 0) {
+-    return (
+-      <div
+-        style={{
+-          marginTop: "1rem",
+-          padding: "0.75rem 1rem",
+-          borderRadius: "8px",
+-          background: "#f8fafc",
+-          border: "1px solid #e2e8f0",
+-        }}
+-      >
+-        <p
+-          style={{
+-            margin: 0,
+-            fontSize: "0.9rem",
+-            color: "#64748b",
+-            fontStyle: "italic",
+-          }}
+-        >
+-          Hand-made on the open web.
+-        </p>
+-      </div>
+-    );
++    if (parts.length === 0) {
++      bodyContent = "Hand-made on the open web.";
++      isFallback = true;
++    } else {
++      bodyContent = parts.join(" · ");
++    }
+   }
+ 
+   return (
+-    <div
+-      style={{
+-        marginTop: "1rem",
+-        padding: "0.75rem 1rem",
+-        borderRadius: "8px",
+-        background: "#f8fafc",
+-        border: "1px solid #e2e8f0",
+-      }}
+-    >
+-      <dl style={{ margin: 0, display: "flex", flexWrap: "wrap", gap: "0.75rem 1.5rem" }}>
+-        {fields.map(({ label, value }) => (
+-          <div key={label} style={{ display: "flex", flexDirection: "column" }}>
+-            <dt
+-              style={{
+-                fontSize: "0.75rem",
+-                fontWeight: 600,
+-                color: "#64748b",
+-                textTransform: "uppercase",
+-                letterSpacing: "0.025em",
+-              }}
+-            >
+-              {label}
+-            </dt>
+-            <dd style={{ margin: 0, fontSize: "0.9rem", color: "#1e293b" }}>
+-              {value}
+-            </dd>
+-          </div>
+-        ))}
+-      </dl>
++    <div className="prov-card">
++      <p className="prov-card__heading">
++        HOW THIS SITE IS BUILT — CATCH №&nbsp;{site.id} OF 288
++      </p>
++      <p className={`prov-card__body${isFallback ? " prov-card__body--fallback" : ""}`}>
++        {bodyContent}
++      </p>
++      <p className="prov-card__footer">
++        Everyone's a builder. Learn from the sites you like.
++      </p>
++      <span className="prov-card__stamp" aria-hidden="true">
++        OPENS IN NEW TAB
++      </span>
+     </div>
+   );
+ }
+diff --git a/src/client/components/Remote.tsx b/src/client/components/Remote.tsx
+new file mode 100644
+index 0000000..00a5c8c
+--- /dev/null
++++ b/src/client/components/Remote.tsx
+@@ -0,0 +1,124 @@
++import type { ZapState } from "../App";
++
++/** Mood key definitions — short keycap + full frozen label + API value */
++const MOOD_KEYS: { keycap: string; label: string; value: string | null }[] = [
++  { keycap: "USEFUL", label: "Show me something useful", value: "useful" },
++  { keycap: "TEACH", label: "Teach me something", value: "learn" },
++  { keycap: "WASTE", label: "Waste my time", value: "waste_time" },
++  { keycap: "BEAUTY", label: "Show me something beautiful", value: "beautiful" },
++  { keycap: "THINK", label: "Make me think", value: "think" },
++  { keycap: "LUCKY", label: "Surprise me", value: null },
++];
++
++export interface RemoteProps {
++  selectedMood: string | null;
++  onMoodChange: (mood: string | null) => void;
++  cornerMode: boolean;
++  onCornerToggle: () => void;
++  onSurf: () => void;
++  isLoading: boolean;
++  zapState: ZapState;
++  isFirstSurf: boolean;
++  lcdText: string;
++}
++
++/**
++ * The Remote — a charcoal device surface containing the SURF key,
++ * mood keys, INPUT key, IR LED, and LCD readout.
++ */
++export default function Remote({
++  selectedMood,
++  onMoodChange,
++  cornerMode,
++  onCornerToggle,
++  onSurf,
++  isLoading,
++  zapState,
++  isFirstSurf,
++  lcdText,
++}: RemoteProps) {
++  function handleMoodClick(value: string | null) {
++    if (value === null) {
++      // LUCKY always clears the mood filter
++      onMoodChange(null);
++    } else if (selectedMood === value) {
++      // Toggle off
++      onMoodChange(null);
++    } else {
++      onMoodChange(value);
++    }
++  }
++
++  // Determine LED animation class
++  let ledClass = "ir-led";
++  if (zapState === "zapping") {
++    ledClass += isFirstSurf ? " ir-led--blip" : " ir-led--blip-fast";
++  }
++
++  // Determine LCD flicker class
++  let lcdClass = "lcd";
++  if (zapState === "zapping") {
++    lcdClass += " lcd--flicker";
++  }
++
++  // SURF key pressed state
++  let surfKeyClass = "surf-key";
++  if (zapState === "zapping") {
++    surfKeyClass += " surf-key--pressed";
++  }
++
++  return (
++    <div className="remote" role="group" aria-label="Surfdeck remote control">
++      {/* IR LED */}
++      <div className={ledClass} aria-hidden="true" />
++
++      {/* LCD Readout */}
++      <div className={lcdClass} aria-live="polite" aria-atomic="true">
++        <span className="lcd__text">{lcdText}</span>
++      </div>
++
++      {/* SURF Key */}
++      <button
++        type="button"
++        className={surfKeyClass}
++        onClick={onSurf}
++        disabled={isLoading}
++        aria-busy={isLoading}
++        aria-label="Surf — open a random site in a new tab"
++      >
++        {isLoading ? "SURFING…" : "SURF"}
++      </button>
++
++      {/* Mood Keys */}
++      <div className="mood-keys" role="group" aria-label="Mood selector">
++        {MOOD_KEYS.map(({ keycap, label, value }) => {
++          const isActive = value !== null && selectedMood === value;
++
++          return (
++            <button
++              key={keycap}
++              type="button"
++              className={`mood-key${isActive ? " mood-key--active" : ""}`}
++              aria-pressed={isActive}
++              aria-label={label}
++              onClick={() => handleMoodClick(value)}
++            >
++              {keycap}
++            </button>
++          );
++        })}
++      </div>
++
++      {/* INPUT Key */}
++      <button
++        type="button"
++        className={`input-key${cornerMode ? " input-key--active" : ""}`}
++        onClick={onCornerToggle}
++        aria-pressed={cornerMode}
++        aria-label={cornerMode ? "Switch to open web mode" : "Switch to vibecoded mode"}
++      >
++        {cornerMode ? "INPUT: VIBECODED" : "INPUT: OPEN WEB"}
++      </button>
++    </div>
++  );
++}
+diff --git a/src/client/components/StatusMessage.tsx b/src/client/components/StatusMessage.tsx
+index 32aa6b0..89d0dd0 100644
+--- a/src/client/components/StatusMessage.tsx
++++ b/src/client/components/StatusMessage.tsx
+@@ -1,48 +1,21 @@
+ import type { StatusKind } from "../App";
+ 
+ export interface StatusMessageProps {
+-  /** Current status to display. Null means no message shown. */
+   status: StatusKind;
+-  /** Site URL for popup-blocked state — displayed as a clickable link. */
+   siteUrl?: string | null;
+-  /** Callback for the reset button in the exhausted state. */
+   onReset?: () => void;
+ }
+ 
+ /**
+- * StatusMessage renders contextual messages after a surf attempt:
+- *
+- * - **no_match**: "Nothing in that corner right now." + "Loosen a filter and try again."
+- * - **exhausted**: "You've wandered the whole neighbourhood." + "Reset history to start fresh?" + reset button
+- * - **popup_blocked**: Informs the user and provides the site URL as a clickable link.
+- *
+- * The exhausted state is visually distinguished from zero-match (it is not an error).
+- * The zero-match message should be cleared by the parent when a filter changes (Req 6.4).
++ * StatusMessage — contextual messages expressed through the telly/remote metaphor.
++ * No red error boxes. A miss is part of the wander.
+  */
+ export default function StatusMessage({ status, siteUrl, onReset }: StatusMessageProps) {
+-  // Ouroboros treatment: when the surfed site is Surfdeck itself
++  // Ouroboros treatment
+   if (status === "ok" && siteUrl === "/ouroboros") {
+     return (
+-      <div
+-        role="status"
+-        aria-live="polite"
+-        style={{
+-          marginTop: "1.5rem",
+-          padding: "1rem 1.25rem",
+-          borderRadius: "8px",
+-          background: "#f0fdf4",
+-          border: "1px solid #86efac",
+-          textAlign: "center",
+-        }}
+-      >
+-        <p
+-          style={{
+-            margin: 0,
+-            fontSize: "1rem",
+-            fontWeight: 600,
+-            color: "#166534",
+-          }}
+-        >
++      <div className="status-line" role="status" aria-live="polite">
++        <p className="status-line__text">
+           The loop closes — you surfed to the surfer.
+         </p>
+       </div>
+@@ -55,35 +28,8 @@ export default function StatusMessage({ status, siteUrl, onReset }: StatusMessag
+ 
+   if (status === "no_match") {
+     return (
+-      <div
+-        role="status"
+-        aria-live="polite"
+-        style={{
+-          marginTop: "1.5rem",
+-          padding: "1rem 1.25rem",
+-          borderRadius: "8px",
+-          background: "#fef3c7",
+-          border: "1px solid #f59e0b",
+-          textAlign: "center",
+-        }}
+-      >
+-        <h2
+-          style={{
+-            margin: 0,
+-            fontSize: "1.1rem",
+-            fontWeight: 600,
+-            color: "#92400e",
+-          }}
+-        >
+-          Nothing in that corner right now.
+-        </h2>
+-        <p
+-          style={{
+-            margin: "0.25rem 0 0",
+-            fontSize: "0.9rem",
+-            color: "#a16207",
+-          }}
+-        >
++      <div className="status-line" role="status" aria-live="polite">
++        <p className="status-line__text">
+           Loosen a filter and try again.
+         </p>
+       </div>
+@@ -92,54 +38,12 @@ export default function StatusMessage({ status, siteUrl, onReset }: StatusMessag
+ 
+   if (status === "exhausted") {
+     return (
+-      <div
+-        role="status"
+-        aria-live="polite"
+-        style={{
+-          marginTop: "1.5rem",
+-          padding: "1rem 1.25rem",
+-          borderRadius: "8px",
+-          background: "#ede9fe",
+-          border: "1px solid #a78bfa",
+-          textAlign: "center",
+-        }}
+-      >
+-        <h2
+-          style={{
+-            margin: 0,
+-            fontSize: "1.1rem",
+-            fontWeight: 600,
+-            color: "#5b21b6",
+-          }}
+-        >
++      <div className="status-line" role="status" aria-live="polite">
++        <p className="status-line__text">
+           You've wandered the whole neighbourhood.
+-        </h2>
+-        <p
+-          style={{
+-            margin: "0.25rem 0 0",
+-            fontSize: "0.9rem",
+-            color: "#6d28d9",
+-          }}
+-        >
+-          Reset history to start fresh?
+         </p>
+         {onReset && (
+-          <button
+-            type="button"
+-            onClick={onReset}
+-            style={{
+-              marginTop: "0.75rem",
+-              padding: "0.5rem 1.25rem",
+-              fontSize: "0.9rem",
+-              fontWeight: 600,
+-              border: "none",
+-              borderRadius: "6px",
+-              background: "#7c3aed",
+-              color: "#fff",
+-              cursor: "pointer",
+-              transition: "background 0.15s ease",
+-            }}
+-          >
++          <button type="button" className="reset-btn" onClick={onReset}>
+             Reset
+           </button>
+         )}
+@@ -149,69 +53,33 @@ export default function StatusMessage({ status, siteUrl, onReset }: StatusMessag
+ 
+   if (status === "popup_blocked") {
+     return (
+-      <div
+-        role="alert"
+-        aria-live="assertive"
+-        style={{
+-          marginTop: "1.5rem",
+-          padding: "1rem 1.25rem",
+-          borderRadius: "8px",
+-          background: "#f0f9ff",
+-          border: "1px solid #38bdf8",
+-          textAlign: "center",
+-        }}
+-      >
+-        <p
+-          style={{
+-            margin: 0,
+-            fontSize: "0.95rem",
+-            color: "#0c4a6e",
+-          }}
+-        >
++      <div className="status-line" role="alert" aria-live="assertive">
++        <p className="status-line__text">
+           Your browser blocked the new tab.
+-          {siteUrl ? (
++          {siteUrl && (
+             <>
+               {" "}
+               <a
+                 href={siteUrl}
+                 target="_blank"
+                 rel="noopener noreferrer"
+-                style={{ color: "#0284c7", fontWeight: 600, textDecoration: "underline" }}
++                className="status-line__link"
+               >
+                 Open the site here
+               </a>
+             </>
+-          ) : (
+-            " Try allowing popups for this site."
+           )}
+         </p>
+       </div>
+     );
+   }
+ 
+-  // status === "error" — remain interactive, no blocking overlay (Req 7.3)
++  // error
+   if (status === "error") {
+     return (
+-      <div
+-        role="status"
+-        aria-live="polite"
+-        style={{
+-          marginTop: "1.5rem",
+-          padding: "1rem 1.25rem",
+-          borderRadius: "8px",
+-          background: "#fef2f2",
+-          border: "1px solid #fca5a5",
+-          textAlign: "center",
+-        }}
+-      >
+-        <p
+-          style={{
+-            margin: 0,
+-            fontSize: "0.95rem",
+-            color: "#991b1b",
+-          }}
+-        >
+-          Something hiccupped. Hit Surf again whenever you're ready.
++      <div className="status-line" role="status" aria-live="polite">
++        <p className="status-line__text">
++          That one got away. Surf again whenever you're ready.
+         </p>
+       </div>
+     );
+diff --git a/src/client/components/Telly.tsx b/src/client/components/Telly.tsx
+new file mode 100644
+index 0000000..0700d3c
+--- /dev/null
++++ b/src/client/components/Telly.tsx
+@@ -0,0 +1,51 @@
++import type { ZapState, StatusKind } from "../App";
++
++export interface TellyProps {
++  zapState: ZapState;
++  isFirstSurf: boolean;
++  channelNumber: number | null;
++  status: StatusKind;
++}
++
++/**
++ * The Telly — a CRT television screen that shows:
++ * - idle: blank/off
++ * - static: CSS noise animation during zap
++ * - tuned: channel number + subtitle (persists until next press)
++ * - exhausted: snow + NO SIGNAL
++ */
++export default function Telly({ zapState, isFirstSurf, channelNumber, status }: TellyProps) {
++  // Determine screen state class
++  let screenClass = "telly__screen";
++
++  if (status === "exhausted") {
++    screenClass += " telly__screen--exhausted";
++  } else if (zapState === "zapping") {
++    screenClass += isFirstSurf ? " telly__screen--static" : " telly__screen--static-fast";
++  } else if (zapState === "tuned") {
++    screenClass += " telly__screen--tuned";
++  } else {
++    screenClass += " telly__screen--idle";
++  }
++
++  return (
++    <div className="telly" role="region" aria-label="Channel display">
++      <div className={screenClass} aria-live="polite">
++        {/* Exhausted state */}
++        {status === "exhausted" && (
++          <span className="telly__no-signal">NO SIGNAL</span>
++        )}
++
++        {/* Tuned state — channel display */}
++        {zapState === "tuned" && status !== "exhausted" && channelNumber !== null && (
++          <>
++            <span className="telly__channel">CH {channelNumber}</span>
++            <span className="telly__subtitle">
++              somebody's hand-made site → opens in a new tab
++            </span>
++          </>
++        )}
++      </div>
++    </div>
++  );
++}
+diff --git a/src/client/components/SurfButton.tsx b/src/client/hooks/useSurf.ts
+similarity index 70%
+rename from src/client/components/SurfButton.tsx
+rename to src/client/hooks/useSurf.ts
+index ee551a0..08f3cd2 100644
+--- a/src/client/components/SurfButton.tsx
++++ b/src/client/hooks/useSurf.ts
+@@ -1,4 +1,4 @@
+-import { useState } from "react";
++import { useState, useCallback } from "react";
+ import type { BuildFilterSelection, StatusKind, SurfSite } from "../App";
+ 
+ /** localStorage key for the seen-list. */
+@@ -7,7 +7,7 @@ const SEEN_KEY = "surfdeck_seen";
+ /** Timeout in milliseconds for the surf fetch request. */
+ const FETCH_TIMEOUT_MS = 5000;
+ 
+-export interface SurfButtonProps {
++export interface UseSurfOptions {
+   selectedMood: string | null;
+   selectedCharacter: string | null;
+   buildFilters: BuildFilterSelection;
+@@ -17,6 +17,11 @@ export interface SurfButtonProps {
+   onStatusChange: (status: StatusKind) => void;
+ }
+ 
++export interface UseSurfReturn {
++  handleSurf: () => void;
++  isLoading: boolean;
++}
++
+ /**
+  * Reads the seen-list from localStorage as an array of site IDs.
+  * Returns an empty array if not set or invalid.
+@@ -59,27 +64,21 @@ function buildQueryString(
+ ): string {
+   const params = new URLSearchParams();
+ 
+-  // Vibecoded corner mode
+   if (cornerMode) {
+     params.set("vibecoded", "1");
+-
+-    // Tier filter (only in corner mode)
+     if (selectedTiers.length > 0) {
+       params.set("tier", selectedTiers.join(","));
+     }
+   }
+ 
+-  // Mood: only send if a real mood is selected (not null / not "surprise")
+   if (mood) {
+     params.set("mood", mood);
+   }
+ 
+-  // Character
+   if (character) {
+     params.set("character", character);
+   }
+ 
+-  // Build filters
+   if (buildFilters.stacks.length > 0) {
+     params.set("stack", buildFilters.stacks.join(","));
+   }
+@@ -90,7 +89,6 @@ function buildQueryString(
+     params.set("static_or_dynamic", buildFilters.static_or_dynamic.join(","));
+   }
+ 
+-  // Seen-list
+   if (seen.length > 0) {
+     params.set("seen", seen.join(","));
+   }
+@@ -100,16 +98,10 @@ function buildQueryString(
+ }
+ 
+ /**
+- * The main Surf button. Handles the open-then-navigate pattern:
+- * 1. Opens a blank tab synchronously within the click gesture.
+- * 2. Fetches /api/surf with current filters + seen-list.
+- * 3. On success: navigates the pre-opened tab to the site URL.
+- * 4. On failure/timeout: closes the blank tab and shows error state.
+- * 5. If popup is blocked (window.open returns null): still fetches, updates
+- *    seen-list and result, then sets popup_blocked so StatusMessage can link
+- *    to the freshly fetched site.
++ * Hook that encapsulates all surf logic: fetch, tab opening, seen-list, and status.
++ * Extracted from the old SurfButton component to decouple behaviour from UI.
+  */
+-export default function SurfButton({
++export function useSurf({
+   selectedMood,
+   selectedCharacter,
+   buildFilters,
+@@ -117,10 +109,10 @@ export default function SurfButton({
+   selectedTiers,
+   onSurfResult,
+   onStatusChange,
+-}: SurfButtonProps) {
++}: UseSurfOptions): UseSurfReturn {
+   const [isLoading, setIsLoading] = useState(false);
+ 
+-  async function handleSurf() {
++  const handleSurf = useCallback(async () => {
+     // Open blank tab synchronously within the click gesture (required for Safari)
+     const tab = window.open("about:blank", "_blank");
+     const popupBlocked = !tab;
+@@ -132,7 +124,6 @@ export default function SurfButton({
+     const seen = getSeenList();
+     const queryString = buildQueryString(selectedMood, selectedCharacter, buildFilters, seen, cornerMode, selectedTiers);
+ 
+-    // AbortController with 5-second timeout
+     const controller = new AbortController();
+     const timeoutId = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
+ 
+@@ -144,7 +135,6 @@ export default function SurfButton({
+       clearTimeout(timeoutId);
+ 
+       if (!response.ok) {
+-        // Server error (500, etc.)
+         tab?.close();
+         onStatusChange("error");
+         return;
+@@ -157,12 +147,10 @@ export default function SurfButton({
+ 
+       if (data.status === "ok" && data.site) {
+         if (popupBlocked) {
+-          // Popup was blocked — update state so StatusMessage shows a link to the fresh site
+           appendToSeenList(data.site.id);
+           onSurfResult(data.site);
+           onStatusChange("popup_blocked");
+         } else {
+-          // Navigate the pre-opened tab to the site URL
+           tab.location.href = data.site.url;
+           appendToSeenList(data.site.id);
+           onSurfResult(data.site);
+@@ -177,41 +165,17 @@ export default function SurfButton({
+         onSurfResult(null);
+         onStatusChange("exhausted");
+       } else {
+-        // Unexpected response shape
+         tab?.close();
+         onStatusChange("error");
+       }
+     } catch {
+-      // Network error or timeout (AbortError)
+       clearTimeout(timeoutId);
+       tab?.close();
+       onStatusChange("error");
+     } finally {
+       setIsLoading(false);
+     }
+-  }
++  }, [selectedMood, selectedCharacter, buildFilters, cornerMode, selectedTiers, onSurfResult, onStatusChange]);
+ 
+-  return (
+-    <div>
+-      <button
+-        type="button"
+-        onClick={handleSurf}
+-        disabled={isLoading}
+-        aria-busy={isLoading}
+-        style={{
+-          padding: "0.75rem 2rem",
+-          fontSize: "1.1rem",
+-          fontWeight: 700,
+-          border: "none",
+-          borderRadius: "8px",
+-          background: isLoading ? "#94a3b8" : "#1a73e8",
+-          color: "#fff",
+-          cursor: isLoading ? "not-allowed" : "pointer",
+-          transition: "background 0.15s ease",
+-        }}
+-      >
+-        {isLoading ? "Surfing\u2026" : "Surf"}
+-      </button>
+-    </div>
+-  );
++  return { handleSurf, isLoading };
+ }
+diff --git a/src/client/main.tsx b/src/client/main.tsx
+index c7d3475..4b12dec 100644
+--- a/src/client/main.tsx
++++ b/src/client/main.tsx
+@@ -1,4 +1,5 @@
+ import { createRoot } from "react-dom/client";
++import "./surfdeck.css";
+ import App from "./App";
+ 
+ const rootElement = document.getElementById("root");
+diff --git a/src/client/surfdeck.css b/src/client/surfdeck.css
+new file mode 100644
+index 0000000..e14a1fd
+--- /dev/null
++++ b/src/client/surfdeck.css
+@@ -0,0 +1,709 @@
++/* ============================================================
++   Surfdeck — Remote + Card Printer
++   A TV remote for the hand-made web.
++   ============================================================ */
++
++/* 1. @font-face declarations
++   ------------------------------------------------------------ */
++@font-face {
++  font-family: 'Familjen Grotesk';
++  font-style: normal;
++  font-weight: 400 700;
++  font-display: swap;
++  src: url('/fonts/familjen-grotesk-latin.woff2') format('woff2');
++}
++
++@font-face {
++  font-family: 'Doto';
++  font-style: normal;
++  font-weight: 900;
++  font-display: swap;
++  src: url('/fonts/doto-900.woff') format('woff');
++}
++
++@font-face {
++  font-family: 'Special Elite';
++  font-style: normal;
++  font-weight: 400;
++  font-display: swap;
++  src: url('/fonts/special-elite-400.woff2') format('woff2');
++}
++
++/* 2. CSS Custom Properties
++   ------------------------------------------------------------ */
++:root {
++  /* Palette */
++  --bg: #F2F0E9;
++  --card-white: #FFFFFF;
++  --ink: #26262A;
++  --body-grey: #6E6A5E;
++  --caption-grey: #8A867A;
++  --key-shadow: #B8B4A8;
++  --device-charcoal: #2B2B2E;
++  --screen: #191916;
++  --lcd-bg: #1A241A;
++  --deep-shadow-1: #141416;
++  --deep-shadow-2: #17171A;
++  --coral: #E8542F;
++  --coral-pressed: #A33417;
++  --lcd-green: #9FE870;
++
++  /* Typography */
++  --font-body: 'Familjen Grotesk', 'Arial', 'Helvetica Neue', sans-serif;
++  --font-lcd: 'Doto', 'Courier New', 'Lucida Console', monospace;
++  --font-card: 'Special Elite', 'Courier New', 'Lucida Console', monospace;
++
++  /* Timing */
++  --zap-full: 2000ms;
++  --zap-compressed: 1000ms;
++  --static-full: 800ms;
++  --static-compressed: 400ms;
++  --card-delay-full: 1000ms;
++  --card-delay-compressed: 500ms;
++  --card-slide: 300ms;
++}
++
++/* 3. Reset / Base
++   ------------------------------------------------------------ */
++*, *::before, *::after {
++  box-sizing: border-box;
++}
++
++body {
++  margin: 0;
++  padding: 0;
++  background: var(--bg);
++  color: var(--ink);
++  font-family: var(--font-body);
++  font-weight: 400;
++  line-height: 1.5;
++  -webkit-font-smoothing: antialiased;
++  -moz-osx-font-smoothing: grayscale;
++}
++
++/* 4. Layout — Scene
++   ------------------------------------------------------------ */
++.page {
++  max-width: 960px;
++  margin: 0 auto;
++  padding: 2rem 1.5rem;
++}
++
++.hero {
++  text-align: center;
++  margin-bottom: 2rem;
++}
++
++.hero__wordmark {
++  font-family: var(--font-body);
++  font-weight: 700;
++  font-size: 1.5rem;
++  color: var(--ink);
++  margin: 0 0 0.25rem;
++  letter-spacing: -0.01em;
++}
++
++.hero__headline {
++  font-size: 1rem;
++  color: var(--body-grey);
++  margin: 0;
++  font-weight: 400;
++}
++
++.scene {
++  display: flex;
++  flex-direction: row;
++  align-items: flex-start;
++  gap: 2rem;
++  margin-bottom: 2rem;
++}
++
++/* 5. Remote
++   ------------------------------------------------------------ */
++.remote {
++  width: 240px;
++  min-width: 240px;
++  background: var(--device-charcoal);
++  border-radius: 24px 24px 32px 32px;
++  padding: 1.5rem 1.25rem 2rem;
++  display: flex;
++  flex-direction: column;
++  align-items: center;
++  gap: 1rem;
++  box-shadow:
++    0 8px 24px rgba(0, 0, 0, 0.3),
++    inset 0 1px 0 rgba(255, 255, 255, 0.05);
++  position: relative;
++}
++
++/* IR LED */
++.ir-led {
++  width: 8px;
++  height: 8px;
++  border-radius: 50%;
++  background: var(--deep-shadow-1);
++  position: absolute;
++  top: 12px;
++  left: 50%;
++  transform: translateX(-50%);
++  transition: background 0.1s;
++}
++
++.ir-led--blip {
++  animation: led-blip-3 0.9s ease-out;
++}
++
++.ir-led--blip-fast {
++  animation: led-blip-2 0.6s ease-out;
++}
++
++/* LCD Readout */
++.lcd {
++  width: 100%;
++  background: var(--lcd-bg);
++  border-radius: 4px;
++  padding: 0.5rem 0.75rem;
++  min-height: 2.5rem;
++  display: flex;
++  align-items: center;
++  justify-content: center;
++  text-align: center;
++  border: 1px solid rgba(159, 232, 112, 0.1);
++}
++
++.lcd__text {
++  font-family: var(--font-lcd);
++  font-weight: 900;
++  font-size: 0.7rem;
++  color: var(--lcd-green);
++  line-height: 1.3;
++  text-transform: uppercase;
++  letter-spacing: 0.03em;
++}
++
++.lcd--flicker {
++  animation: lcd-flicker 0.3s steps(3);
++}
++
++/* SURF Key */
++.surf-key {
++  width: 100%;
++  padding: 1rem;
++  font-family: var(--font-body);
++  font-weight: 700;
++  font-size: 1.1rem;
++  letter-spacing: 0.05em;
++  text-transform: uppercase;
++  color: #fff;
++  background: var(--coral);
++  border: none;
++  border-radius: 12px;
++  cursor: pointer;
++  position: relative;
++  transform: translateY(0);
++  box-shadow:
++    0 4px 0 var(--coral-pressed),
++    0 6px 12px rgba(0, 0, 0, 0.3);
++  transition: transform 0.08s ease, box-shadow 0.08s ease;
++  min-height: 52px;
++}
++
++.surf-key:hover {
++  background: #d94a28;
++}
++
++.surf-key:active,
++.surf-key--pressed {
++  transform: translateY(3px);
++  box-shadow:
++    0 1px 0 var(--coral-pressed),
++    0 2px 4px rgba(0, 0, 0, 0.2);
++}
++
++.surf-key:disabled {
++  opacity: 0.7;
++  cursor: not-allowed;
++}
++
++/* Mood Keys */
++.mood-keys {
++  display: grid;
++  grid-template-columns: 1fr 1fr;
++  gap: 0.4rem;
++  width: 100%;
++}
++
++.mood-key {
++  padding: 0.5rem 0.25rem;
++  font-family: var(--font-body);
++  font-weight: 600;
++  font-size: 0.65rem;
++  letter-spacing: 0.04em;
++  text-transform: uppercase;
++  color: #ccc;
++  background: var(--deep-shadow-1);
++  border: none;
++  border-radius: 6px;
++  cursor: pointer;
++  min-height: 44px;
++  display: flex;
++  align-items: center;
++  justify-content: center;
++  box-shadow: 0 2px 0 var(--deep-shadow-2);
++  transition: background 0.1s, color 0.1s, box-shadow 0.1s;
++}
++
++.mood-key:hover {
++  background: #222225;
++  color: #fff;
++}
++
++.mood-key--active {
++  background: var(--coral);
++  color: #fff;
++  box-shadow: 0 2px 0 var(--coral-pressed);
++}
++
++/* INPUT Key */
++.input-key {
++  width: 100%;
++  padding: 0.5rem;
++  font-family: var(--font-body);
++  font-weight: 600;
++  font-size: 0.6rem;
++  letter-spacing: 0.03em;
++  text-transform: uppercase;
++  color: #999;
++  background: var(--deep-shadow-2);
++  border: 1px solid #333;
++  border-radius: 6px;
++  cursor: pointer;
++  min-height: 44px;
++  transition: color 0.15s, border-color 0.15s;
++}
++
++.input-key:hover {
++  color: #fff;
++  border-color: #555;
++}
++
++.input-key--active {
++  color: var(--lcd-green);
++  border-color: rgba(159, 232, 112, 0.3);
++}
++
++/* 6. Telly
++   ------------------------------------------------------------ */
++.telly-container {
++  flex: 1;
++  min-width: 0;
++  display: flex;
++  flex-direction: column;
++}
++
++.telly {
++  background: #222;
++  border-radius: 12px;
++  padding: 12px;
++  box-shadow:
++    0 8px 24px rgba(0, 0, 0, 0.2),
++    inset 0 0 0 2px #333;
++}
++
++.telly__screen {
++  width: 100%;
++  aspect-ratio: 16 / 10;
++  background: var(--screen);
++  border-radius: 4px;
++  display: flex;
++  flex-direction: column;
++  align-items: center;
++  justify-content: center;
++  position: relative;
++  overflow: hidden;
++}
++
++/* Telly states */
++.telly__screen--idle {
++  /* Dark, off — faint scanline hint */
++}
++
++.telly__screen--idle::after {
++  content: '';
++  position: absolute;
++  inset: 0;
++  background: repeating-linear-gradient(
++    transparent,
++    transparent 2px,
++    rgba(0, 0, 0, 0.03) 2px,
++    rgba(0, 0, 0, 0.03) 4px
++  );
++  pointer-events: none;
++}
++
++.telly__screen--static {
++  animation: static-noise var(--static-full) steps(8) forwards;
++}
++
++.telly__screen--static-fast {
++  animation: static-noise var(--static-compressed) steps(6) forwards;
++}
++
++.telly__screen--tuned {
++  /* Channel is displayed — no static */
++}
++
++.telly__screen--exhausted {
++  animation: static-noise 2s steps(8) infinite;
++}
++
++/* Channel display */
++.telly__channel {
++  font-family: var(--font-lcd);
++  font-weight: 900;
++  font-size: clamp(2rem, 5vw, 3.5rem);
++  color: #fff;
++  text-align: center;
++  line-height: 1.1;
++}
++
++.telly__subtitle {
++  font-family: var(--font-body);
++  font-size: 0.8rem;
++  color: var(--caption-grey);
++  margin-top: 0.5rem;
++  text-align: center;
++}
++
++.telly__no-signal {
++  font-family: var(--font-lcd);
++  font-weight: 900;
++  font-size: 1.5rem;
++  color: #fff;
++  text-shadow: 0 0 8px rgba(255, 255, 255, 0.3);
++}
++
++/* 7. Card Slot
++   ------------------------------------------------------------ */
++.card-slot {
++  margin-top: 0.75rem;
++  overflow: hidden;
++  position: relative;
++}
++
++.card-slot__inner {
++  transform: translateY(110%);
++  transition: transform var(--card-slide) ease-out;
++}
++
++.card-slot--visible .card-slot__inner {
++  transform: translateY(0);
++}
++
++.card-slot--ducking .card-slot__inner {
++  transform: translateY(110%);
++  transition: transform 0.15s ease-in;
++}
++
++/* 8. Provenance Card
++   ------------------------------------------------------------ */
++.prov-card {
++  background: var(--card-white);
++  border: 1px solid #e0ddd5;
++  border-radius: 8px;
++  padding: 1.25rem 1.5rem;
++  font-family: var(--font-card);
++  position: relative;
++  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
++}
++
++.prov-card__heading {
++  font-family: var(--font-body);
++  font-size: 0.65rem;
++  font-weight: 600;
++  text-transform: uppercase;
++  letter-spacing: 0.06em;
++  color: var(--caption-grey);
++  margin: 0 0 0.75rem;
++}
++
++.prov-card__body {
++  font-size: 1rem;
++  color: var(--ink);
++  margin: 0 0 0.75rem;
++  line-height: 1.5;
++}
++
++.prov-card__body--fallback {
++  font-style: italic;
++  color: var(--body-grey);
++}
++
++.prov-card__footer {
++  font-family: var(--font-body);
++  font-size: 0.75rem;
++  color: var(--caption-grey);
++  margin: 0;
++  font-style: italic;
++}
++
++.prov-card__stamp {
++  position: absolute;
++  top: 1rem;
++  right: 1rem;
++  font-family: var(--font-body);
++  font-size: 0.55rem;
++  font-weight: 700;
++  text-transform: uppercase;
++  letter-spacing: 0.08em;
++  color: var(--coral);
++  border: 1.5px solid var(--coral);
++  padding: 0.2rem 0.4rem;
++  border-radius: 3px;
++  transform: rotate(3deg);
++  opacity: 0.8;
++}
++
++/* 9. Filters (chip rows below scene)
++   ------------------------------------------------------------ */
++.filters {
++  margin-bottom: 1.5rem;
++}
++
++.filters__group {
++  margin-bottom: 0.75rem;
++}
++
++.filters__label {
++  font-size: 0.7rem;
++  font-weight: 600;
++  text-transform: uppercase;
++  letter-spacing: 0.04em;
++  color: var(--caption-grey);
++  margin-bottom: 0.4rem;
++}
++
++.chip-row {
++  display: flex;
++  flex-wrap: wrap;
++  gap: 0.4rem;
++}
++
++.chip {
++  padding: 0.4rem 0.75rem;
++  font-family: var(--font-body);
++  font-size: 0.75rem;
++  font-weight: 400;
++  color: var(--body-grey);
++  background: var(--card-white);
++  border: 1px solid var(--key-shadow);
++  border-radius: 100px;
++  cursor: pointer;
++  transition: background 0.12s, color 0.12s, border-color 0.12s;
++  min-height: 36px;
++  display: flex;
++  align-items: center;
++}
++
++.chip:hover {
++  border-color: var(--body-grey);
++  color: var(--ink);
++}
++
++.chip--active {
++  background: var(--coral);
++  color: #fff;
++  border-color: var(--coral);
++  font-weight: 600;
++}
++
++.chip--active:hover {
++  background: #d94a28;
++  border-color: #d94a28;
++  color: #fff;
++}
++
++/* 10. Status line
++   ------------------------------------------------------------ */
++.status-line {
++  text-align: center;
++  padding: 1rem 0;
++}
++
++.status-line__text {
++  font-size: 0.9rem;
++  color: var(--body-grey);
++  margin: 0 0 0.5rem;
++}
++
++.status-line__sub {
++  font-size: 0.8rem;
++  color: var(--caption-grey);
++  margin: 0;
++}
++
++.status-line__link {
++  color: var(--coral);
++  text-decoration: underline;
++  cursor: pointer;
++}
++
++.status-line__link:hover {
++  color: var(--coral-pressed);
++}
++
++.reset-btn {
++  margin-top: 0.75rem;
++  padding: 0.5rem 1.25rem;
++  font-family: var(--font-body);
++  font-size: 0.8rem;
++  font-weight: 600;
++  color: #fff;
++  background: var(--coral);
++  border: none;
++  border-radius: 6px;
++  cursor: pointer;
++  transition: background 0.12s;
++}
++
++.reset-btn:hover {
++  background: var(--coral-pressed);
++}
++
++/* 11. Keyframe Animations
++   ------------------------------------------------------------ */
++
++/* Static noise effect */
++@keyframes static-noise {
++  0% { background-position: 0 0; }
++  100% { background-position: -200px -200px; }
++}
++
++.telly__screen--static,
++.telly__screen--static-fast,
++.telly__screen--exhausted {
++  background-image:
++    repeating-linear-gradient(
++      0deg,
++      transparent,
++      transparent 1px,
++      rgba(255, 255, 255, 0.02) 1px,
++      rgba(255, 255, 255, 0.02) 2px
++    ),
++    repeating-linear-gradient(
++      90deg,
++      transparent,
++      transparent 2px,
++      rgba(255, 255, 255, 0.015) 2px,
++      rgba(255, 255, 255, 0.015) 4px
++    ),
++    url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.15'/%3E%3C/svg%3E");
++  background-color: var(--screen);
++  background-size: 200px 200px;
++}
++
++/* LED blip — 3 pulses (full ceremony) */
++@keyframes led-blip-3 {
++  0%, 100% { background: var(--deep-shadow-1); }
++  10%, 20% { background: var(--coral); box-shadow: 0 0 6px var(--coral); }
++  30%, 40% { background: var(--deep-shadow-1); }
++  43%, 53% { background: var(--coral); box-shadow: 0 0 6px var(--coral); }
++  63%, 73% { background: var(--deep-shadow-1); }
++  76%, 86% { background: var(--coral); box-shadow: 0 0 6px var(--coral); }
++}
++
++/* LED blip — 2 pulses (compressed) */
++@keyframes led-blip-2 {
++  0%, 100% { background: var(--deep-shadow-1); }
++  15%, 30% { background: var(--coral); box-shadow: 0 0 6px var(--coral); }
++  45%, 60% { background: var(--deep-shadow-1); }
++  65%, 80% { background: var(--coral); box-shadow: 0 0 6px var(--coral); }
++}
++
++/* LCD flicker */
++@keyframes lcd-flicker {
++  0% { opacity: 1; }
++  33% { opacity: 0.3; }
++  66% { opacity: 0.8; }
++  100% { opacity: 1; }
++}
++
++/* 12. @media (prefers-reduced-motion: reduce)
++   ------------------------------------------------------------ */
++@media (prefers-reduced-motion: reduce) {
++  .ir-led--blip,
++  .ir-led--blip-fast {
++    animation: none;
++  }
++
++  .lcd--flicker {
++    animation: none;
++  }
++
++  .telly__screen--static,
++  .telly__screen--static-fast {
++    animation: none;
++    background-image: none;
++  }
++
++  .telly__screen--exhausted {
++    animation: none;
++  }
++
++  .card-slot__inner {
++    transition: none;
++  }
++
++  .card-slot--visible .card-slot__inner {
++    transform: translateY(0);
++  }
++
++  .surf-key:active,
++  .surf-key--pressed {
++    transform: none;
++    box-shadow: 0 4px 0 var(--coral-pressed), 0 6px 12px rgba(0, 0, 0, 0.3);
++    background: var(--coral-pressed);
++  }
++}
++
++/* 13. @media responsive — phone
++   ------------------------------------------------------------ */
++@media (max-width: 768px) {
++  .scene {
++    flex-direction: column;
++    align-items: stretch;
++  }
++
++  .remote {
++    width: 100%;
++    min-width: unset;
++    border-radius: 20px;
++    padding: 1.25rem 1rem 1.5rem;
++  }
++
++  .mood-keys {
++    grid-template-columns: 1fr 1fr 1fr;
++  }
++
++  .page {
++    padding: 1.5rem 1rem;
++  }
++}
++
++@media (max-width: 430px) {
++  .hero__wordmark {
++    font-size: 1.25rem;
++  }
++
++  .hero__headline {
++    font-size: 0.9rem;
++  }
++
++  .telly__channel {
++    font-size: 2rem;
++  }
++
++  .prov-card {
++    padding: 1rem 1.25rem;
++  }
++}
+diff --git a/src/worker/routes/ouroboros.ts b/src/worker/routes/ouroboros.ts
+index 2e4797e..86e34b4 100644
+--- a/src/worker/routes/ouroboros.ts
++++ b/src/worker/routes/ouroboros.ts
+@@ -15,21 +15,245 @@ ouroborosRoute.get("/ouroboros", (c) => {
+ <head>
+   <meta charset="utf-8">
+   <meta name="viewport" content="width=device-width, initial-scale=1">
++  <meta name="theme-color" content="#F2F0E9">
+   <title>Surfdeck — The Ouroboros</title>
+   <style>
+-    body { font-family: system-ui, sans-serif; max-width: 600px; margin: 4rem auto; padding: 0 1rem; line-height: 1.6; }
+-    .glyph { font-size: 4rem; text-align: center; margin: 2rem 0; opacity: 0.3; }
+-    h1 { font-size: 1.5rem; }
+-    a { color: inherit; }
++    @font-face {
++      font-family: 'Familjen Grotesk';
++      font-style: normal;
++      font-weight: 400 700;
++      font-display: swap;
++      src: url('/fonts/familjen-grotesk-latin.woff2') format('woff2');
++    }
++    @font-face {
++      font-family: 'Doto';
++      font-style: normal;
++      font-weight: 900;
++      font-display: swap;
++      src: url('/fonts/doto-900.woff') format('woff');
++    }
++    @font-face {
++      font-family: 'Special Elite';
++      font-style: normal;
++      font-weight: 400;
++      font-display: swap;
++      src: url('/fonts/special-elite-400.woff2') format('woff2');
++    }
++
++    :root {
++      --bg: #F2F0E9;
++      --ink: #26262A;
++      --body-grey: #6E6A5E;
++      --caption-grey: #8A867A;
++      --coral: #E8542F;
++      --screen: #191916;
++      --font-body: 'Familjen Grotesk', 'Arial', sans-serif;
++      --font-lcd: 'Doto', 'Courier New', monospace;
++      --font-card: 'Special Elite', 'Courier New', monospace;
++    }
++
++    * { box-sizing: border-box; }
++
++    body {
++      font-family: var(--font-body);
++      max-width: 600px;
++      margin: 4rem auto;
++      padding: 0 1.5rem;
++      line-height: 1.6;
++      background: var(--bg);
++      color: var(--ink);
++    }
++
++    h1 {
++      font-size: 1.5rem;
++      font-weight: 700;
++      margin: 2rem 0 0.5rem;
++    }
++
++    p { color: var(--body-grey); }
++
++    a { color: var(--coral); }
++
++    /* Ouroboros container */
++    .ouroboros {
++      width: 200px;
++      height: 200px;
++      margin: 2rem auto;
++      position: relative;
++    }
++
++    /* Pixel cells forming the ring */
++    .ouroboros__cell {
++      position: absolute;
++      width: 12px;
++      height: 12px;
++      border-radius: 2px;
++      background: var(--caption-grey);
++      opacity: 0.4;
++    }
++
++    .ouroboros__cell--head {
++      background: var(--coral);
++      opacity: 1;
++      animation: snake-advance 8s steps(24) infinite;
++    }
++
++    /* Generate ring positions via inline styles in the HTML */
++
++    @keyframes snake-advance {
++      0% { opacity: 1; }
++      4% { opacity: 1; }
++      4.1% { opacity: 0.4; background: var(--caption-grey); }
++      100% { opacity: 0.4; background: var(--caption-grey); }
++    }
++
++    /* The real animation: rotate the highlight around */
++    .ouroboros__ring {
++      width: 100%;
++      height: 100%;
++      position: relative;
++      animation: ring-rotate 8s linear infinite;
++    }
++
++    @keyframes ring-rotate {
++      from { transform: rotate(0deg); }
++      to { transform: rotate(360deg); }
++    }
++
++    /* Provenance card */
++    .prov-card {
++      background: #fff;
++      border: 1px solid #e0ddd5;
++      border-radius: 8px;
++      padding: 1.25rem 1.5rem;
++      font-family: var(--font-card);
++      position: relative;
++      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
++      margin: 2rem 0;
++    }
++
++    .prov-card__heading {
++      font-family: var(--font-body);
++      font-size: 0.65rem;
++      font-weight: 600;
++      text-transform: uppercase;
++      letter-spacing: 0.06em;
++      color: var(--caption-grey);
++      margin: 0 0 0.75rem;
++    }
++
++    .prov-card__body {
++      font-size: 1rem;
++      color: var(--ink);
++      margin: 0 0 0.75rem;
++      line-height: 1.5;
++    }
++
++    .prov-card__footer {
++      font-family: var(--font-body);
++      font-size: 0.75rem;
++      color: var(--caption-grey);
++      margin: 0;
++      font-style: italic;
++    }
++
++    .prov-card__stamp {
++      position: absolute;
++      top: 1rem;
++      right: 1rem;
++      font-family: var(--font-body);
++      font-size: 0.55rem;
++      font-weight: 700;
++      text-transform: uppercase;
++      letter-spacing: 0.08em;
++      color: var(--coral);
++      border: 1.5px solid var(--coral);
++      padding: 0.2rem 0.4rem;
++      border-radius: 3px;
++      transform: rotate(3deg);
++      opacity: 0.8;
++    }
++
++    /* Telly frame around ouroboros */
++    .telly-frame {
++      background: #222;
++      border-radius: 12px;
++      padding: 12px;
++      box-shadow: 0 8px 24px rgba(0,0,0,0.2), inset 0 0 0 2px #333;
++      margin: 2rem auto;
++      max-width: 320px;
++    }
++
++    .telly-screen {
++      background: var(--bg);
++      border-radius: 4px;
++      display: flex;
++      align-items: center;
++      justify-content: center;
++      padding: 2rem;
++      aspect-ratio: 4/3;
++    }
++
++    @media (prefers-reduced-motion: reduce) {
++      .ouroboros__ring {
++        animation: none;
++      }
++      .ouroboros__cell--head {
++        animation: none;
++        opacity: 1;
++        background: var(--coral);
++      }
++    }
+   </style>
+ </head>
+ <body>
+-  <div class="glyph" aria-hidden="true">&#x1F40D;</div>
+   <h1>The loop closes.</h1>
+   <p>You're inside the app you're surfing with. Surfdeck was built end-to-end by AI in Kiro — exhibit #1 in its own vibecoded corner.</p>
++
++  <!-- Telly showing the ouroboros -->
++  <div class="telly-frame">
++    <div class="telly-screen">
++      <div class="ouroboros" aria-label="Dot-matrix ouroboros — a ring of square pixels with an advancing coral head">
++        <div class="ouroboros__ring">
++          ${generateOuroborosCells()}
++        </div>
++      </div>
++    </div>
++  </div>
++
++  <!-- Provenance card -->
++  <div class="prov-card">
++    <p class="prov-card__heading">HOW THIS SITE IS BUILT — CATCH № 288 OF 288</p>
++    <p class="prov-card__body">CATCH № 288 OF 288 — the loop closes.</p>
++    <p class="prov-card__footer">Everyone's a builder. Learn from the sites you like.</p>
++    <span class="prov-card__stamp">OPENS IN NEW TAB</span>
++  </div>
++
+   <p><a href="https://github.com/thekashifnazir/surfdeck">View the repo &amp; process log</a></p>
+-  <p class="note"><em>Glyph placeholder — the real ouroboros design comes in a later cycle.</em></p>
+ </body>
+ </html>`;
+   return c.html(html);
+ });
++
++/**
++ * Generates 24 square pixel cells arranged in a ring (circle).
++ * One cell is marked as the "head" with coral highlight.
++ */
++function generateOuroborosCells(): string {
++  const count = 24;
++  const radius = 80; // px from center
++  const center = 100; // center of the 200×200 container
++  const cellSize = 12;
++  const cells: string[] = [];
++
++  for (let i = 0; i < count; i++) {
++    const angle = (i / count) * Math.PI * 2 - Math.PI / 2;
++    const x = center + radius * Math.cos(angle) - cellSize / 2;
++    const y = center + radius * Math.sin(angle) - cellSize / 2;
++    const isHead = i === 0;
++    const className = `ouroboros__cell${isHead ? " ouroboros__cell--head" : ""}`;
++    cells.push(`<div class="${className}" style="left:${x.toFixed(1)}px;top:${y.toFixed(1)}px"></div>`);
++  }
++
++  return cells.join("\n          ");
++}
