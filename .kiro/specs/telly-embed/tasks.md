@@ -98,7 +98,7 @@ Tasks are sequenced so the cycle has a shippable checkpoint after task 12. Bug f
 
 ## Phase C: Provenance Card Upgrade (tasks 9–12)
 
-- [ ] 9. Add `/api/corpus-size` endpoint
+- [x] 9. Add `/api/corpus-size` endpoint
   - **Files:** new `src/worker/routes/corpus-size.ts`, `src/worker/index.ts`
   - **Changes:**
     - New route: `GET /api/corpus-size` → `SELECT COUNT(*) as total FROM sites WHERE nsfw = 0`.
@@ -107,7 +107,7 @@ Tasks are sequenced so the cycle has a shippable checkpoint after task 12. Bug f
   - **Done when:** `curl /api/corpus-size` returns `{"total":349}` (or current count). Tests cover the endpoint. All tests pass.
   - _Requirements: 6.6_
 
-- [ ] 10. Upgrade ProvenanceCard content (title, why-note, dynamic total)
+- [x] 10. Upgrade ProvenanceCard content (title, why-note, dynamic total)
   - **Files:** `src/client/components/ProvenanceCard.tsx`, `src/client/surfdeck.css`
   - **Changes:**
     - Add site title as first line: `<p className="prov-card__title">{site.title}</p>` — Familjen Grotesk 600, 14px, ink.
@@ -118,7 +118,7 @@ Tasks are sequenced so the cycle has a shippable checkpoint after task 12. Bug f
   - **Done when:** Card displays site title, catch number with live total, provenance fields, and why-note. Tests pass.
   - _Requirements: 6.3–6.6_
 
-- [ ] 11. Move provenance card to a column beside the telly
+- [x] 11. Move provenance card to a column beside the telly
   - **Files:** `src/client/App.tsx`, `src/client/surfdeck.css`
   - **Changes:**
     - App.tsx: restructure `.scene` to three children:
@@ -131,7 +131,7 @@ Tasks are sequenced so the cycle has a shippable checkpoint after task 12. Bug f
   - **Done when:** On desktop, provenance card sits to the right of the telly. On mobile, it stacks below. Card persists between presses. Tests pass.
   - _Requirements: 6.1–6.2_
 
-- [ ] 12. Card stamp and tests
+- [x] 12. Card stamp and tests
   - **Files:** `src/client/components/ProvenanceCard.tsx`, new/extended test file
   - **Changes:**
     - Stamp text becomes conditional: accept `embedded: boolean` prop.

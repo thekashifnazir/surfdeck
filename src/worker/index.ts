@@ -6,6 +6,7 @@
 import { Hono } from "hono";
 import { surfRoute } from "./routes/surf";
 import { filtersRoute } from "./routes/filters";
+import { corpusSizeRoute } from "./routes/corpus-size";
 import { ouroborosRoute } from "./routes/ouroboros";
 
 type Bindings = {
@@ -20,6 +21,7 @@ app.route("", ouroborosRoute);
 // Mount API routes
 app.route("/api", surfRoute);
 app.route("/api", filtersRoute);
+app.route("/api", corpusSizeRoute);
 
 // Catch-all: unknown /api/* paths return 404 JSON (Req 9.4)
 app.all("/api/*", (c) => c.json({ error: "Not found" }, 404));

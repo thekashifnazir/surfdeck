@@ -77,6 +77,9 @@ export default function App() {
     corner_tiers: [],
   });
 
+  // Corpus size (fetched from API)
+  const [corpusTotal, setCorpusTotal] = useState<number>(0);
+
   // Surf result state
   const [lastSurfResult, setLastSurfResult] = useState<SurfSite | null>(null);
   const [statusMessage, setStatusMessage] = useState<StatusKind>(null);
@@ -127,6 +130,27 @@ export default function App() {
     }
 
     fetchFilters();
+    return () => { cancelled = true; };
+  }, []);
+
+  // Fetch corpus size on mount
+  useEffect(() => {
+    let cancelled = false;
+
+    async function fetchCorpusSize() {
+      try {
+        const response = await fetch("/api/corpus-size");
+        if (!response.ok) return;
+        const data: { total: number } = await response.json();
+        if (!cancelled) {
+          setCorpusTotal(data.total);
+        }
+      } catch {
+        // Silently ignore — card will show 0 until loaded
+      }
+    }
+
+    fetchCorpusSize();
     return () => { cancelled = true; };
   }, []);
 
@@ -302,11 +326,13 @@ export default function App() {
           />
 
           <div className="telly__stand" aria-hidden="true" />
+        </div>
 
-          {/* Card Slot — below the telly */}
+        {/* Card column — beside the telly on desktop, below on mobile */}
+        <div className="card-column">
           <CardSlot visible={cardVisible} reprint={isReprint}>
             {lastSurfResult && (
-              <ProvenanceCard site={lastSurfResult} cornerMode={cornerMode} />
+              <ProvenanceCard site={lastSurfResult} cornerMode={cornerMode} corpusTotal={corpusTotal} />
             )}
           </CardSlot>
         </div>

@@ -493,6 +493,17 @@ body {
   margin-top: 8px;
 }
 
+/* 6b. Card Column (beside telly on desktop, below on mobile)
+   ------------------------------------------------------------ */
+.card-column {
+  width: 220px;
+  flex-shrink: 0;
+  align-self: stretch;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+}
+
 /* 7. Card Slot
    ------------------------------------------------------------ */
 .card-slot {
@@ -544,6 +555,14 @@ body {
   box-shadow: 0 4px 8px rgba(38, 38, 42, 0.12);
 }
 
+.prov-card__title {
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--ink);
+  margin: 0 0 0.25rem;
+}
+
 .prov-card__heading {
   padding-right: 90px;
   font-family: var(--font-body);
@@ -565,6 +584,14 @@ body {
 .prov-card__body--fallback {
   font-style: italic;
   color: var(--body-grey);
+}
+
+.prov-card__why {
+  font-family: var(--font-body);
+  font-style: italic;
+  font-size: 12px;
+  color: var(--body-grey);
+  margin: 0 0 0.75rem;
 }
 
 .prov-card__footer {
@@ -814,6 +841,11 @@ body {
   .scene {
     flex-direction: column;
     align-items: stretch;
+  }
+
+  .card-column {
+    width: 100%;
+    order: 3;
   }
 
   .remote {

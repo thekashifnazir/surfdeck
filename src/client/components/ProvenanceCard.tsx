@@ -2,12 +2,11 @@ import type { SurfSite } from "../App";
 import { getProvenanceLabel } from "../provenance-labels";
 import { getBuiltWithLabel, getBuiltWithTier, getTierLabel } from "../vibecoded-labels";
 
-// Update when data/featured-sites.csv changes. Source of truth: SELECT COUNT(*) FROM sites WHERE nsfw = 0
-const CORPUS_TOTAL = 349;
-
 export interface ProvenanceCardProps {
   site: SurfSite;
   cornerMode: boolean;
+  corpusTotal: number;
+  embedded?: boolean;
 }
 
 /**
@@ -33,7 +32,7 @@ function isDisplayable(value: string | null | undefined): value is string {
  * Never displays "unknown · unknown · unknown".
  * All-blank fallback: "Hand-made on the open web."
  */
-export default function ProvenanceCard({ site, cornerMode }: ProvenanceCardProps) {
+export default function ProvenanceCard({ site, cornerMode, corpusTotal, embedded = false }: ProvenanceCardProps) {
   // Build body content
   let bodyContent: string;
   let isFallback = false;
@@ -63,17 +62,21 @@ export default function ProvenanceCard({ site, cornerMode }: ProvenanceCardProps
 
   return (
     <div className="prov-card">
+      <p className="prov-card__title">{site.title}</p>
       <p className="prov-card__heading">
-        HOW THIS SITE IS BUILT — CATCH №&nbsp;{site.id} OF {CORPUS_TOTAL}
+        CATCH №&nbsp;{site.id} OF {corpusTotal}
       </p>
       <p className={`prov-card__body${isFallback ? " prov-card__body--fallback" : ""}`}>
         {bodyContent}
       </p>
+      {site.why_note && (
+        <p className="prov-card__why">{site.why_note}</p>
+      )}
       <p className="prov-card__footer">
         Everyone's a builder. Learn from the sites you like.
       </p>
       <span className="prov-card__stamp" aria-hidden="true">
-        OPENS IN NEW TAB
+        {embedded ? "OPENS IN TELLY" : "OPENS IN NEW TAB"}
       </span>
     </div>
   );

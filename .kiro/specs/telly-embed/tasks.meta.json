@@ -96,6 +96,54 @@
         "chatSessionId": "sess_904a5902-6969-4b7d-94fd-765ef3341a4a",
         "timestamp": 1787346373244
       }
+    ],
+    "9. Add `/api/corpus-size` endpoint": [
+      {
+        "executionId": "52c9dbf1-ba6c-4275-9ea7-acd736fb6104",
+        "chatSessionId": "sess_1695f81e-58de-4f0d-b247-6a31d45395cc",
+        "timestamp": 1787346850762
+      },
+      {
+        "executionId": "52c9dbf1-ba6c-4275-9ea7-acd736fb6104",
+        "chatSessionId": "sess_1695f81e-58de-4f0d-b247-6a31d45395cc",
+        "timestamp": 1787347282331
+      }
+    ],
+    "10. Upgrade ProvenanceCard content (title, why-note, dynamic total)": [
+      {
+        "executionId": "b591800f-5fa0-4afc-96b3-44415ba2d534",
+        "chatSessionId": "sess_7fdf2571-009e-47df-8d0e-8ad94d7b62d4",
+        "timestamp": 1787347332713
+      },
+      {
+        "executionId": "b591800f-5fa0-4afc-96b3-44415ba2d534",
+        "chatSessionId": "sess_7fdf2571-009e-47df-8d0e-8ad94d7b62d4",
+        "timestamp": 1787347554700
+      }
+    ],
+    "11. Move provenance card to a column beside the telly": [
+      {
+        "executionId": "b37ad3e4-edd0-452b-87e1-d0d952ed2896",
+        "chatSessionId": "sess_48c62137-edb9-417f-b260-f89943593f28",
+        "timestamp": 1787347617675
+      },
+      {
+        "executionId": "b37ad3e4-edd0-452b-87e1-d0d952ed2896",
+        "chatSessionId": "sess_48c62137-edb9-417f-b260-f89943593f28",
+        "timestamp": 1787347709432
+      }
+    ],
+    "12. Card stamp and tests": [
+      {
+        "executionId": "8a5c1a21-4378-4f71-9001-713dc597c62b",
+        "chatSessionId": "sess_20f87340-da0b-4436-a1a6-9fe3ad07ab41",
+        "timestamp": 1787347777395
+      },
+      {
+        "executionId": "8a5c1a21-4378-4f71-9001-713dc597c62b",
+        "chatSessionId": "sess_20f87340-da0b-4436-a1a6-9fe3ad07ab41",
+        "timestamp": 1787348199777
+      }
     ]
   }
 }
