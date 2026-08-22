@@ -138,7 +138,7 @@ mobile 390px keeps no horizontal scroll.
 
 ## Phase D — Provenance card v2 (`ProvenanceCard.tsx` + CSS)
 
-- [-] 15. Single-column layout + contrast
+- [x] 15. Single-column layout + contrast
   - **Files:** `ProvenanceCard.tsx`, `surfdeck.css`
   - **Changes:** collapse the two-column grid to the comp's single-column flow
     (design §2.0); heading/footer colour → `--body-grey` or darker (verify AA).
@@ -146,14 +146,14 @@ mobile 390px keeps no horizontal scroll.
     have no horizontal scroll.
   - _Requirements: 2.1, 2.12_
 
-- [ ] 16. Mode-dependent heading
+- [x] 16. Mode-dependent heading
   - **Files:** `ProvenanceCard.tsx`
   - **Changes:** open-web "CATCH № {id} · ONE OF {corpusTotal} HAND-PICKED SITES";
     corner "CATCH № {id} · VIBECODED CORNER".
   - **Done when:** heading switches by mode.
   - _Requirements: 2.2_
 
-- [ ] 17. Linked tech line (open-web) via URL map
+- [x] 17. Linked tech line (open-web) via URL map
   - **Files:** `ProvenanceCard.tsx`, `surfdeck.css`
   - **Changes:** stack + host labels → `.prov-link` dotted-coral anchors
     (`target="_blank" rel="noopener noreferrer"`) when `getProvenanceUrl` returns
@@ -161,7 +161,7 @@ mobile 390px keeps no horizontal scroll.
   - **Done when:** stack/host link out; type is plain; no broken links.
   - _Requirements: 2.3, 2.4, 2.5_
 
-- [ ] 18. Recipe line (open-web) via fragments
+- [x] 18. Recipe line (open-web) via fragments
   - **Files:** `ProvenanceCard.tsx`, `surfdeck.css`
   - **Changes:** under the tech line, render "the recipe: {stackFragment} —
     {hostFragment}" from `RECIPE_FRAGMENTS` (present fragments only; omit if none).
@@ -169,7 +169,7 @@ mobile 390px keeps no horizontal scroll.
     no tools — hosted free from a code repo".
   - _Requirements: 2.6_
 
-- [ ] 19. Corner tier line + divider/footer rules
+- [x] 19. Corner tier line + divider/footer rules
   - **Files:** `ProvenanceCard.tsx`, `surfdeck.css`
   - **Changes:** corner tech line "Built with {Tool link} · Tier {N} —
     {tier label lowercased}" via `getTierLabel`; open-web adds dashed divider +
@@ -179,7 +179,7 @@ mobile 390px keeps no horizontal scroll.
     corner hides the generic footer.
   - _Requirements: 2.7, 2.8, 2.9_
 
-- [ ] 20. MAKE ONE YOURSELF block (corner + open-web) via tool/URL maps
+- [x] 20. MAKE ONE YOURSELF block (corner + open-web) via tool/URL maps
   - **Files:** `ProvenanceCard.tsx`, `surfdeck.css`, `tool-map.ts` (task 7),
     `provenance-urls.ts` (task 6)
   - **Changes (corner):** in corner mode with a mapped `built_with`, render the
@@ -201,7 +201,7 @@ mobile 390px keeps no horizontal scroll.
     fallback; both use the identical dashed-coral pattern.
   - _Requirements: 3.1–3.12_
 
-- [ ] 21. ProvenanceCard tests
+- [x] 21. ProvenanceCard tests
   - **Files:** `src/client/components/ProvenanceCard.test.ts`
   - **Changes:** heading by mode; stack/host anchors present + type plain; recipe
     line; corner "Tier N — label"; open-web footer copy + corner omission; all-blank

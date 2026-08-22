@@ -168,6 +168,90 @@
         "chatSessionId": "sess_8ba8561c-2ed7-4d6b-af19-ccd42580289c",
         "timestamp": 1787409858049
       }
+    ],
+    "15. Single-column layout + contrast": [
+      {
+        "executionId": "65667021-b483-4f67-aa5d-c8d792949a65",
+        "chatSessionId": "sess_e9c15225-f7ed-4d5b-958f-ce4d9f47e66b",
+        "timestamp": 1787410732732
+      },
+      {
+        "executionId": "65667021-b483-4f67-aa5d-c8d792949a65",
+        "chatSessionId": "sess_e9c15225-f7ed-4d5b-958f-ce4d9f47e66b",
+        "timestamp": 1787410900026
+      }
+    ],
+    "16. Mode-dependent heading": [
+      {
+        "executionId": "1f02e22d-8adc-4ede-b7bb-63bff0f6c436",
+        "chatSessionId": "sess_8ddfa298-e119-4273-b405-391b229fdb81",
+        "timestamp": 1787410920572
+      },
+      {
+        "executionId": "1f02e22d-8adc-4ede-b7bb-63bff0f6c436",
+        "chatSessionId": "sess_8ddfa298-e119-4273-b405-391b229fdb81",
+        "timestamp": 1787411030205
+      }
+    ],
+    "17. Linked tech line (open-web) via URL map": [
+      {
+        "executionId": "6b0f8f9b-33f7-427c-9f29-a21aef90e5c9",
+        "chatSessionId": "sess_707df867-a600-4eec-a7f7-3f6d9e293a44",
+        "timestamp": 1787411047899
+      },
+      {
+        "executionId": "6b0f8f9b-33f7-427c-9f29-a21aef90e5c9",
+        "chatSessionId": "sess_707df867-a600-4eec-a7f7-3f6d9e293a44",
+        "timestamp": 1787411135375
+      }
+    ],
+    "18. Recipe line (open-web) via fragments": [
+      {
+        "executionId": "8776c953-318d-4524-9425-3d394161dbd4",
+        "chatSessionId": "sess_4c4bb754-dda4-483a-b195-6b5ebc7fa3fe",
+        "timestamp": 1787411191261
+      },
+      {
+        "executionId": "8776c953-318d-4524-9425-3d394161dbd4",
+        "chatSessionId": "sess_4c4bb754-dda4-483a-b195-6b5ebc7fa3fe",
+        "timestamp": 1787411376432
+      }
+    ],
+    "19. Corner tier line + divider/footer rules": [
+      {
+        "executionId": "32b64b8c-6ff4-4d52-b3fb-27e9adce5324",
+        "chatSessionId": "sess_b80bb0fe-5306-4e72-bd71-68f5bd65d6c7",
+        "timestamp": 1787411423665
+      },
+      {
+        "executionId": "32b64b8c-6ff4-4d52-b3fb-27e9adce5324",
+        "chatSessionId": "sess_b80bb0fe-5306-4e72-bd71-68f5bd65d6c7",
+        "timestamp": 1787411537501
+      }
+    ],
+    "20. MAKE ONE YOURSELF block (corner + open-web) via tool/URL maps": [
+      {
+        "executionId": "f4c06745-d062-4e22-a839-736b8880c4d8",
+        "chatSessionId": "sess_810cd689-3a2f-4b85-ac90-69f26cc106d4",
+        "timestamp": 1787411580646
+      },
+      {
+        "executionId": "f4c06745-d062-4e22-a839-736b8880c4d8",
+        "chatSessionId": "sess_810cd689-3a2f-4b85-ac90-69f26cc106d4",
+        "timestamp": 1787411804608
+      }
+    ],
+    "21. ProvenanceCard tests": [
+      {
+        "executionId": "27a416cb-42eb-4f32-9839-9f1035bf2550",
+        "chatSessionId": "sess_d49b57eb-af1a-4195-8be0-256711f020a5",
+        "timestamp": 1787411835508
+      },
+      {
+        "executionId": "27a416cb-42eb-4f32-9839-9f1035bf2550",
+        "chatSessionId": "sess_d49b57eb-af1a-4195-8be0-256711f020a5",
+        "timestamp": 1787412088919
+      }
     ]
   }
 }

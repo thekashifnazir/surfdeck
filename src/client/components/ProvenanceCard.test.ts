@@ -90,12 +90,12 @@ describe("ProvenanceCard why-note", () => {
 describe("ProvenanceCard dynamic corpus total", () => {
   it("renders the corpus total from the prop", () => {
     const html = renderCard({ id: 7 }, { corpusTotal: 349 });
-    expect(html).toContain("CATCH №\u00a07 OF 349");
+    expect(html).toContain("CATCH №\u00a07 · ONE OF 349 HAND-PICKED SITES");
   });
 
   it("updates when corpus total changes", () => {
     const html = renderCard({ id: 100 }, { corpusTotal: 500 });
-    expect(html).toContain("CATCH №\u00a0100 OF 500");
+    expect(html).toContain("CATCH №\u00a0100 · ONE OF 500 HAND-PICKED SITES");
   });
 });
 
@@ -104,6 +104,216 @@ describe("ProvenanceCard dynamic corpus total", () => {
 describe("ProvenanceCard catch number", () => {
   it("uses site.id for the catch number", () => {
     const html = renderCard({ id: 288 }, { corpusTotal: 349 });
-    expect(html).toContain("CATCH №\u00a0288 OF 349");
+    expect(html).toContain("CATCH №\u00a0288 · ONE OF 349 HAND-PICKED SITES");
+  });
+});
+
+// ─── Heading by mode (Requirement 2.2) ───
+
+describe("ProvenanceCard heading by mode", () => {
+  it("open-web heading names the corpus total", () => {
+    const html = renderCard({ id: 12 }, { cornerMode: false, corpusTotal: 349 });
+    expect(html).toContain("CATCH №\u00a012 · ONE OF 349 HAND-PICKED SITES");
+    expect(html).not.toContain("VIBECODED CORNER");
+  });
+
+  it("corner heading reads VIBECODED CORNER (no corpus total)", () => {
+    const html = renderCard(
+      { id: 12, built_with: "bolt" },
+      { cornerMode: true, corpusTotal: 349 }
+    );
+    expect(html).toContain("CATCH №\u00a012 · VIBECODED CORNER");
+    expect(html).not.toContain("HAND-PICKED SITES");
+  });
+});
+
+// ─── Open-web linked tech line: stack/host anchors, type plain (Req 2.3–2.5) ───
+
+describe("ProvenanceCard open-web tech line", () => {
+  it("renders stack and host as prov-link anchors with the mapped href, new tab + noopener", () => {
+    const html = renderCard(
+      { stack: "react_spa", host: "netlify", static_or_dynamic: "static" },
+      { cornerMode: false }
+    );
+    // stack anchor
+    expect(html).toContain('href="https://react.dev"');
+    expect(html).toContain(">React SPA</a>");
+    // host anchor
+    expect(html).toContain('href="https://www.netlify.com"');
+    expect(html).toContain(">Netlify</a>");
+    // link hardening + styling
+    expect(html).toContain('class="prov-link"');
+    expect(html).toContain('target="_blank"');
+    expect(html).toContain('rel="noopener noreferrer"');
+  });
+
+  it("renders the type value (Static/Dynamic) as plain text, never an anchor", () => {
+    const html = renderCard(
+      { stack: "react_spa", host: "netlify", static_or_dynamic: "static" },
+      { cornerMode: false }
+    );
+    expect(html).toContain("Static");
+    // type must not be wrapped in an anchor
+    expect(html).not.toContain(">Static</a>");
+  });
+
+  it("renders an unmapped stack/host as plain text (no broken link)", () => {
+    // `self` has a provenance label but no URL in PROVENANCE_URLS.
+    const html = renderCard(
+      { stack: "self", host: "self", static_or_dynamic: null },
+      { cornerMode: false }
+    );
+    expect(html).toContain("Self-hosted");
+    expect(html).not.toContain(">Self-hosted</a>");
+  });
+});
+
+// ─── Recipe line (Requirement 2.6) ───
+
+describe("ProvenanceCard recipe line", () => {
+  it("composes the recipe line from stack + host fragments joined by an em dash", () => {
+    const html = renderCard(
+      { stack: "static_html", host: "github_pages", static_or_dynamic: "static" },
+      { cornerMode: false }
+    );
+    expect(html).toContain(
+      "the recipe: written by hand, no tools — hosted free from a code repo"
+    );
+    expect(html).toContain('class="prov-card__recipe"');
+  });
+
+  it("omits the recipe line entirely when neither stack nor host has a fragment", () => {
+    const html = renderCard(
+      { stack: null, host: null, static_or_dynamic: "static" },
+      { cornerMode: false }
+    );
+    expect(html).not.toContain("prov-card__recipe");
+    expect(html).not.toContain("the recipe:");
+  });
+});
+
+// ─── Corner tier line (Requirement 2.7) ───
+
+describe("ProvenanceCard corner tier line", () => {
+  it('renders "Built with {Tool} · Tier N — {tier label lowercased}"', () => {
+    const html = renderCard({ built_with: "bolt" }, { cornerMode: true });
+    // tool is a link
+    expect(html).toContain(">Bolt</a>");
+    expect(html).toContain('href="https://bolt.new"');
+    // tier number + lowercased label
+    expect(html).toContain("Tier\u00a02 — ai app-builder");
+  });
+
+  it("lowercases the tier label for tier 1", () => {
+    const html = renderCard({ built_with: "godaddy_airo" }, { cornerMode: true });
+    expect(html).toContain("Tier\u00a01 — no-code ai builder");
+  });
+});
+
+// ─── Footer copy + corner omission (Requirements 2.8, 2.9) ───
+
+describe("ProvenanceCard footer", () => {
+  it("open-web renders the dashed divider + learn footer", () => {
+    const html = renderCard({}, { cornerMode: false });
+    expect(html).toContain('class="prov-card__divider"');
+    expect(html).toContain("Learn from this one");
+    expect(html).toContain("tap the underlined parts.");
+  });
+
+  it("corner mode omits the generic footer and divider", () => {
+    const html = renderCard({ built_with: "bolt" }, { cornerMode: true });
+    expect(html).not.toContain("prov-card__footer");
+    expect(html).not.toContain("prov-card__divider");
+    expect(html).not.toContain("tap the underlined parts.");
+  });
+});
+
+// ─── All-blank fallback + no "unknown" (Requirements 9.2, 9.6) ───
+
+describe("ProvenanceCard all-blank fallback", () => {
+  it('falls back to "Hand-made on the open web." when stack/host/type are all null', () => {
+    const html = renderCard(
+      { stack: null, host: null, static_or_dynamic: null },
+      { cornerMode: false }
+    );
+    expect(html).toContain("Hand-made on the open web.");
+    expect(html).toContain("prov-card__body--fallback");
+  });
+
+  it('treats the literal "unknown" as blank and never renders the string "unknown"', () => {
+    const html = renderCard(
+      { stack: "unknown", host: "unknown", static_or_dynamic: "unknown", built_with: null },
+      { cornerMode: false }
+    );
+    expect(html).toContain("Hand-made on the open web.");
+    expect(html).not.toContain("unknown");
+  });
+
+  it('corner mode with unknown built_with never renders "unknown"', () => {
+    const html = renderCard(
+      { built_with: "unknown", stack: null, host: null, static_or_dynamic: null },
+      { cornerMode: true }
+    );
+    expect(html).not.toContain("unknown");
+  });
+});
+
+// ─── MAKE ONE YOURSELF block — corner mode (Requirements 3.x) ───
+
+describe("ProvenanceCard MAKE ONE YOURSELF — corner mode", () => {
+  it("renders the tier-keyed block when built_with is mapped in the tool map", () => {
+    const html = renderCard({ built_with: "bolt" }, { cornerMode: true });
+    expect(html).toContain("MAKE ONE YOURSELF");
+    // tier-2 lead line
+    expect(html).toContain("This site was prompted together in the browser. Try");
+    // tool link inside the lead
+    expect(html).toContain('href="https://bolt.new"');
+    expect(html).toContain(">Bolt</a>");
+    // time cue
+    expect(html).toContain("prompt in the browser · free to start · a site by tonight");
+  });
+
+  it("omits the block when built_with is unmapped in the tool map", () => {
+    // squarespace_ai has a tier + label but no TOOL_MAP entry.
+    const html = renderCard({ built_with: "squarespace_ai" }, { cornerMode: true });
+    // tech line still renders the tool name (as plain text, no link)...
+    expect(html).toContain("Squarespace AI");
+    expect(html).not.toContain(">Squarespace AI</a>");
+    // ...but the MAKE ONE YOURSELF block is omitted (no tool info).
+    expect(html).not.toContain("MAKE ONE YOURSELF");
+  });
+});
+
+// ─── MAKE ONE YOURSELF block — open-web mode (Requirements 3.x) ───
+
+describe("ProvenanceCard MAKE ONE YOURSELF — open-web mode", () => {
+  it("stack-present path names the stack and links Start yours → to the stack URL", () => {
+    const html = renderCard(
+      { stack: "nextjs", host: "vercel", static_or_dynamic: "static" },
+      { cornerMode: false }
+    );
+    expect(html).toContain("MAKE ONE YOURSELF");
+    expect(html).toContain("This site was hand-built with Next.js.");
+    expect(html).toContain("Start yours →");
+    // "Start yours →" links the stack's provenance URL
+    expect(html).toContain('href="https://nextjs.org"');
+  });
+
+  it("blank-stack fallback reads 'made by a person, not a platform.' and links neocities", () => {
+    const html = renderCard(
+      { stack: null, host: null, static_or_dynamic: null },
+      { cornerMode: false }
+    );
+    expect(html).toContain("MAKE ONE YOURSELF");
+    expect(html).toContain("This site was made by a person, not a platform.");
+    expect(html).toContain("Start yours →");
+    expect(html).toContain('href="https://neocities.org"');
+  });
+
+  it('always renders the fixed open-web time cue', () => {
+    const withStack = renderCard({ stack: "nextjs" }, { cornerMode: false });
+    const withoutStack = renderCard({ stack: null }, { cornerMode: false });
+    expect(withStack).toContain("a text editor and a free host is all it takes");
+    expect(withoutStack).toContain("a text editor and a free host is all it takes");
   });
 });

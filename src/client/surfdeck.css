@@ -947,19 +947,9 @@ body {
   font-family: var(--font-card);
   position: relative;
   box-shadow: 0 4px 8px rgba(38, 38, 42, 0.12);
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr);
-  column-gap: 24px;
-  align-items: start;
-}
-
-.prov-card__left,
-.prov-card__right {
+  display: flex;
+  flex-direction: column;
   min-width: 0;
-}
-
-.prov-card__right {
-  padding-top: 1.5rem;
 }
 
 .prov-card__title {
@@ -977,8 +967,8 @@ body {
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  color: var(--caption-grey);
-  margin: 0;
+  color: var(--body-grey);
+  margin: 0 0 0.5rem;
 }
 
 .prov-card__body {
@@ -993,6 +983,24 @@ body {
   color: var(--body-grey);
 }
 
+.prov-link {
+  color: var(--coral);
+  text-decoration: underline dotted;
+  text-underline-offset: 2px;
+}
+
+.prov-link:hover {
+  color: var(--coral-pressed);
+}
+
+.prov-card__recipe {
+  font-family: var(--font-card);
+  font-size: 13px;
+  color: var(--body-grey);
+  margin: 0 0 0.5rem;
+  line-height: 1.5;
+}
+
 .prov-card__why {
   font-family: var(--font-body);
   font-style: italic;
@@ -1001,12 +1009,64 @@ body {
   margin: 0 0 0.5rem;
 }
 
+.prov-card__divider {
+  border: 0;
+  border-top: 1px dashed var(--caption-grey);
+  margin: 0 0 0.5rem;
+}
+
 .prov-card__footer {
   font-family: var(--font-body);
   font-size: 0.75rem;
-  color: var(--caption-grey);
+  color: var(--body-grey);
   margin: 0;
   font-style: italic;
+}
+
+.prov-card__footer-emph {
+  text-decoration: underline dotted;
+  text-underline-offset: 2px;
+}
+
+/* MAKE ONE YOURSELF — dashed-coral box, shared by corner + open-web cards.
+   The only new visual pattern the card gains; identical in both modes. */
+.make-one {
+  margin-top: 0.75rem;
+  border: 1.5px dashed var(--coral);
+  border-radius: 8px;
+  background: rgba(232, 84, 47, 0.06);
+  padding: 10px 14px 12px;
+}
+
+.make-one__label {
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--coral);
+  margin: 0 0 0.35rem;
+}
+
+.make-one__line {
+  font-family: var(--font-card);
+  font-size: 14px;
+  color: var(--ink);
+  line-height: 1.5;
+  margin: 0 0 0.35rem;
+}
+
+.make-one__line .prov-link {
+  font-weight: 700;
+}
+
+.make-one__cue {
+  font-family: var(--font-body);
+  font-style: italic;
+  font-size: 12px;
+  color: var(--body-grey);
+  line-height: 1.4;
+  margin: 0;
 }
 
 .prov-card__stamp {
@@ -1280,14 +1340,6 @@ body {
     padding: 1.5rem 1rem;
   }
 
-  .prov-card {
-    grid-template-columns: minmax(0, 1fr);
-    column-gap: 0;
-  }
-
-  .prov-card__left {
-    margin-bottom: 0.75rem;
-  }
 }
 
 @media (max-width: 430px) {
