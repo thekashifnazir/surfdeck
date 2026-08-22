@@ -218,7 +218,7 @@ mobile 390px keeps no horizontal scroll.
 
 ## Phase E — Footer on every page
 
-- [ ] 22. Footer React component + wire into App
+- [x] 22. Footer React component + wire into App
   - **Files:** new `src/client/components/Footer.tsx`, `src/client/App.tsx`,
     `src/client/surfdeck.css`
   - **Changes:** build the footer (design §5.1): coral top rule; id block; five
@@ -228,7 +228,7 @@ mobile 390px keeps no horizontal scroll.
   - **Done when:** footer renders on the SPA, matches comp, no 390px scroll.
   - _Requirements: 5.1–5.6_
 
-- [ ] 23. Footer tests
+- [x] 23. Footer tests
   - **Files:** new `src/client/components/Footer.test.ts`
   - **Changes:** links present in order with correct hrefs; © + Doto tagline
     render; "HOW THIS WAS MADE" points to `/ouroboros`.

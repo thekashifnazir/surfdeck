@@ -4,6 +4,7 @@ import Telly from "./components/Telly";
 import CardSlot from "./components/CardSlot";
 import ProvenanceCard from "./components/ProvenanceCard";
 import StatusMessage from "./components/StatusMessage";
+import Footer from "./components/Footer";
 import { useSurf } from "./hooks/useSurf";
 import { computeLcdText } from "./lcd-text";
 import { getZapTimings } from "./zap-timings";
@@ -363,6 +364,8 @@ export default function App() {
         siteUrl={lastSurfResult?.url ?? null}
         onReset={handleReset}
       />
+
+      <Footer />
     </main>
   );
 }

@@ -252,6 +252,30 @@
         "chatSessionId": "sess_d49b57eb-af1a-4195-8be0-256711f020a5",
         "timestamp": 1787412088919
       }
+    ],
+    "22. Footer React component + wire into App": [
+      {
+        "executionId": "59cfee13-0ac0-4019-aa11-99c435419e28",
+        "chatSessionId": "sess_ceae75e5-f4ea-4537-8407-f39fb2526e31",
+        "timestamp": 1787412753104
+      },
+      {
+        "executionId": "59cfee13-0ac0-4019-aa11-99c435419e28",
+        "chatSessionId": "sess_ceae75e5-f4ea-4537-8407-f39fb2526e31",
+        "timestamp": 1787412912604
+      }
+    ],
+    "23. Footer tests": [
+      {
+        "executionId": "b0ebf1cd-dab1-4b60-b7c9-3ca6c3bdf3b7",
+        "chatSessionId": "sess_a98fa039-2adc-497b-94d7-a65f02c10d81",
+        "timestamp": 1787412995259
+      },
+      {
+        "executionId": "b0ebf1cd-dab1-4b60-b7c9-3ca6c3bdf3b7",
+        "chatSessionId": "sess_a98fa039-2adc-497b-94d7-a65f02c10d81",
+        "timestamp": 1787414347643
+      }
     ]
   }
 }

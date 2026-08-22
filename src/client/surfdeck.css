@@ -1316,6 +1316,84 @@ body {
   }
 }
 
+/* Site footer — coral top rule, id block + link row, base row.
+   Rendered at the bottom of every page. */
+.site-footer {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  margin-top: 2.5rem;
+  padding: 1.25rem 0 0;
+  border-top: 2px solid var(--coral);
+  font-family: var(--font-body);
+}
+
+.site-footer__top {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+.site-footer__id {
+  display: flex;
+  flex-direction: column;
+}
+
+.site-footer__name {
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.site-footer__role {
+  font-size: 0.85rem;
+  color: var(--body-grey);
+}
+
+.site-footer__links {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem 1rem;
+}
+
+.site-footer__link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--coral);
+  text-decoration: underline dotted;
+  text-underline-offset: 2px;
+}
+
+.site-footer__link:hover {
+  color: var(--coral-pressed);
+}
+
+.site-footer__base {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem 1rem;
+  margin-top: 0.75rem;
+  padding-bottom: 1.25rem;
+  font-size: 0.75rem;
+  color: var(--body-grey);
+}
+
+.site-footer__doto {
+  font-family: var(--font-lcd);
+  font-weight: 900;
+  letter-spacing: 0.04em;
+  color: var(--body-grey);
+}
+
 /* 13. @media responsive — phone
    ------------------------------------------------------------ */
 @media (max-width: 768px) {
@@ -1353,5 +1431,17 @@ body {
 
   .prov-card {
     padding: 12px 16px 10px;
+  }
+
+  /* Footer stacks: id block over links, base row stacks. */
+  .site-footer__top {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+  }
+
+  .site-footer__base {
+    flex-direction: column;
+    align-items: flex-start;
   }
 }
