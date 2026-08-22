@@ -48,6 +48,73 @@
         "chatSessionId": "sess_d27fbc93-2217-43f0-b40b-9deb9b74ce5f",
         "timestamp": 1787406842868
       }
+    ],
+    "5. Gloss map module (+ recipe fragments) + tests": [
+      {
+        "executionId": "28c1525f-c16c-4d2e-9e71-dde2104c9ec2",
+        "chatSessionId": "sess_489710f2-eb27-4519-b339-0f42efac358c",
+        "timestamp": 1787407207745
+      },
+      {
+        "executionId": "28c1525f-c16c-4d2e-9e71-dde2104c9ec2",
+        "chatSessionId": "sess_489710f2-eb27-4519-b339-0f42efac358c",
+        "timestamp": 1787407415344
+      }
+    ],
+    "6. Provenance URL map + tests": [
+      {
+        "executionId": "84625822-1cff-4b85-a3b5-cf60cb3a50f2",
+        "chatSessionId": "sess_beec4a86-249b-44bb-85d5-defb170f425d",
+        "timestamp": 1787407539716
+      },
+      {
+        "executionId": "84625822-1cff-4b85-a3b5-cf60cb3a50f2",
+        "chatSessionId": "sess_beec4a86-249b-44bb-85d5-defb170f425d",
+        "timestamp": 1787407707580
+      }
+    ],
+    "7. Tool map + tests": [
+      {
+        "executionId": "cdc7bb02-9c32-4f97-9f90-6a7744a24416",
+        "chatSessionId": "sess_bf28de6d-9add-4f92-ac99-1f315b9f2a7e",
+        "timestamp": 1787407889032
+      },
+      {
+        "executionId": "cdc7bb02-9c32-4f97-9f90-6a7744a24416",
+        "chatSessionId": "sess_bf28de6d-9add-4f92-ac99-1f315b9f2a7e",
+        "timestamp": 1787408050813
+      }
+    ],
+    "8. Embed-viewport pure function + tests": [
+      {
+        "executionId": "8d6e342d-9b13-4689-943f-c974d384da8c",
+        "chatSessionId": "sess_0a624a31-c9ee-4df3-8126-bb5075c56f95",
+        "timestamp": 1787408095919
+      },
+      {
+        "executionId": "8d6e342d-9b13-4689-943f-c974d384da8c",
+        "chatSessionId": "sess_0a624a31-c9ee-4df3-8126-bb5075c56f95",
+        "timestamp": 1787408240890
+      }
+    ],
+    "9. Validator stack-enum tests (records Req 7)": [
+      {
+        "executionId": "7b0e150e-7554-44df-8548-bc4c1bad2192",
+        "chatSessionId": "sess_73eb0b71-e827-4618-93d2-9c45c3350fda",
+        "timestamp": 1787408270331
+      },
+      {
+        "executionId": "7b0e150e-7554-44df-8548-bc4c1bad2192",
+        "chatSessionId": "sess_73eb0b71-e827-4618-93d2-9c45c3350fda",
+        "timestamp": 1787408425836
+      }
+    ],
+    "10. OSD backdrop, labels, header subtitle": [
+      {
+        "executionId": "34af08bc-2613-408d-8615-96eb914287bc",
+        "chatSessionId": "sess_f0dcec30-2468-4afa-a8ea-7060824c1e5c",
+        "timestamp": 1787408551890
+      }
     ]
   }
 }

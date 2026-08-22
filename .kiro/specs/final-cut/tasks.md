@@ -53,7 +53,7 @@ mobile 390px keeps no horizontal scroll.
 
 ## Phase B — Pure lookup modules + data-hygiene tests (no UI yet)
 
-- [ ] 5. Gloss map module (+ recipe fragments) + tests
+- [x] 5. Gloss map module (+ recipe fragments) + tests
   - **Files:** new `src/client/gloss-map.ts`, `src/client/gloss-map.test.ts`
   - **Changes:** export `GROUP_GLOSS`, `CHIP_GLOSS`, `RECIPE_FRAGMENTS` (design
     §1.4, §2.4) with approved copy. Tests: every corpus stack/host/character/type
@@ -61,21 +61,21 @@ mobile 390px keeps no horizontal scroll.
   - **Done when:** module compiles; coverage test passes.
   - _Requirements: 1.3, 1.4, 1.5, 2.6_
 
-- [ ] 6. Provenance URL map + tests
+- [x] 6. Provenance URL map + tests
   - **Files:** new `src/client/provenance-urls.ts`, `.test.ts`
   - **Changes:** `PROVENANCE_URLS` + `getProvenanceUrl` (design §2.3, approved
     URLs). Tests: all 11 corpus stacks + 6 hosts resolve; unknown → null.
   - **Done when:** tests pass.
   - _Requirements: 2.3, 2.5_
 
-- [ ] 7. Tool map + tests
+- [x] 7. Tool map + tests
   - **Files:** new `src/client/tool-map.ts`, `.test.ts`
   - **Changes:** `TOOL_MAP` + `getToolInfo` for the 8 real `built_with` values
     (design §3.1, approved cues/URLs). Tests: all 8 resolve; unknown → null.
   - **Done when:** tests pass.
   - _Requirements: 3.5, 3.6_
 
-- [ ] 8. Embed-viewport pure function + tests
+- [x] 8. Embed-viewport pure function + tests
   - **Files:** new `src/client/embed-viewport.ts`, `.test.ts`
   - **Changes:** `computeEmbedViewport(screenW, screenH)` (design §8.1). Tests:
     scaled width === screenW; scaled height === screenH; virtualWidth 1280 at
@@ -83,7 +83,7 @@ mobile 390px keeps no horizontal scroll.
   - **Done when:** tests pass; no DOM used.
   - _Requirements: 8.3, 8.4_
 
-- [ ] 9. Validator stack-enum tests (records Req 7)
+- [x] 9. Validator stack-enum tests (records Req 7)
   - **Files:** `scripts/rules.test.ts` (or new `scripts/lib/validate-csv.test.ts`)
   - **Changes:** assert the existing check #8 rejects `stack = modern_indie`,
     accepts blank, accepts `nextjs`. Add a comment recording "investigated — no
@@ -95,7 +95,7 @@ mobile 390px keeps no horizontal scroll.
 
 ## Phase C — TUNING menu v2 (`TellyMenu.tsx` + CSS)
 
-- [ ] 10. OSD backdrop, labels, header subtitle
+- [-] 10. OSD backdrop, labels, header subtitle
   - **Files:** `src/client/components/TellyMenu.tsx`, `src/client/surfdeck.css`
   - **Changes:** `.osd` bg → solid `#101210`; `.filters__label` opacity → 0.85;
     add centred italic subtitle under `— TUNING —`.
