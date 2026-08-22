@@ -35,3 +35,10 @@ export const PROVENANCE_URLS: Record<string, string> = {
 export function getProvenanceUrl(value: string): string | null {
   return PROVENANCE_URLS[value] ?? null;
 }
+
+/**
+ * Fallback "make one yourself" link for open-web sites whose `stack` is blank —
+ * a person, not a platform, made it. Used by the open-web MAKE ONE YOURSELF
+ * block (Final Cut, design §3.3).
+ */
+export const NEOCITIES_URL = "https://neocities.org";

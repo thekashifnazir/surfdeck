@@ -28,3 +28,18 @@ export const TOOL_MAP: Record<string, ToolInfo> = {
 export function getToolInfo(value: string): ToolInfo | null {
   return TOOL_MAP[value] ?? null;
 }
+
+/**
+ * Corner-mode MAKE ONE YOURSELF lead line, keyed off the SITE's tier
+ * (`getBuiltWithTier(built_with)`), not the tool. `{Tool}` is substituted with
+ * the linked `getBuiltWithLabel(built_with)`. Note tier 4 uses "See {Tool} →"
+ * rather than "Try {Tool} →".
+ *
+ * Copy APPROVED verbatim (Final Cut, design §3.1).
+ */
+export const LEAD_LINE_BY_TIER: Record<number, string> = {
+  1: "This site was described into existence. Try {Tool} →",
+  2: "This site was prompted together in the browser. Try {Tool} →",
+  3: "This site was pair-coded with AI. Try {Tool} →",
+  4: "This site was built by AI agents on a developer platform. See {Tool} →",
+};
