@@ -1,0 +1,53 @@
+{
+  "pbtResults": {},
+  "executionHistory": {
+    "1. Hero tagline + press-note strings": [
+      {
+        "executionId": "71a5c5f2-2b55-4a1a-b048-5468cde4f6d7",
+        "chatSessionId": "sess_e2effc9c-4c39-4411-a34c-dfadd79ce915",
+        "timestamp": 1787405986336
+      },
+      {
+        "executionId": "71a5c5f2-2b55-4a1a-b048-5468cde4f6d7",
+        "chatSessionId": "sess_e2effc9c-4c39-4411-a34c-dfadd79ce915",
+        "timestamp": 1787406094061
+      }
+    ],
+    "2. Telly idle line": [
+      {
+        "executionId": "5e4cc623-8410-4e1c-b210-b8d6c4fd9abd",
+        "chatSessionId": "sess_d9942c63-913e-4222-b9c3-a6cbdfce19e7",
+        "timestamp": 1787406113199
+      },
+      {
+        "executionId": "5e4cc623-8410-4e1c-b210-b8d6c4fd9abd",
+        "chatSessionId": "sess_d9942c63-913e-4222-b9c3-a6cbdfce19e7",
+        "timestamp": 1787406234625
+      }
+    ],
+    "3. `index.html` title + meta + OG": [
+      {
+        "executionId": "11cfc5dc-4383-4f13-90fd-b69c661d0074",
+        "chatSessionId": "sess_cfbf7461-d42d-4f13-b65c-144ff6f98535",
+        "timestamp": 1787406258329
+      },
+      {
+        "executionId": "11cfc5dc-4383-4f13-90fd-b69c661d0074",
+        "chatSessionId": "sess_cfbf7461-d42d-4f13-b65c-144ff6f98535",
+        "timestamp": 1787406331020
+      }
+    ],
+    "4. LCD filter summary humanising + tests": [
+      {
+        "executionId": "cf711c3c-6168-4861-be5e-1b80f0330dc3",
+        "chatSessionId": "sess_d27fbc93-2217-43f0-b40b-9deb9b74ce5f",
+        "timestamp": 1787406454613
+      },
+      {
+        "executionId": "cf711c3c-6168-4861-be5e-1b80f0330dc3",
+        "chatSessionId": "sess_d27fbc93-2217-43f0-b40b-9deb9b74ce5f",
+        "timestamp": 1787406842868
+      }
+    ]
+  }
+}
