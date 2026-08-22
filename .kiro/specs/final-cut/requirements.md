@@ -4,7 +4,7 @@
 
 The final polish pass before sign-off. It makes the TUNING menu legible to
 first-time visitors, turns the provenance card into a set of learnable links,
-adds a "make one yourself" invitation to the corner cards, rebuilds `/ouroboros`
+adds a "make one yourself" invitation to the cards, rebuilds `/ouroboros`
 as the "Dead Air" colophon and self-portrait, adds a personal footer to every
 page, sweeps the surface copy so the product's voice is consistent, records a
 data-hygiene investigation, and renders embedded sites at a virtual desktop
@@ -39,7 +39,9 @@ routing, or API-contract changes beyond what each requirement states.
   one toggle.
 - **Recipe line:** A plain-English sentence under the open-web card's tech line,
   composed from per-value recipe fragments.
-- **MAKE ONE YOURSELF block:** A dashed-coral invitation printed on corner cards.
+- **MAKE ONE YOURSELF block:** A dashed-coral invitation printed on corner AND
+  open-web cards (corner: tier-keyed tool nudge; open-web: stack-keyed "make one"
+  nudge).
 - **Dead Air:** The rebuilt `/ouroboros` page — the app's colophon + self-portrait.
 - **The ladder:** A four-rung "how it was built" ladder on `/ouroboros`.
 - **Virtual viewport:** A larger CSS width the embedded iframe is laid out at,
@@ -90,6 +92,23 @@ here for traceability:
   not headings). See `design.md` §4.4.
 - **"— OPEN (collapsed by default)"** on the BUILD DIALS row is confirmed a stage
   direction, NOT label copy (review 10). See Requirement 1.6.
+
+### Amendment — text-authoritative learning-layer additions
+
+Two later additions to the learning layer are **text-authoritative**: the comps
+do NOT show them, but they reuse existing comp patterns exactly and invent no new
+visual design. The comps remain the authority for everything else.
+
+1. **Ladder rung 0 ("BY HAND").** A fifth rung ABOVE Tier 1 on `/ouroboros`, using
+   the same rung pattern as the comp (number label + title + description + "start
+   here →" link). See Requirement 4.7. The four existing rungs are unchanged.
+2. **MAKE ONE YOURSELF on open-web cards.** The same dashed-coral block from the
+   corner comp is rendered on OPEN-WEB cards too, with stack-keyed copy and a
+   blank-stack fallback. See Requirement 3. Corner cards keep their tier-keyed
+   version unchanged.
+
+Both additions reuse existing comp patterns (the dashed MAKE ONE YOURSELF block;
+the ladder rung row) — nothing beyond what the amendment text states is invented.
 
 ---
 
@@ -168,25 +187,37 @@ me click through to learn the tools a site was built with.
    and the footer, and the footer SHALL read "Everyone's a builder. Learn from
    this one — tap the underlined parts." with "Learn from this one" dotted-underlined.
 9. IN corner mode the generic footer line SHALL be omitted; the MAKE ONE YOURSELF
-   block (Requirement 3) is the card's closer.
+   block (Requirement 3) is the card's closer. IN open-web mode the divider and
+   footer SHALL remain, and the open-web MAKE ONE YOURSELF block (Requirement 3)
+   SHALL follow them as the card's closer.
 10. THE all-blank fallback ("Hand-made on the open web.") and the
     never-show-"unknown" rule SHALL be preserved.
 11. THE stamp SHALL read "OPENS IN TELLY" when embedded (per the embed cycle),
     and the card's print/reprint animation SHALL be unchanged.
 12. THE card content SHALL flow as a single vertical column matching the comps
-    (title → heading → tech line → recipe/tier → why-note → [divider + footer |
-    make-one block]); the earlier two-column landscape grid is superseded.
+    (title → heading → tech line → recipe/tier → why-note → [open-web: divider +
+    footer] → make-one block); the make-one block is the closer in BOTH modes
+    (corner: tier-keyed; open-web: stack-keyed). The earlier two-column landscape
+    grid is superseded.
 
 ---
 
-## Requirement 3: Corner-Card MAKE ONE YOURSELF block
+## Requirement 3: MAKE ONE YOURSELF block (corner + open-web)
 
-**User Story:** As a visitor looking at a vibecoded site, I want a nudge showing
-which tool made it and roughly how long it takes, so I could try it myself.
+**User Story:** As a visitor looking at any site, I want a nudge showing how it
+was made and how I could make one too — for vibecoded sites, which tool made it;
+for hand-made sites, that a person built it and I could start the same way.
+
+> The open-web variant (criteria 7–12) is a **text-authoritative** addition (see
+> § Resolved Against Comps → Amendment): it reuses the corner comp's dashed-coral
+> block pattern EXACTLY, with stack-keyed copy. The corner variant (criteria 1–6)
+> is unchanged.
 
 ### Acceptance Criteria
 
-1. IN corner mode ONLY, and only when `built_with` is displayable, the card SHALL
+#### Corner mode (unchanged)
+
+1. IN corner mode, and only when `built_with` is displayable, the card SHALL
    include a dashed-coral box with a very light coral fill.
 2. THE box SHALL carry the label "MAKE ONE YOURSELF" (coral, bold, uppercase).
 3. THE box SHALL contain the line: "This site was described into existence.
@@ -201,6 +232,29 @@ which tool made it and roughly how long it takes, so I could try it myself.
    No marketing language. `design.md` drafts these for human review.
 6. IF a `built_with` value has no map entry, the MAKE ONE YOURSELF box SHALL be
    omitted (no generic link).
+
+#### Open-web mode (text-authoritative addition)
+
+7. IN open-web mode, the card SHALL include the SAME dashed-coral box (identical
+   visual pattern and styling to the corner comp — reused, not a new design),
+   carrying the same label "MAKE ONE YOURSELF" (coral, bold, uppercase).
+8. WHEN the site's `stack` is present, the box SHALL contain the line: "This site
+   was hand-built with {Stack}. Start yours →" where `{Stack}` is the stack's
+   display label (`getProvenanceLabel`) and "Start yours →" is a bold link to the
+   stack's official site from the existing URL map (`getProvenanceUrl`), opening
+   in a new tab with `rel="noopener noreferrer"`.
+9. WHEN the site's `stack` is blank, the box SHALL instead contain the line: "This
+   site was made by a person, not a platform. Start yours →" where "Start yours →"
+   links to `https://neocities.org` (new tab, `rel="noopener noreferrer"`).
+10. THE open-web box SHALL contain the fixed time-cue line "a text editor and a
+    free host is all it takes", styled as italic grey (same style slot as the
+    corner time-cue).
+11. THE open-web box SHALL ALWAYS render in open-web mode: the stack-present path
+    (criterion 8) and the blank-stack fallback (criterion 9) between them cover
+    every open-web site. All 11 corpus stack values resolve in the URL map, so a
+    present stack never yields a broken link.
+12. THE corner-mode tier-keyed version (criteria 1–6) SHALL be unchanged by this
+    addition.
 
 ---
 
@@ -235,18 +289,30 @@ colophon — a self-portrait showing how Surfdeck itself was built.
      AI in Kiro, every step human-gated."
    - Links "Read the repo · read the build log" (dotted-coral; hrefs in
      `design.md` §4.1, reusing the review-9 repo and process-log URLs).
-7. THE page SHALL show THE LADDER exactly as comped:
+7. THE page SHALL show THE LADDER as comped, plus one text-authoritative rung
+   above it:
    - Header "— THE LADDER —" (Doto) and subtitle "every site in the corner sits
      on a rung. pick yours and make one." (italic).
-   - Four white rungs, each with a coral "TIER {N}" marker (Doto), a bold title,
-     a grey description, and a dotted-coral "start here →" link to a
-     representative tool's official site (from the tool map, `design.md` §4.3).
+   - A rung 0 ABOVE Tier 1, using the SAME rung pattern as the comp (number label
+     + bold title + grey description + dotted-coral "start here →" link). This
+     rung is a text-authoritative addition (see § Resolved Against Comps →
+     Amendment); it reuses the comped rung layout and invents no new design:
+     - marker label "BY HAND" (Doto, in the same slot the comp uses for
+       "TIER {N}") — title "No tools at all" — description "a text editor, one
+       HTML file, a free host — the original way" — "start here →" →
+       `https://neocities.org`.
+     - The BY HAND rung SHALL have no badge.
+   - THEN four white rungs (unchanged from the comp), each with a coral "TIER {N}"
+     marker (Doto), a bold title, a grey description, and a dotted-coral
+     "start here →" link to a representative tool's official site (from the tool
+     map, `design.md` §4.3).
      - Tier 1 — "No-code AI builder" — "describe a site in a sentence, get a site"
      - Tier 2 — "AI app-builder" — "sketch screens and logic, AI wires it up"
      - Tier 3 — "AI-assisted coding" — "you steer, an AI pair-codes with you"
      - Tier 4 — "Developer cloud + agents" — "spec it, and agents build it — this
        site's own recipe"
    - Tier 4 SHALL have a coral border and a coral "SURFDECK'S RUNG" badge.
+   - THE four existing (Tier 1–4) rungs SHALL be unchanged by this addition.
 8. THE page SHALL include the footer (Requirement 5).
 9. Build-time constants SHALL be computed from the repo (not scattered literals)
    and injected at build; `design.md` defines the derivation.

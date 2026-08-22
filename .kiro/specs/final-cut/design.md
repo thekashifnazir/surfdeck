@@ -160,9 +160,13 @@ recipe line      (open-web only — §2.4)
 why-note         (italic)
 ── dashed divider ──   (open-web only)
 footer           (open-web only — §2.6)
-[MAKE ONE YOURSELF]    (corner only — §3)
+[MAKE ONE YOURSELF]    (BOTH modes — §3; corner: tier-keyed / open-web: stack-keyed)
 stamp            (OPENS IN TELLY, rotated, top-right)
 ```
+
+The MAKE ONE YOURSELF block is the card's closer in BOTH modes (§3). In corner
+mode it follows the why-note directly (no footer); in open-web mode it follows the
+divider + footer.
 
 ### 2.1 Contrast
 
@@ -280,10 +284,17 @@ tool map's URL (§3.2).
 
 ---
 
-## 3. MAKE ONE YOURSELF block (`ProvenanceCard.tsx` + `tool-map.ts` + CSS)
+## 3. MAKE ONE YOURSELF block (`ProvenanceCard.tsx` + `tool-map.ts` + `provenance-urls.ts` + CSS)
 
-Rendered only when `cornerMode && isDisplayable(site.built_with) &&
-getToolInfo(built_with)`.
+The SAME dashed-coral box renders in BOTH modes, with mode-keyed copy:
+- **Corner mode** (§3.1–3.2): tier-keyed lead line + tool link + tool time-cue.
+  Rendered only when `cornerMode && isDisplayable(site.built_with) &&
+  getToolInfo(built_with)`.
+- **Open-web mode** (§3.3): stack-keyed line + stack link (blank-stack fallback)
+  + fixed time-cue. This is a text-authoritative addition (requirements
+  § Amendment) that reuses the corner box's markup/styling EXACTLY — no new
+  visual design. Rendered ALWAYS in open-web mode (the blank-stack path covers
+  sites with no stack).
 
 ```
 ┌───────────────────────────────┐  dashed coral border, light coral fill
@@ -292,7 +303,7 @@ getToolInfo(built_with)`.
 │ existence. Try Lovable →      │  bold link → tool official site
 │ type what you want · free to  │  italic grey time cue (dot-separated)
 │ start · a site by tonight     │
-└───────────────────────────────┘
+└───────────────────────────────┘   (corner variant shown; open-web variant §3.4)
 ```
 
 ### 3.1 Lead line — keyed off the SITE's tier (APPROVED, review 3)
@@ -344,6 +355,50 @@ then the time cue below. If `built_with` is unmapped, omit the whole box.
 background: rgba(232,84,47,0.06); padding: …`. Label Familjen Grotesk 700
 uppercase coral; body in the card's Special Elite; link `.prov-link` style.
 
+### 3.3 Open-web variant — stack-keyed (text-authoritative)
+
+The SAME `.make-one` box (identical border/fill/label/typography as §3.2) renders
+on open-web cards, with stack-keyed copy. No new module: reuses
+`getProvenanceLabel` (label), `getProvenanceUrl` (link), and a blank-stack
+fallback URL.
+
+```
+┌───────────────────────────────┐  same dashed coral border + light coral fill
+│ MAKE ONE YOURSELF             │  coral bold uppercase (identical to §3.2)
+│ This site was hand-built with │  ← stack-keyed line
+│ Static HTML. Start yours →    │  bold link → stack's official site (URL map)
+│ a text editor and a free host │  italic grey time-cue (FIXED string)
+│ is all it takes               │
+└───────────────────────────────┘
+```
+
+- **Line (stack present):** "This site was hand-built with {Stack}. Start yours →"
+  where `{Stack}` = `getProvenanceLabel(site.stack)` and "Start yours →" is a bold
+  `.prov-link` anchor to `getProvenanceUrl(site.stack)`
+  (`target="_blank" rel="noopener noreferrer"`).
+- **Line (stack blank):** "This site was made by a person, not a platform.
+  Start yours →" where "Start yours →" links to `https://neocities.org`
+  (`target="_blank" rel="noopener noreferrer"`).
+- **Time-cue (fixed):** "a text editor and a free host is all it takes" (italic
+  grey, same style slot as the corner time-cue).
+- **Always renders** in open-web mode — the two paths cover every open-web site.
+  All 11 corpus stacks resolve in `PROVENANCE_URLS`, so a present stack never
+  yields a broken link; only genuinely blank stacks take the neocities fallback.
+
+```tsx
+const stack = site.stack;
+const hasStack = isDisplayable(stack);           // non-blank
+const label = hasStack ? getProvenanceLabel(stack) : null;
+const href  = hasStack ? getProvenanceUrl(stack) : "https://neocities.org";
+// line: hasStack
+//   ? `This site was hand-built with ${label}. ` + <a href={href}>Start yours →</a>
+//   : `This site was made by a person, not a platform. ` + <a href="https://neocities.org">Start yours →</a>
+// time-cue: "a text editor and a free host is all it takes"
+```
+
+`NEOCITIES_URL = "https://neocities.org"` may live as a small const beside the
+component (or in `provenance-urls.ts`); confirm at implementation.
+
 ---
 
 ## 4. `/ouroboros` "Dead Air" rebuild (`src/worker/routes/ouroboros.ts`)
@@ -388,14 +443,21 @@ rotation removed (static ring). Keeps the dot-matrix / Doto aesthetic.
 ### 4.3 The ladder `[comp]`
 
 Header "— THE LADDER —" (Doto) + subtitle "every site in the corner sits on a
-rung. pick yours and make one." Four white rungs:
+rung. pick yours and make one." One text-authoritative BY HAND rung (row 0) above
+four comped rungs — five white rungs total:
 
-| Rung | Title `[comp]` | Description `[comp]` | "start here →" href | Badge |
+| Rung | Title | Description | "start here →" href | Badge |
 |---|---|---|---|---|
-| TIER 1 | No-code AI builder | describe a site in a sentence, get a site | https://www.godaddy.com/airo | — |
-| TIER 2 | AI app-builder | sketch screens and logic, AI wires it up | https://lovable.dev | — |
-| TIER 3 | AI-assisted coding | you steer, an AI pair-codes with you | https://kiro.dev | — |
-| TIER 4 | Developer cloud + agents | spec it, and agents build it — this site's own recipe | https://workers.cloudflare.com | SURFDECK'S RUNG |
+| BY HAND `[text]` | No tools at all | a text editor, one HTML file, a free host — the original way | https://neocities.org | — |
+| TIER 1 `[comp]` | No-code AI builder | describe a site in a sentence, get a site | https://www.godaddy.com/airo | — |
+| TIER 2 `[comp]` | AI app-builder | sketch screens and logic, AI wires it up | https://lovable.dev | — |
+| TIER 3 `[comp]` | AI-assisted coding | you steer, an AI pair-codes with you | https://kiro.dev | — |
+| TIER 4 `[comp]` | Developer cloud + agents | spec it, and agents build it — this site's own recipe | https://workers.cloudflare.com | SURFDECK'S RUNG |
+
+- **BY HAND rung** (`[text]` = text-authoritative, requirements § Amendment):
+  reuses the comped rung layout EXACTLY — its marker slot shows "BY HAND" (Doto,
+  where the comped rungs show "TIER {N}"); no badge. It sits ABOVE Tier 1 and
+  invents no new design. The four TIER rungs are unchanged from the comp.
 
 - The visible link label is "start here →" (coral, dotted-underline); the href is
   a representative tool from `TOOL_MAP` (choices in §4.3 approved, review 3).
@@ -598,7 +660,7 @@ from the telly-embed cycle.
 |---|---|---|
 | 1 TUNING | `TellyMenu.tsx`, new `gloss-map.ts`, `surfdeck.css` | glosses, info strip, BUILD DIALS, backdrop, subtitle |
 | 2 Card | `ProvenanceCard.tsx`, new `provenance-urls.ts`, `gloss-map.ts`, `surfdeck.css` | layout, contrast, heading, links, recipe, tier label, footer |
-| 3 Make-one | `ProvenanceCard.tsx`, new `tool-map.ts`, `surfdeck.css` | dashed-coral block |
+| 3 Make-one | `ProvenanceCard.tsx`, new `tool-map.ts`, `provenance-urls.ts`, `surfdeck.css` | dashed-coral block — corner (tier-keyed) + open-web (stack-keyed) |
 | 4 Ouroboros | `src/worker/routes/ouroboros.ts`, generated `colophon-stats.ts` | Dead Air rebuild, stat card, ladder |
 | 5 Footer | new `Footer.tsx`, `App.tsx`, `ouroboros.ts`, `surfdeck.css` | footer both paths |
 | 6 Copy | `App.tsx`, `Telly.tsx`, `lcd-text.ts`, `index.html` | tagline, press-notes, idle line, LCD, meta |

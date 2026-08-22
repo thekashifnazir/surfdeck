@@ -138,7 +138,7 @@ mobile 390px keeps no horizontal scroll.
 
 ## Phase D — Provenance card v2 (`ProvenanceCard.tsx` + CSS)
 
-- [ ] 15. Single-column layout + contrast
+- [-] 15. Single-column layout + contrast
   - **Files:** `ProvenanceCard.tsx`, `surfdeck.css`
   - **Changes:** collapse the two-column grid to the comp's single-column flow
     (design §2.0); heading/footer colour → `--body-grey` or darker (verify AA).
@@ -179,21 +179,40 @@ mobile 390px keeps no horizontal scroll.
     corner hides the generic footer.
   - _Requirements: 2.7, 2.8, 2.9_
 
-- [ ] 20. MAKE ONE YOURSELF block (corner) via tool map
-  - **Files:** `ProvenanceCard.tsx`, `surfdeck.css`, new `tool-map.ts` (task 7)
-  - **Changes:** in corner mode with a mapped `built_with`, render the dashed-coral
-    box: label, "This site was described into existence. Try {Tool} →" (bold link
-    to tool URL), and the italic dot-separated time cue. Omit if unmapped.
-  - **Done when:** corner cards show the block per comp; unmapped tools omit it.
-  - _Requirements: 3.1–3.6_
+- [ ] 20. MAKE ONE YOURSELF block (corner + open-web) via tool/URL maps
+  - **Files:** `ProvenanceCard.tsx`, `surfdeck.css`, `tool-map.ts` (task 7),
+    `provenance-urls.ts` (task 6)
+  - **Changes (corner):** in corner mode with a mapped `built_with`, render the
+    dashed-coral box: label, "This site was described into existence. Try {Tool} →"
+    (bold link to tool URL), and the italic dot-separated time cue. Omit if
+    unmapped. (Unchanged from prior scope.)
+  - **Changes (open-web — text-authoritative addition, design §3.3):** in open-web
+    mode render the SAME `.make-one` box (reuse markup/styling exactly) with the
+    label and:
+    - stack present → "This site was hand-built with {Stack}. Start yours →"
+      ({Stack} = `getProvenanceLabel`, "Start yours →" a bold `.prov-link` to
+      `getProvenanceUrl(stack)`, new tab, `rel="noopener noreferrer"`);
+    - stack blank → "This site was made by a person, not a platform. Start yours →"
+      ("Start yours →" links `https://neocities.org`);
+    - fixed italic-grey time-cue "a text editor and a free host is all it takes".
+    The open-web box ALWAYS renders (blank-stack path covers stackless sites).
+  - **Done when:** corner cards show the tier-keyed block per comp (unmapped tools
+    omit it); open-web cards always show the stack-keyed block with the blank-stack
+    fallback; both use the identical dashed-coral pattern.
+  - _Requirements: 3.1–3.12_
 
 - [ ] 21. ProvenanceCard tests
   - **Files:** `src/client/components/ProvenanceCard.test.ts`
   - **Changes:** heading by mode; stack/host anchors present + type plain; recipe
-    line; corner "Tier N — label"; open-web footer copy + corner omission; make-one
-    block present/omitted; all-blank fallback + no-"unknown" preserved.
-  - **Done when:** new + existing tests pass; `tsc --noEmit` clean.
-  - _Requirements: 2.x, 3.x, 9.2, 9.3_
+    line; corner "Tier N — label"; open-web footer copy + corner omission; all-blank
+    fallback + no-"unknown" preserved. MAKE ONE YOURSELF block:
+    - corner: tier-keyed block present when `built_with` mapped, omitted when unmapped;
+    - open-web: block renders in BOTH the stack-present path (line names {Stack},
+      "Start yours →" links the stack's URL) AND the blank-stack fallback (line reads
+      "made by a person, not a platform.", link → `https://neocities.org`);
+    - fixed open-web time-cue "a text editor and a free host is all it takes" present.
+  - **Done when:** new + existing tests pass; `tsc --noEmit` clean; 390px unchanged.
+  - _Requirements: 2.x, 3.x, 9.2, 9.3, 9.6_
 
 ---
 
@@ -281,10 +300,16 @@ mobile 390px keeps no horizontal scroll.
 
 - [ ] 29. The ladder
   - **Files:** `src/worker/routes/ouroboros.ts`
-  - **Changes:** "— THE LADDER —" + subtitle; four rungs with comp titles/
-    descriptions (design §4.3), "start here →" links to representative tools
-    (approved hrefs); Tier 4 coral border + "SURFDECK'S RUNG" badge.
-  - **Done when:** ladder matches comp exactly.
+  - **Changes:** "— THE LADDER —" + subtitle; a BY HAND rung 0 ABOVE Tier 1
+    (text-authoritative addition, design §4.3): marker "BY HAND" in the same slot
+    the comped rungs use for "TIER {N}", title "No tools at all", description
+    "a text editor, one HTML file, a free host — the original way", "start here →"
+    → `https://neocities.org`, no badge — reusing the comped rung markup exactly.
+    THEN four comped rungs with comp titles/descriptions (design §4.3),
+    "start here →" links to representative tools (approved hrefs); Tier 4 coral
+    border + "SURFDECK'S RUNG" badge.
+  - **Done when:** ladder shows five rungs (BY HAND above Tier 1–4); the four TIER
+    rungs match the comp exactly; the BY HAND rung reuses the same rung pattern.
   - _Requirements: 4.7_
 
 - [ ] 30. Footer on `/ouroboros` + route tests
@@ -306,10 +331,11 @@ mobile 390px keeps no horizontal scroll.
 - [ ] TUNING OSD: opaque backdrop, group glosses, info strip, BUILD DIALS collapsed
       by default; active/inactive chip styles per comp
 - [ ] Card: mode-dependent heading, stack/host links, recipe line, corner "Tier N —
-      label", make-one block, open-web divider+footer
+      label", open-web divider+footer; MAKE ONE YOURSELF block in BOTH modes
+      (corner tier-keyed; open-web stack-keyed + blank-stack neocities fallback)
 - [ ] Footer on both the SPA and `/ouroboros`; links + Doto tagline correct
 - [ ] `/ouroboros`: Dead Air telly (green ring, colour bars), self-portrait numbers
-      from build constants, ladder per comp
+      from build constants, ladder = BY HAND rung above the four comped rungs
 - [ ] Embedded sites render desktop layout scaled to fit; scroll/click work; no
       reload on resize
 - [ ] Ceremony timing, palette, fonts unchanged; fonts still self-hosted
