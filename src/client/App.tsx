@@ -297,7 +297,7 @@ export default function App() {
       <header className="hero">
         <h1 className="hero__wordmark">Surfdeck</h1>
         <p className="hero__headline">
-          Every catch prints a card worth keeping.
+          Somebody made this. See how.
         </p>
       </header>
 
@@ -352,9 +352,9 @@ export default function App() {
 
       {/* Press-note — evolving hint below the telly */}
       <p className="press-note">
-        {pressCount === 0 && "press SURF — zap, then the card prints"}
-        {pressCount === 1 && "channel and card stay up — press again whenever"}
-        {pressCount >= 2 && "quick blip; the card reprints with each catch"}
+        {pressCount === 0 && "press SURF — the site tunes in right here"}
+        {pressCount === 1 && "your card's printed — press again anytime"}
+        {pressCount >= 2 && "every press prints a fresh card"}
       </p>
 
       {/* Status message */}

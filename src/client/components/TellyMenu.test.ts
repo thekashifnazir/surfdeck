@@ -13,6 +13,14 @@ const SOURCE = readFileSync(
   "utf-8"
 );
 
+// Character options were lifted to a shared module (character-labels.ts) so the
+// LCD filter summary and the OSD share one source of truth. The character
+// values live there now; the component imports CHARACTERS from it.
+const CHARACTER_LABELS_SOURCE = readFileSync(
+  resolve(__dirname, "../character-labels.ts"),
+  "utf-8"
+);
+
 describe("TellyMenu: Component structure", () => {
   it("exports a default function component", () => {
     expect(SOURCE).toContain("export default function TellyMenu");
@@ -32,10 +40,13 @@ describe("TellyMenu: Component structure", () => {
 
 describe("TellyMenu: OPEN WEB mode (cornerMode=false)", () => {
   it("renders character chips with all 4 values", () => {
-    expect(SOURCE).toContain("modern_indie");
-    expect(SOURCE).toContain("old_web");
-    expect(SOURCE).toContain("retro_personal");
-    expect(SOURCE).toContain("minimal_static");
+    // Values now sourced from the shared character-labels module.
+    expect(SOURCE).toContain("CHARACTERS");
+    expect(SOURCE).toContain("character-labels");
+    expect(CHARACTER_LABELS_SOURCE).toContain("modern_indie");
+    expect(CHARACTER_LABELS_SOURCE).toContain("old_web");
+    expect(CHARACTER_LABELS_SOURCE).toContain("retro_personal");
+    expect(CHARACTER_LABELS_SOURCE).toContain("minimal_static");
   });
 
   it("renders character chips as single-select toggle-off", () => {

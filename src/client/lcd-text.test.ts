@@ -18,22 +18,22 @@ describe("getActiveFilterSummary", () => {
     expect(result).toBeNull();
   });
 
-  it("returns uppercased value for a single character filter", () => {
+  it("humanises a single character filter (modern_indie → MODERN INDIE)", () => {
     const result = getActiveFilterSummary(
       "modern_indie",
       { stacks: [], hosts: [], static_or_dynamic: [] },
       []
     );
-    expect(result).toBe("MODERN_INDIE");
+    expect(result).toBe("MODERN INDIE");
   });
 
-  it("returns uppercased value for a single stack filter", () => {
+  it("humanises a single stack filter via the provenance label map (nextjs → NEXT.JS)", () => {
     const result = getActiveFilterSummary(
       null,
       { stacks: ["nextjs"], hosts: [], static_or_dynamic: [] },
       []
     );
-    expect(result).toBe("NEXTJS");
+    expect(result).toBe("NEXT.JS");
   });
 
   it("returns uppercased value for a single host filter", () => {
@@ -63,23 +63,43 @@ describe("getActiveFilterSummary", () => {
     expect(result).toBe("TIER 3");
   });
 
-  it("returns first value +N for multiple filters", () => {
+  it("returns first humanised value +N for multiple filters", () => {
     const result = getActiveFilterSummary(
       "modern_indie",
       { stacks: ["nextjs", "react"], hosts: [], static_or_dynamic: [] },
       []
     );
-    // character + 2 stacks = 3 values → "MODERN_INDIE +2"
-    expect(result).toBe("MODERN_INDIE +2");
+    // character + 2 stacks = 3 values → "MODERN INDIE +2"
+    expect(result).toBe("MODERN INDIE +2");
   });
 
-  it("returns first value +1 for exactly two filters", () => {
+  it("returns first humanised value +1 for exactly two filters", () => {
     const result = getActiveFilterSummary(
       null,
       { stacks: ["nextjs"], hosts: ["vercel"], static_or_dynamic: [] },
       []
     );
-    expect(result).toBe("NEXTJS +1");
+    // nextjs → "Next.js" resolved before uppercasing → "NEXT.JS +1"
+    expect(result).toBe("NEXT.JS +1");
+  });
+
+  it("humanises the leading label when the first value is a multi-word host (github_pages → GITHUB PAGES)", () => {
+    const result = getActiveFilterSummary(
+      null,
+      { stacks: [], hosts: ["github_pages", "neocities"], static_or_dynamic: [] },
+      []
+    );
+    // github_pages → "GitHub Pages" → "GITHUB PAGES"; two values → "+1"
+    expect(result).toBe("GITHUB PAGES +1");
+  });
+
+  it("humanises a single host filter via the provenance label map (github_pages → GITHUB PAGES)", () => {
+    const result = getActiveFilterSummary(
+      null,
+      { stacks: [], hosts: ["github_pages"], static_or_dynamic: [] },
+      []
+    );
+    expect(result).toBe("GITHUB PAGES");
   });
 
   it("counts tiers alongside build filters", () => {
@@ -123,7 +143,7 @@ describe("computeLcdText with active filters", () => {
       buildFilters: { stacks: ["nextjs"], hosts: ["vercel"], static_or_dynamic: ["static"] },
       selectedTiers: [],
     });
-    expect(result).toBe("CH 218 · THINK · NEXTJS +2");
+    expect(result).toBe("CH 218 · THINK · NEXT.JS +2");
   });
 
   it("appends filter summary when tuned with no mood", () => {
@@ -138,7 +158,7 @@ describe("computeLcdText with active filters", () => {
       buildFilters: { stacks: [], hosts: [], static_or_dynamic: [] },
       selectedTiers: [],
     });
-    expect(result).toBe("CH 300 - OPEN WEB · RETRO_PERSONAL");
+    expect(result).toBe("CH 300 - OPEN WEB · RETRO PERSONAL");
   });
 
   it("does not append filter summary when idle (not tuned)", () => {

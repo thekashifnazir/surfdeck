@@ -157,6 +157,14 @@ export default function Telly({
           <span className="telly__no-signal">NO SIGNAL</span>
         )}
 
+        {/* Idle state — invite the first surf. Distinct from the tuned/embed
+            subtitle below (which is unchanged). */}
+        {zapState === "idle" && status !== "exhausted" && (
+          <span className="telly__subtitle">
+            press SURF — somebody's hand-made site tunes in right here
+          </span>
+        )}
+
         {/* Tuned state — channel display (plain channel only; suppressed while
             an embed is loading/showing so nothing bleeds through the frame) */}
         {showChannelReadout && (

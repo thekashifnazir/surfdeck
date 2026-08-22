@@ -1,4 +1,6 @@
 import type { ZapState, StatusKind, BuildFilterSelection } from "./App";
+import { getProvenanceLabel } from "./provenance-labels";
+import { getCharacterLabel } from "./character-labels";
 
 /** Frozen mood labels — displayed on the LCD when a mood is selected. */
 export const MOOD_LABELS: Record<string, string> = {
@@ -24,9 +26,14 @@ export interface LcdTextOpts {
 /**
  * Collects all active secondary filter values into a single LCD-friendly string.
  *
+ * Each value is resolved to its humanised display label via the existing label
+ * maps BEFORE uppercasing, so `modern_indie` → "MODERN INDIE" (not
+ * "MODERN_INDIE") and `nextjs` → "NEXT.JS". Tier chips keep their "TIER {n}"
+ * form.
+ *
  * - 0 active filters → null
- * - 1 active filter  → "VALUE" (uppercased)
- * - 2+ active filters → "FIRST_VALUE +{n-1}"
+ * - 1 active filter  → "LABEL" (uppercased)
+ * - 2+ active filters → "FIRST_LABEL +{n-1}"
  */
 export function getActiveFilterSummary(
   selectedCharacter: string | null | undefined,
@@ -36,13 +43,13 @@ export function getActiveFilterSummary(
   const values: string[] = [];
 
   if (selectedCharacter) {
-    values.push(selectedCharacter);
+    values.push(getCharacterLabel(selectedCharacter));
   }
 
   if (buildFilters) {
-    values.push(...buildFilters.stacks);
-    values.push(...buildFilters.hosts);
-    values.push(...buildFilters.static_or_dynamic);
+    values.push(...buildFilters.stacks.map(getProvenanceLabel));
+    values.push(...buildFilters.hosts.map(getProvenanceLabel));
+    values.push(...buildFilters.static_or_dynamic.map(getProvenanceLabel));
   }
 
   if (selectedTiers && selectedTiers.length > 0) {

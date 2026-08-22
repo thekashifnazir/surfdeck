@@ -1,14 +1,7 @@
 import type { BuildFilterSelection, AvailableFilters } from "../App";
 import { getProvenanceLabel } from "../provenance-labels";
+import { CHARACTERS } from "../character-labels";
 import { TIER_LABELS } from "../../shared/vibecoded-tiers";
-
-/** The four character options with user-friendly labels and their API query values. */
-const CHARACTERS: { label: string; value: string }[] = [
-  { label: "Modern Indie", value: "modern_indie" },
-  { label: "Old Web", value: "old_web" },
-  { label: "Retro Personal", value: "retro_personal" },
-  { label: "Minimal Static", value: "minimal_static" },
-];
 
 export interface TellyMenuProps {
   open: boolean;
