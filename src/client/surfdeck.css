@@ -370,7 +370,7 @@ body {
   z-index: 20;
   display: flex;
   flex-direction: column;
-  background: rgba(16, 18, 15, 0.93);
+  background: #101210;
   border: 1px solid var(--lcd-green);
   border-radius: 6px;
   padding: 14px 18px;
@@ -409,6 +409,19 @@ body {
   letter-spacing: 0.35em;
   text-align: center;
   color: var(--lcd-green);
+  margin-bottom: 0.35rem;
+  flex-shrink: 0;
+  position: relative;
+}
+
+/* Subtitle under the — TUNING — header: centred italic guidance line */
+.osd__subtitle {
+  font-style: italic;
+  font-size: 0.72rem;
+  line-height: 1.3;
+  text-align: center;
+  color: var(--lcd-green);
+  opacity: 0.75;
   margin-bottom: 0.75rem;
   flex-shrink: 0;
   position: relative;
@@ -456,12 +469,25 @@ body {
   margin-bottom: 0.6rem;
 }
 
+.osd .filters__labelbox {
+  padding-top: 0.5rem;
+}
+
 .osd .filters__label {
   color: var(--lcd-green);
-  opacity: 0.6;
+  opacity: 0.85;
   font-size: 0.62rem;
   margin-bottom: 0;
-  padding-top: 0.5rem;
+}
+
+/* Group gloss: a small, muted LCD-green line under each group label */
+.osd .filters__gloss {
+  color: var(--lcd-green);
+  opacity: 0.55;
+  font-size: 0.55rem;
+  font-style: italic;
+  line-height: 1.25;
+  margin-top: 0.15rem;
 }
 
 /* Chips inside the OSD — green outline, filled when active */
@@ -510,6 +536,89 @@ body {
   opacity: 0.75;
 }
 
+/* Info strip — a single reserved line pinned to the OSD bottom. The fixed
+   min-height keeps the OSD height constant between idle and populated states
+   (no layout shift). Reads as a small muted LCD-green line; the chip label is
+   emphasised at full-strength green. */
+.osd__info-strip {
+  flex-shrink: 0;
+  min-height: 2.4em;
+  margin-top: 0.55rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid rgba(159, 232, 112, 0.2);
+  font-size: 0.66rem;
+  line-height: 1.3;
+  font-style: italic;
+  color: rgba(159, 232, 112, 0.7);
+  position: relative;
+}
+
+.osd__info-strip-label {
+  font-weight: 700;
+  font-style: normal;
+  color: var(--lcd-green);
+}
+
+/* BUILD DIALS — dashed toggle row that collapses STACK + HOSTED ON + TYPE.
+   Collapsed by default; the row itself stays visible so the dials can be
+   opened. Meets the 44px touch target and is keyboard operable (it is a
+   <button>). */
+.osd__build-dials-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+  min-height: 44px;
+  margin-bottom: 0.6rem;
+  padding: 0.4rem 0.6rem;
+  background: transparent;
+  border: 1px dashed rgba(159, 232, 112, 0.55);
+  border-radius: 6px;
+  color: var(--lcd-green);
+  font-family: var(--font-body);
+  font-size: 0.62rem;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 0.12s, opacity 0.12s;
+}
+
+.osd__build-dials-toggle:hover {
+  border-color: var(--lcd-green);
+  opacity: 0.9;
+}
+
+.osd__build-dials-chevron {
+  flex-shrink: 0;
+  font-size: 0.8rem;
+  line-height: 1;
+}
+
+.osd__build-dials-label {
+  flex: 1;
+}
+
+.osd__build-dials-state {
+  flex-shrink: 0;
+  font-family: var(--font-lcd);
+  font-weight: 900;
+  letter-spacing: 0.15em;
+  opacity: 0.75;
+}
+
+/* Collapse via the max-height / overflow idiom used by .card-slot. */
+.osd__build-dials {
+  overflow: hidden;
+  max-height: 0;
+  transition: max-height 0.3s ease-out;
+}
+
+.osd__build-dials--open {
+  /* Large enough to fit the three build groups on any screen; capped so the
+     transition has an end value. Content taller than this still scrolls via
+     the OSD body. */
+  max-height: 1200px;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .osd {
     transition: none;
@@ -517,6 +626,10 @@ body {
 
   .osd--open {
     transform: none;
+  }
+
+  .osd__build-dials {
+    transition: none;
   }
 }
 

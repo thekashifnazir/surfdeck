@@ -114,6 +114,59 @@
         "executionId": "34af08bc-2613-408d-8615-96eb914287bc",
         "chatSessionId": "sess_f0dcec30-2468-4afa-a8ea-7060824c1e5c",
         "timestamp": 1787408551890
+      },
+      {
+        "executionId": "34af08bc-2613-408d-8615-96eb914287bc",
+        "chatSessionId": "sess_f0dcec30-2468-4afa-a8ea-7060824c1e5c",
+        "timestamp": 1787408624564
+      }
+    ],
+    "11. Group glosses under each label": [
+      {
+        "executionId": "a95e6033-e68a-45e7-964b-50d8042222f8",
+        "chatSessionId": "sess_be2bd4e1-a38c-4297-bdd2-8d3407d75e52",
+        "timestamp": 1787408657475
+      },
+      {
+        "executionId": "a95e6033-e68a-45e7-964b-50d8042222f8",
+        "chatSessionId": "sess_be2bd4e1-a38c-4297-bdd2-8d3407d75e52",
+        "timestamp": 1787409075400
+      }
+    ],
+    "12. Info strip (idle + hover/focus)": [
+      {
+        "executionId": "d9567892-4424-4b6d-824a-36572aa754fd",
+        "chatSessionId": "sess_788286c9-9783-4dba-8e98-1ad3ce1c7623",
+        "timestamp": 1787409198328
+      },
+      {
+        "executionId": "d9567892-4424-4b6d-824a-36572aa754fd",
+        "chatSessionId": "sess_788286c9-9783-4dba-8e98-1ad3ce1c7623",
+        "timestamp": 1787409507892
+      }
+    ],
+    "13. BUILD DIALS collapse": [
+      {
+        "executionId": "c46bf408-137e-4b33-b610-f3e1e26c44c6",
+        "chatSessionId": "sess_0f314026-2f2d-4e2e-86d6-197c32e14c9d",
+        "timestamp": 1787409529739
+      },
+      {
+        "executionId": "c46bf408-137e-4b33-b610-f3e1e26c44c6",
+        "chatSessionId": "sess_0f314026-2f2d-4e2e-86d6-197c32e14c9d",
+        "timestamp": 1787409668359
+      }
+    ],
+    "14. TellyMenu tests": [
+      {
+        "executionId": "d391f1dd-75d8-4fbf-b5bf-4d1694382916",
+        "chatSessionId": "sess_8ba8561c-2ed7-4d6b-af19-ccd42580289c",
+        "timestamp": 1787409689834
+      },
+      {
+        "executionId": "d391f1dd-75d8-4fbf-b5bf-4d1694382916",
+        "chatSessionId": "sess_8ba8561c-2ed7-4d6b-af19-ccd42580289c",
+        "timestamp": 1787409858049
       }
     ]
   }

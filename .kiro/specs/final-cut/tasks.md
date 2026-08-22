@@ -95,21 +95,21 @@ mobile 390px keeps no horizontal scroll.
 
 ## Phase C — TUNING menu v2 (`TellyMenu.tsx` + CSS)
 
-- [-] 10. OSD backdrop, labels, header subtitle
+- [x] 10. OSD backdrop, labels, header subtitle
   - **Files:** `src/client/components/TellyMenu.tsx`, `src/client/surfdeck.css`
   - **Changes:** `.osd` bg → solid `#101210`; `.filters__label` opacity → 0.85;
     add centred italic subtitle under `— TUNING —`.
   - **Done when:** OSD is opaque; subtitle shows; chips/behaviour unchanged.
   - _Requirements: 1.1, 1.2, 1.7, 1.8_
 
-- [ ] 11. Group glosses under each label
+- [x] 11. Group glosses under each label
   - **Files:** `TellyMenu.tsx`, `surfdeck.css`
   - **Changes:** render `GROUP_GLOSS[...]` as a small muted green line under each
     group label (CHARACTER/STACK/HOSTED ON/TYPE/TIER).
   - **Done when:** each group shows its verbatim gloss.
   - _Requirements: 1.3_
 
-- [ ] 12. Info strip (idle + hover/focus)
+- [x] 12. Info strip (idle + hover/focus)
   - **Files:** `TellyMenu.tsx`, `surfdeck.css`
   - **Changes:** reserved bottom line, fixed min-height; idle text; on chip
     hover/focus show "**{label}** — {CHIP_GLOSS[value]}"; clear on leave/blur.
@@ -117,7 +117,7 @@ mobile 390px keeps no horizontal scroll.
     focus works.
   - _Requirements: 1.4, 1.10_
 
-- [ ] 13. BUILD DIALS collapse
+- [x] 13. BUILD DIALS collapse
   - **Files:** `TellyMenu.tsx`, `surfdeck.css`
   - **Changes:** wrap STACK+HOSTED ON+TYPE in a collapsible section behind a
     dashed toggle "BUILD DIALS — filter by what it's built with (for the curious)",
@@ -127,7 +127,7 @@ mobile 390px keeps no horizontal scroll.
     mode (TIER) unaffected.
   - _Requirements: 1.6_
 
-- [ ] 14. TellyMenu tests
+- [x] 14. TellyMenu tests
   - **Files:** `src/client/components/TellyMenu.test.ts`
   - **Changes:** group glosses render; info strip idle + hover text; BUILD DIALS
     collapsed by default and toggles; existing filter-logic assertions intact.
