@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import type { CSSProperties } from "react";
 import type {
   ZapState,
   StatusKind,
@@ -6,6 +7,7 @@ import type {
   AvailableFilters,
 } from "../App";
 import TellyMenu from "./TellyMenu";
+import { computeEmbedViewport } from "../embed-viewport";
 
 /**
  * How long an embed may take to load before the telly gives up and shows the
@@ -72,6 +74,29 @@ export default function Telly({
   onTierChange,
   onClearAll,
 }: TellyProps) {
+  // Read-only measurement of the screen so the embedded iframe can be laid out
+  // at a virtual desktop viewport and scaled to fit. A ResizeObserver keeps the
+  // measured width/height in state; it never touches the iframe, so changing
+  // size only updates style props on the existing element (no remount/reload).
+  const screenRef = useRef<HTMLDivElement>(null);
+  const [screenSize, setScreenSize] = useState<{
+    width: number;
+    height: number;
+  } | null>(null);
+
+  useEffect(() => {
+    const el = screenRef.current;
+    if (!el || typeof ResizeObserver === "undefined") return;
+    const observer = new ResizeObserver((entries) => {
+      for (const entry of entries) {
+        const { width, height } = entry.contentRect;
+        setScreenSize({ width, height });
+      }
+    });
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
   // Track iframe load so the CSS fade-in can trigger via the --loaded class.
   const [iframeLoaded, setIframeLoaded] = useState(false);
 
@@ -85,6 +110,23 @@ export default function Telly({
     setIframeLoaded(false);
     setLoadFailed(false);
   }, [embeddedUrl]);
+
+  // Virtual-viewport style for the embedded iframe: lay it out at a desktop
+  // width and scale it down to fill the measured screen. Pure maths lives in
+  // computeEmbedViewport (no DOM). Only these style props change on resize, so
+  // React updates the existing iframe in place — it is never remounted.
+  const embedViewport =
+    screenSize && screenSize.width > 0 && screenSize.height > 0
+      ? computeEmbedViewport(screenSize.width, screenSize.height)
+      : null;
+  const iframeStyle: CSSProperties | undefined = embedViewport
+    ? {
+        width: `${embedViewport.iframeWidth}px`,
+        height: `${embedViewport.iframeHeight}px`,
+        transform: `scale(${embedViewport.scale})`,
+        transformOrigin: "0 0",
+      }
+    : undefined;
 
   const tuned = zapState === "tuned" && status !== "exhausted";
   // Only render the iframe while the embed is live and hasn't failed to load.
@@ -151,7 +193,7 @@ export default function Telly({
 
   return (
     <div className="telly" role="region" aria-label="Channel display">
-      <div className={screenClass} aria-live="polite">
+      <div className={screenClass} aria-live="polite" ref={screenRef}>
         {/* Exhausted state */}
         {status === "exhausted" && (
           <span className="telly__no-signal">NO SIGNAL</span>
@@ -199,6 +241,7 @@ export default function Telly({
             }
             sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox"
             referrerPolicy="no-referrer"
+            style={iframeStyle}
             onLoad={() => setIframeLoaded(true)}
           />
         )}

@@ -4,6 +4,7 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import Telly, { type TellyProps } from "./components/Telly";
+import { computeEmbedViewport } from "./embed-viewport";
 
 /**
  * Telly iframe/embed behaviour tests — Cycle 6, Phase D (task 19).
@@ -439,5 +440,142 @@ describe("Telly embedded iframe scrolling is not stolen", () => {
     });
     expect(html).toContain('class="osd"');
     expect(html).not.toContain("osd--open");
+  });
+});
+
+// ─── Task 25 / Requirements 8.4, 8.5, 9.3: embedded virtual viewport ────────
+//
+// The Telly measures `.telly__screen` via a ResizeObserver, stores the size in
+// state, and feeds it to the pure `computeEmbedViewport(...)` to build the
+// iframe's inline width/height/transform. Only those style props derive from
+// the measured size — src/sandbox/referrerPolicy/title/onLoad do not — so a
+// size change updates the *same* iframe element in place rather than remounting
+// it (which would reload the embedded site).
+//
+// The test env is node with no DOM renderer (react-dom/server only) and no new
+// deps are permitted (Requirement 9), so effects (ResizeObserver → state) never
+// fire under renderToStaticMarkup. As elsewhere in this file, the effect- and
+// state-driven contract is asserted against the component source, and the
+// derived numeric values are pinned with the pure function itself.
+
+describe("Telly embed viewport — style derived from computeEmbedViewport", () => {
+  it("measures .telly__screen with a ResizeObserver that only writes to state", () => {
+    // The observer stores the measured size; it never touches the iframe, so
+    // resizing cannot remount/reload the frame — it only re-derives style.
+    expect(TELLY_SOURCE).toContain("new ResizeObserver");
+    expect(TELLY_SOURCE).toMatch(/observer\.observe\(el\)/);
+    expect(TELLY_SOURCE).toMatch(/const\s*\{\s*width,\s*height\s*\}\s*=\s*entry\.contentRect/);
+    expect(TELLY_SOURCE).toMatch(/setScreenSize\(\{\s*width,\s*height\s*\}\)/);
+  });
+
+  it("feeds the measured screen size into computeEmbedViewport", () => {
+    expect(TELLY_SOURCE).toMatch(
+      /computeEmbedViewport\(\s*screenSize\.width,\s*screenSize\.height\s*\)/
+    );
+  });
+
+  it("builds iframeStyle = { width, height, transform: scale(...), transformOrigin } from the viewport", () => {
+    // The exact mapping the component uses. Pinning it here keeps the runtime
+    // value assertions below faithful to what the component actually renders.
+    expect(TELLY_SOURCE).toMatch(/width:\s*`\$\{embedViewport\.iframeWidth\}px`/);
+    expect(TELLY_SOURCE).toMatch(/height:\s*`\$\{embedViewport\.iframeHeight\}px`/);
+    expect(TELLY_SOURCE).toMatch(/transform:\s*`scale\(\$\{embedViewport\.scale\}\)`/);
+    expect(TELLY_SOURCE).toMatch(/transformOrigin:\s*"0 0"/);
+  });
+
+  it("passes the derived iframeStyle to the iframe's style prop", () => {
+    expect(TELLY_SOURCE).toMatch(/style=\{iframeStyle\}/);
+  });
+
+  it("derives desktop values (screen 1280×158 → 1280px / 158px / scale(1))", () => {
+    // Reproduce the component's exact style construction from the pure fn.
+    const vp = computeEmbedViewport(1280, 158);
+    const style = {
+      width: `${vp.iframeWidth}px`,
+      height: `${vp.iframeHeight}px`,
+      transform: `scale(${vp.scale})`,
+      transformOrigin: "0 0",
+    };
+    expect(style.width).toBe("1280px");
+    expect(style.height).toBe("158px");
+    expect(style.transform).toBe("scale(1)");
+    expect(style.transformOrigin).toBe("0 0");
+  });
+
+  it("derives narrow/mobile values (screen 390×200 → 980px wide, scaled to fit)", () => {
+    // Below the 480px breakpoint the frame lays out at the 980px virtual width.
+    const vp = computeEmbedViewport(390, 200);
+    const style = {
+      width: `${vp.iframeWidth}px`,
+      height: `${vp.iframeHeight}px`,
+      transform: `scale(${vp.scale})`,
+    };
+    expect(style.width).toBe("980px");
+    expect(vp.scale).toBeCloseTo(390 / 980, 10);
+    expect(style.transform).toBe(`scale(${390 / 980})`);
+    // Scaled dimensions exactly fill the measured screen.
+    expect(vp.iframeWidth * vp.scale).toBeCloseTo(390, 6);
+    expect(vp.iframeHeight * vp.scale).toBeCloseTo(200, 6);
+  });
+
+  it("leaves iframeStyle undefined until a size is measured (guards a 0×0 render)", () => {
+    // With no measurement (effects unfired), the iframe renders without inline
+    // sizing rather than collapsing to scale(0) — style is only built once a
+    // positive screen size is in state.
+    expect(TELLY_SOURCE).toMatch(
+      /screenSize && screenSize\.width > 0 && screenSize\.height > 0/
+    );
+    expect(TELLY_SOURCE).toMatch(/:\s*undefined;/);
+    const html = renderTelly({ zapState: "tuned", embeddedUrl: "https://embed.example.com" });
+    expect(html).toContain("<iframe");
+  });
+});
+
+describe("Telly embed viewport — iframe is not remounted on resize", () => {
+  const EMBED_URL = "https://embed.example.com";
+
+  it("does not key the iframe on the screen size (no key ⇒ no remount)", () => {
+    // Locate the iframe element in source and confirm it carries no `key`
+    // prop — React would otherwise treat a size-change as a new element.
+    const iframeIdx = TELLY_SOURCE.indexOf('title="Embedded channel"');
+    expect(iframeIdx).toBeGreaterThan(-1);
+    const iframeBlock = TELLY_SOURCE.slice(iframeIdx - 40, iframeIdx + 500);
+    expect(iframeBlock).not.toMatch(/\bkey=/);
+  });
+
+  it("derives ONLY the style prop from the measured size (identity-stable attrs)", () => {
+    // src/sandbox/referrerPolicy/title/onLoad must not reference the measured
+    // size or the viewport — otherwise a resize would change identity-relevant
+    // attributes and could force a reload.
+    const iframeIdx = TELLY_SOURCE.indexOf('title="Embedded channel"');
+    const iframeBlock = TELLY_SOURCE.slice(iframeIdx, iframeIdx + 500);
+    for (const attr of ["src=", "sandbox=", "referrerPolicy=", "title=", "onLoad="]) {
+      const line = iframeBlock
+        .split("\n")
+        .find((l) => l.includes(attr)) ?? "";
+      expect(line).not.toContain("screenSize");
+      expect(line).not.toContain("embedViewport");
+      expect(line).not.toContain("iframeStyle");
+    }
+  });
+
+  it("documents that only style props change on resize (no remount comment)", () => {
+    // The component explicitly states the invariant; guard it so a refactor
+    // that reintroduces a remount is caught.
+    expect(TELLY_SOURCE).toMatch(/never remounted|no remount/i);
+  });
+
+  it("keeps sandbox/referrerpolicy identical regardless of embed props (size-independent)", () => {
+    // renderToStaticMarkup can't fire the resize effect, but it proves these
+    // attributes are static literals: they are byte-for-byte identical across
+    // independent renders (a stand-in for "unchanged by resizing").
+    const a = renderTelly({ zapState: "tuned", embeddedUrl: EMBED_URL, isFirstSurf: true });
+    const b = renderTelly({ zapState: "tuned", embeddedUrl: EMBED_URL, isFirstSurf: false });
+    const sandbox =
+      'sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox"';
+    expect(a).toContain(sandbox);
+    expect(b).toContain(sandbox);
+    expect(a).toMatch(/referrerpolicy="no-referrer"/i);
+    expect(b).toMatch(/referrerpolicy="no-referrer"/i);
   });
 });

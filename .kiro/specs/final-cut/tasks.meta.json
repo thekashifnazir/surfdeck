@@ -276,6 +276,30 @@
         "chatSessionId": "sess_a98fa039-2adc-497b-94d7-a65f02c10d81",
         "timestamp": 1787414347643
       }
+    ],
+    "24. Apply virtual viewport to the embedded iframe": [
+      {
+        "executionId": "d8425857-aec1-4f43-95e2-7b9f38f822a0",
+        "chatSessionId": "sess_31f06ebd-4d95-47ff-87d8-51cadbf8537f",
+        "timestamp": 1787414574556
+      },
+      {
+        "executionId": "d8425857-aec1-4f43-95e2-7b9f38f822a0",
+        "chatSessionId": "sess_31f06ebd-4d95-47ff-87d8-51cadbf8537f",
+        "timestamp": 1787414829338
+      }
+    ],
+    "25. Telly viewport tests": [
+      {
+        "executionId": "c37492a7-deaa-483e-a83e-d242e1375f7d",
+        "chatSessionId": "sess_98ef2e2d-1fce-4145-ac46-065319eb8b60",
+        "timestamp": 1787414892205
+      },
+      {
+        "executionId": "c37492a7-deaa-483e-a83e-d242e1375f7d",
+        "chatSessionId": "sess_98ef2e2d-1fce-4145-ac46-065319eb8b60",
+        "timestamp": 1787415101654
+      }
     ]
   }
 }

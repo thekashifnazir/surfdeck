@@ -239,7 +239,7 @@ mobile 390px keeps no horizontal scroll.
 
 ## Phase F — Embedded-site virtual viewport (`Telly.tsx`)
 
-- [ ] 24. Apply virtual viewport to the embedded iframe
+- [x] 24. Apply virtual viewport to the embedded iframe
   - **Files:** `src/client/components/Telly.tsx`, `src/client/surfdeck.css`
   - **Changes:** `ResizeObserver` on `.telly__screen` (read-only) → state; inline
     `width/height/transform:scale/transform-origin:0 0` on the existing iframe from
@@ -251,7 +251,7 @@ mobile 390px keeps no horizontal scroll.
     unchanged.
   - _Requirements: 8.1, 8.2, 8.5, 8.6, 8.7, 8.8, 8.9_
 
-- [ ] 25. Telly viewport tests
+- [x] 25. Telly viewport tests
   - **Files:** `src/client/Telly.embed.test.ts`
   - **Changes:** iframe receives width/height/transform derived from the pure
     function for a given screen size; iframe is not remounted when the size changes
