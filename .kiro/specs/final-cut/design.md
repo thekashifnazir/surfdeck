@@ -128,8 +128,9 @@ four tiers. A missing key leaves the strip on idle text (no crash).
 ### 1.5 BUILD DIALS collapse `[comp]`
 
 - Dashed-border toggle row: "▾ BUILD DIALS — filter by what it's built with (for
-  the curious)". Collapsed by default (`useState(false)`), chevron ▸ closed / ▾
-  open, with an OPEN/CLOSED state indicator.
+  the curious)". Collapsed by default (`useState(false)`), chevron-only
+  expand-state indicator; no visible OPEN/CLOSED text (state exposed via
+  aria-expanded). Chevron ▸ closed / ▾ open.
   - CONFIRMED (review 10): the comp's trailing "— OPEN (collapsed by default)"
     is a stage direction in the image, NOT part of the label copy. The label is
     exactly "BUILD DIALS — filter by what it's built with (for the curious)".

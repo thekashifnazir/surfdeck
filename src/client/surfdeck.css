@@ -597,14 +597,6 @@ body {
   flex: 1;
 }
 
-.osd__build-dials-state {
-  flex-shrink: 0;
-  font-family: var(--font-lcd);
-  font-weight: 900;
-  letter-spacing: 0.15em;
-  opacity: 0.75;
-}
-
 /* Collapse via the max-height / overflow idiom used by .card-slot. */
 .osd__build-dials {
   overflow: hidden;

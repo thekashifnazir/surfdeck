@@ -180,9 +180,6 @@ export default function TellyMenu({
               BUILD DIALS &mdash; filter by what it&rsquo;s built with (for the
               curious)
             </span>
-            <span className="osd__build-dials-state">
-              {buildDialsOpen ? "OPEN" : "CLOSED"}
-            </span>
           </button>
 
           <div

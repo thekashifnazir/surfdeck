@@ -295,11 +295,13 @@ describe("TellyMenu v2: BUILD DIALS collapse (Req 1.6)", () => {
     expect(html).toContain("built with (for the curious)");
   });
 
-  it("is collapsed by default (aria-expanded=false, CLOSED indicator, ▸ chevron)", () => {
+  it("is collapsed by default (aria-expanded=false, ▸ chevron, no OPEN/CLOSED text)", () => {
     const html = renderMenu({ cornerMode: false });
     expect(html).toContain('aria-expanded="false"');
-    expect(html).toContain("CLOSED");
     expect(html).toContain("\u25B8"); // ▸ collapsed chevron
+    // Chevron-only: state is exposed via aria-expanded, not visible text.
+    expect(html).not.toContain("CLOSED");
+    expect(html).not.toContain("osd__build-dials-state");
     // The collapsible container does NOT carry the --open modifier by default.
     expect(html).not.toContain("osd__build-dials--open");
   });
@@ -310,7 +312,6 @@ describe("TellyMenu v2: BUILD DIALS collapse (Req 1.6)", () => {
     expect(SOURCE).toContain("setBuildDialsOpen((v) => !v)");
     expect(SOURCE).toContain("aria-expanded={buildDialsOpen}");
     expect(SOURCE).toContain("osd__build-dials--open");
-    expect(SOURCE).toContain('buildDialsOpen ? "OPEN" : "CLOSED"');
     expect(SOURCE).toContain('buildDialsOpen ? "\\u25BE" : "\\u25B8"'); // ▾ open / ▸ closed
   });
 

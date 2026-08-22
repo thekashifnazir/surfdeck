@@ -120,8 +120,8 @@ each filter means so I can narrow the surf with confidence — or ignore it.
    glosses; `design.md` lists its entries verbatim.
 6. STACK, HOSTED ON, and TYPE SHALL sit inside one collapsible section toggled by
    a dashed row labelled "BUILD DIALS — filter by what it's built with (for the
-   curious)", collapsed by default, with a ▾/▸ chevron and an expand-state
-   indicator.
+   curious)", collapsed by default, with a ▾/▸ chevron-only expand-state
+   indicator; no visible OPEN/CLOSED text (state exposed via aria-expanded).
    - CHARACTER (open-web mode) SHALL sit ABOVE the BUILD DIALS toggle, always
      visible.
    - TIER (corner mode) SHALL sit outside BUILD DIALS.
