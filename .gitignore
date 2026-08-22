@@ -9,3 +9,5 @@ dist/
 .seed-import.sql
 .provenance-cache/
 .vibecoded-cache/
+.embeddable-cache/
+.playwright-mcp/

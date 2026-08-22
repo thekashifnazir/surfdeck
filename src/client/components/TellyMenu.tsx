@@ -10,7 +10,7 @@ const CHARACTERS: { label: string; value: string }[] = [
   { label: "Minimal Static", value: "minimal_static" },
 ];
 
-export interface TuneFlyoutProps {
+export interface TellyMenuProps {
   open: boolean;
   cornerMode: boolean;
   selectedCharacter: string | null;
@@ -24,10 +24,12 @@ export interface TuneFlyoutProps {
 }
 
 /**
- * TUNE flyout panel — expands below the TUNE key inside the remote body.
+ * TellyMenu — the on-screen TUNING display (OSD) overlaid inside the telly
+ * screen. Toggled by the remote's MENU key; sits above whatever the screen
+ * is showing (idle / static / tuned / future iframe embed).
  * Shows character + build filters in OPEN WEB mode, tier chips in VIBECODED mode.
  */
-export default function TuneFlyout({
+export default function TellyMenu({
   open,
   cornerMode,
   selectedCharacter,
@@ -38,7 +40,7 @@ export default function TuneFlyout({
   selectedTiers,
   onTierChange,
   onClearAll,
-}: TuneFlyoutProps) {
+}: TellyMenuProps) {
   // --- Character chip toggle (single-select, toggle-off) ---
   function handleCharacterClick(value: string) {
     if (selectedCharacter === value) {
@@ -69,10 +71,13 @@ export default function TuneFlyout({
     }
   }
 
-  const className = `tune-flyout${open ? " tune-flyout--open" : ""}`;
+  const className = `osd${open ? " osd--open" : ""}`;
 
   return (
-    <div className={className}>
+    <div className={className} role="dialog" aria-label="Tuning menu">
+      <div className="osd__scanlines" aria-hidden="true" />
+      <div className="osd__header">&mdash; TUNING &mdash;</div>
+      <div className="osd__body">
       {cornerMode ? (
         // VIBECODED mode: tier chips
         <div className="filters__group">
@@ -211,11 +216,12 @@ export default function TuneFlyout({
       {/* Clear all button */}
       <button
         type="button"
-        className="tune-flyout__clear"
+        className="osd__clear"
         onClick={onClearAll}
       >
         Clear all &times;
       </button>
+      </div>
     </div>
   );
 }

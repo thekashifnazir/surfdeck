@@ -1,5 +1,4 @@
-import type { ZapState, BuildFilterSelection, AvailableFilters } from "../App";
-import TuneFlyout from "./TuneFlyout";
+import type { ZapState } from "../App";
 
 /** Mood key definitions — short keycap + full frozen label + API value */
 const MOOD_KEYS: { keycap: string; label: string; value: string | null }[] = [
@@ -23,19 +22,13 @@ export interface RemoteProps {
   zapState: ZapState;
   isFirstSurf: boolean;
   lcdText: string;
-  selectedCharacter: string | null;
-  onCharacterChange: (character: string | null) => void;
-  buildFilters: BuildFilterSelection;
-  onSelectionChange: (selection: BuildFilterSelection) => void;
-  availableFilters: AvailableFilters;
-  selectedTiers: number[];
-  onTierChange: (tiers: number[]) => void;
-  onClearAll: () => void;
 }
 
 /**
  * The Remote — a charcoal device surface containing the SURF key,
- * mood keys, INPUT key, IR LED, and LCD readout.
+ * mood keys, INPUT key, MENU key, IR LED, and LCD readout.
+ * The filter panel itself is drawn on the telly screen (see TellyMenu);
+ * the MENU key here only toggles it.
  */
 export default function Remote({
   selectedMood,
@@ -49,14 +42,6 @@ export default function Remote({
   zapState,
   isFirstSurf,
   lcdText,
-  selectedCharacter,
-  onCharacterChange,
-  buildFilters,
-  onSelectionChange,
-  availableFilters,
-  selectedTiers,
-  onTierChange,
-  onClearAll,
 }: RemoteProps) {
   function handleMoodClick(value: string | null) {
     if (value === null) {
@@ -141,31 +126,17 @@ export default function Remote({
         {cornerMode ? "INPUT: VIBECODED" : "INPUT: OPEN WEB"}
       </button>
 
-      {/* TUNE Key */}
+      {/* MENU Key — toggles the on-screen TUNING menu (drawn on the telly) */}
       <button
         type="button"
-        className={`tune-key${tuneOpen ? " tune-key--active" : ""}`}
+        className={`menu-key${tuneOpen ? " menu-key--active" : ""}`}
         onClick={onTuneToggle}
         aria-pressed={tuneOpen}
         aria-expanded={tuneOpen}
-        aria-label={tuneOpen ? "Close filter panel" : "Open filter panel"}
+        aria-label={tuneOpen ? "Close tuning menu" : "Open tuning menu"}
       >
-        {tuneOpen ? "TUNE \u25B4" : "TUNE \u25BE"}
+        {tuneOpen ? "MENU \u25B4" : "MENU \u25BE"}
       </button>
-
-      {/* TUNE Flyout */}
-      <TuneFlyout
-        open={tuneOpen}
-        cornerMode={cornerMode}
-        selectedCharacter={selectedCharacter}
-        onCharacterChange={onCharacterChange}
-        buildFilters={buildFilters}
-        onSelectionChange={onSelectionChange}
-        availableFilters={availableFilters}
-        selectedTiers={selectedTiers}
-        onTierChange={onTierChange}
-        onClearAll={onClearAll}
-      />
     </div>
   );
 }

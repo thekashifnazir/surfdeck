@@ -72,6 +72,7 @@ function transformSiteResponse(site: SiteRow) {
     host: site.host ?? null,
     static_or_dynamic: site.static_or_dynamic ?? null,
     built_with: site.built_with ?? null,
+    embeddable: site.embeddable === 1,
   };
 }
 

@@ -9,15 +9,61 @@
  *   npx tsx scripts/seed.ts --remote  # seed remote (production) D1
  */
 
-import { readFileSync, writeFileSync, unlinkSync } from "node:fs";
+import { readFileSync, writeFileSync, unlinkSync, existsSync, readdirSync } from "node:fs";
 import { execSync } from "node:child_process";
 import { resolve, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
-import { csvToInsertStatements } from "./seed-logic.js";
+import { csvToInsertStatements, EmbeddableLookup } from "./seed-logic.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 const PROJECT_ROOT = resolve(__dirname, "..");
+
+const EMBEDDABLE_CACHE_DIR = resolve(PROJECT_ROOT, ".embeddable-cache");
+
+interface EmbeddableCacheEntry {
+  url: string;
+  embeddable: boolean;
+  checked_at: string;
+}
+
+/**
+ * Loads the precomputed embeddable results written by scripts/check-embeddable.ts.
+ * Reads every JSON file in .embeddable-cache/ and indexes by its `url` field.
+ *
+ * Graceful degradation: if the cache dir doesn't exist or is empty, returns an
+ * empty lookup — every row then defaults to embeddable = 1. No errors thrown.
+ */
+function loadEmbeddableLookup(): EmbeddableLookup {
+  const lookup: EmbeddableLookup = new Map();
+
+  if (!existsSync(EMBEDDABLE_CACHE_DIR)) {
+    console.log("No .embeddable-cache/ found — all rows default to embeddable = 1.");
+    return lookup;
+  }
+
+  let files: string[];
+  try {
+    files = readdirSync(EMBEDDABLE_CACHE_DIR).filter((f) => f.endsWith(".json"));
+  } catch {
+    return lookup;
+  }
+
+  for (const file of files) {
+    try {
+      const raw = readFileSync(resolve(EMBEDDABLE_CACHE_DIR, file), "utf-8");
+      const entry = JSON.parse(raw) as EmbeddableCacheEntry;
+      if (entry && typeof entry.url === "string" && typeof entry.embeddable === "boolean") {
+        lookup.set(entry.url, entry.embeddable);
+      }
+    } catch {
+      // Skip unreadable/malformed cache files — treat as absent (embeddable = 1).
+    }
+  }
+
+  console.log(`Loaded ${lookup.size} embeddable cache entries.`);
+  return lookup;
+}
 
 // ---------------------------------------------------------------------------
 // Main
@@ -31,8 +77,10 @@ function main(): void {
   const csvPath = resolve(PROJECT_ROOT, "data", "featured-sites.csv");
   const csvText = readFileSync(csvPath, "utf-8");
 
+  const embeddableLookup = loadEmbeddableLookup();
+
   const addedAt = new Date().toISOString();
-  const insertStatements = csvToInsertStatements(csvText, addedAt);
+  const insertStatements = csvToInsertStatements(csvText, addedAt, embeddableLookup);
 
   console.log(`Parsed ${insertStatements.length} rows from CSV.`);
 
@@ -53,7 +101,8 @@ function main(): void {
   vibecoded INTEGER NOT NULL DEFAULT 0,
   source TEXT NOT NULL,
   tier TEXT NOT NULL DEFAULT 'featured',
-  added_at TEXT NOT NULL
+  added_at TEXT NOT NULL,
+  embeddable INTEGER NOT NULL DEFAULT 1
 );`,
     ...insertStatements,
   ];

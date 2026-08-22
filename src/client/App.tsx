@@ -20,6 +20,7 @@ export interface SurfSite {
   host: string | null;
   static_or_dynamic: string | null;
   built_with: string | null;
+  embeddable: boolean;
 }
 
 /** Available build filter values from /api/filters. */
@@ -84,6 +85,9 @@ export default function App() {
   const [lastSurfResult, setLastSurfResult] = useState<SurfSite | null>(null);
   const [statusMessage, setStatusMessage] = useState<StatusKind>(null);
 
+  // URL to embed inside the telly (set for embeddable sites, null otherwise)
+  const [embeddedUrl, setEmbeddedUrl] = useState<string | null>(null);
+
   // Zap animation state
   const [zapState, setZapState] = useState<ZapState>("idle");
   const [isFirstSurf, setIsFirstSurf] = useState(true);
@@ -110,6 +114,7 @@ export default function App() {
     selectedTiers,
     onSurfResult: setLastSurfResult,
     onStatusChange: setStatusMessage,
+    onEmbedUrl: setEmbeddedUrl,
   });
 
   // Fetch available filter values on mount
@@ -192,6 +197,9 @@ export default function App() {
 
   /** Handle SURF press — trigger zap animation + actual surf. */
   const handleSurf = useCallback(() => {
+    // A surf always dismisses the on-screen TUNING menu.
+    setTuneOpen(false);
+
     // If a card is currently showing, mark as reprint
     if (cardVisible) {
       setIsReprint(true);
@@ -307,29 +315,32 @@ export default function App() {
           zapState={zapState}
           isFirstSurf={isFirstSurf}
           lcdText={lcdText}
-          selectedCharacter={selectedCharacter}
-          onCharacterChange={setSelectedCharacter}
-          buildFilters={buildFilters}
-          onSelectionChange={setBuildFilters}
-          availableFilters={availableFilters}
-          selectedTiers={selectedTiers}
-          onTierChange={setSelectedTiers}
-          onClearAll={handleClearAllFilters}
         />
 
-        <div className="telly-container">
+        <div className={`telly-container${embeddedUrl ? " telly-container--embedded" : ""}`}>
           <Telly
             zapState={zapState}
             isFirstSurf={isFirstSurf}
             channelNumber={channelNumber}
             status={statusMessage}
+            embeddedUrl={embeddedUrl}
+            siteUrl={lastSurfResult?.url ?? null}
+            siteTitle={lastSurfResult?.title ?? null}
+            menuOpen={tuneOpen}
+            cornerMode={cornerMode}
+            selectedCharacter={selectedCharacter}
+            onCharacterChange={setSelectedCharacter}
+            buildFilters={buildFilters}
+            onSelectionChange={setBuildFilters}
+            availableFilters={availableFilters}
+            selectedTiers={selectedTiers}
+            onTierChange={setSelectedTiers}
+            onClearAll={handleClearAllFilters}
           />
 
           <div className="telly__stand" aria-hidden="true" />
-        </div>
 
-        {/* Card column — beside the telly on desktop, below on mobile */}
-        <div className="card-column">
+          {/* Provenance card — prints below the telly */}
           <CardSlot visible={cardVisible} reprint={isReprint}>
             {lastSurfResult && (
               <ProvenanceCard site={lastSurfResult} cornerMode={cornerMode} corpusTotal={corpusTotal} />

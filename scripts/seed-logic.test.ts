@@ -9,7 +9,15 @@
 
 import { describe, it, expect, beforeEach } from "vitest";
 import Database from "better-sqlite3";
-import { seedRowToSQL, SeedRow } from "./seed-logic.js";
+import {
+  seedRowToSQL,
+  SeedRow,
+  csvRowToSeedRow,
+  csvToInsertStatements,
+  buildColIndex,
+  parseCSV,
+  EmbeddableLookup,
+} from "./seed-logic.js";
 
 // Schema matching schema.sql
 const CREATE_TABLE = `
@@ -28,7 +36,8 @@ CREATE TABLE IF NOT EXISTS sites (
   vibecoded INTEGER NOT NULL DEFAULT 0,
   source TEXT NOT NULL,
   tier TEXT NOT NULL DEFAULT 'featured',
-  added_at TEXT NOT NULL
+  added_at TEXT NOT NULL,
+  embeddable INTEGER NOT NULL DEFAULT 1
 );
 `;
 
@@ -48,6 +57,7 @@ function makeRow(overrides: Partial<SeedRow> = {}): SeedRow {
     source: "manual",
     tier: "featured",
     added_at: "2024-06-01T00:00:00.000Z",
+    embeddable: 1,
     ...overrides,
   };
 }
@@ -151,5 +161,100 @@ describe("UPSERT integration tests", () => {
     expect(result.vibecoded).toBe(0);
     // built_with defaults to null
     expect(result.built_with).toBeNull();
+    // embeddable defaults to 1 (passed through from SeedRow)
+    expect(result.embeddable).toBe(1);
+  });
+
+  it("UPSERT updates embeddable — re-seed flips 1 to 0", () => {
+    const row1 = makeRow({ embeddable: 1 });
+    db.exec(seedRowToSQL(row1));
+
+    const before = db.prepare("SELECT * FROM sites WHERE url = ?").get(row1.url) as any;
+    expect(before.embeddable).toBe(1);
+
+    const row2 = makeRow({ embeddable: 0 });
+    db.exec(seedRowToSQL(row2));
+
+    const after = db.prepare("SELECT * FROM sites WHERE url = ?").get(row1.url) as any;
+    expect(after.embeddable).toBe(0);
+
+    const count = db.prepare("SELECT COUNT(*) as cnt FROM sites").get() as any;
+    expect(count.cnt).toBe(1);
+  });
+});
+
+describe("embeddable flag in generated SQL", () => {
+  it("seedRowToSQL includes the embeddable column and value", () => {
+    const sql = seedRowToSQL(makeRow({ embeddable: 0 }));
+
+    // Column present in the INSERT column list
+    expect(sql).toContain(", added_at, embeddable)");
+    // Value 0 present in the VALUES tuple (after the quoted added_at)
+    expect(sql).toContain("'2024-06-01T00:00:00.000Z', 0)");
+    // Present in the ON CONFLICT update clause
+    expect(sql).toContain("embeddable = excluded.embeddable");
+  });
+
+  it("seedRowToSQL emits embeddable = 1 for an embeddable row", () => {
+    const sql = seedRowToSQL(makeRow({ embeddable: 1 }));
+    expect(sql).toContain("'2024-06-01T00:00:00.000Z', 1)");
+  });
+});
+
+describe("embeddable lookup threading (csvRowToSeedRow / csvToInsertStatements)", () => {
+  const CSV = [
+    "url,title,mood_tags,character,stack,host,static_or_dynamic,built_with,why_note,nsfw,vibecoded,source",
+    "https://a.example,Site A,useful,modern_indie,,,,,Note A,false,,manual",
+    "https://b.example,Site B,learn,old_web,,,,,Note B,false,,manual",
+  ].join("\n");
+
+  it("csvRowToSeedRow defaults embeddable to 1 when no lookup provided", () => {
+    const rows = parseCSV(CSV);
+    const colIndex = buildColIndex(rows[0]);
+    const seedRow = csvRowToSeedRow(rows[1], colIndex, "2024-06-01T00:00:00.000Z");
+    expect(seedRow?.embeddable).toBe(1);
+  });
+
+  it("csvRowToSeedRow honors a lookup marking a URL as not embeddable (0)", () => {
+    const rows = parseCSV(CSV);
+    const colIndex = buildColIndex(rows[0]);
+    const lookup: EmbeddableLookup = new Map([["https://a.example", false]]);
+
+    const seedRowA = csvRowToSeedRow(rows[1], colIndex, "2024-06-01T00:00:00.000Z", lookup);
+    const seedRowB = csvRowToSeedRow(rows[2], colIndex, "2024-06-01T00:00:00.000Z", lookup);
+
+    expect(seedRowA?.embeddable).toBe(0);
+    // URL not in the lookup → defaults to 1
+    expect(seedRowB?.embeddable).toBe(1);
+  });
+
+  it("csvRowToSeedRow treats an explicit true lookup entry as embeddable (1)", () => {
+    const rows = parseCSV(CSV);
+    const colIndex = buildColIndex(rows[0]);
+    const lookup: EmbeddableLookup = new Map([["https://a.example", true]]);
+    const seedRow = csvRowToSeedRow(rows[1], colIndex, "2024-06-01T00:00:00.000Z", lookup);
+    expect(seedRow?.embeddable).toBe(1);
+  });
+
+  it("csvToInsertStatements defaults all rows to embeddable = 1 without a lookup", () => {
+    const statements = csvToInsertStatements(CSV, "2024-06-01T00:00:00.000Z");
+    expect(statements).toHaveLength(2);
+    for (const stmt of statements) {
+      expect(stmt).toContain("'2024-06-01T00:00:00.000Z', 1)");
+    }
+  });
+
+  it("csvToInsertStatements applies the lookup per-URL", () => {
+    const db = new Database(":memory:");
+    db.exec(CREATE_TABLE);
+
+    const lookup: EmbeddableLookup = new Map([["https://a.example", false]]);
+    const statements = csvToInsertStatements(CSV, "2024-06-01T00:00:00.000Z", lookup);
+    for (const stmt of statements) db.exec(stmt);
+
+    const a = db.prepare("SELECT embeddable FROM sites WHERE url = ?").get("https://a.example") as any;
+    const b = db.prepare("SELECT embeddable FROM sites WHERE url = ?").get("https://b.example") as any;
+    expect(a.embeddable).toBe(0);
+    expect(b.embeddable).toBe(1);
   });
 });

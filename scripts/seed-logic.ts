@@ -94,6 +94,25 @@ export interface SeedRow {
   source: string;
   tier: string;
   added_at: string;
+  embeddable: number;
+}
+
+/**
+ * Lookup for the precomputed embeddable flag, keyed by URL.
+ * `true`/absent → embeddable (1); `false` → not embeddable (0).
+ * `embeddable` is NOT a CSV column (Requirement 3.5) — the flag is D1-only,
+ * computed by scripts/check-embeddable.ts and threaded in at seed time.
+ */
+export type EmbeddableLookup = Map<string, boolean>;
+
+/**
+ * Resolves the embeddable integer flag for a URL from an optional lookup.
+ * Defaults to 1 (embeddable) when no lookup is provided or the URL is absent —
+ * graceful degradation when the cache is missing/empty.
+ */
+function resolveEmbeddable(url: string, lookup?: EmbeddableLookup): number {
+  if (lookup && lookup.get(url) === false) return 0;
+  return 1;
 }
 
 /**
@@ -103,7 +122,8 @@ export interface SeedRow {
 export function csvRowToSeedRow(
   row: string[],
   colIndex: Map<string, number>,
-  addedAt: string
+  addedAt: string,
+  embeddableLookup?: EmbeddableLookup
 ): SeedRow | null {
   const get = (col: string): string => {
     const idx = colIndex.get(col);
@@ -149,6 +169,7 @@ export function csvRowToSeedRow(
     source,
     tier: "featured",
     added_at: addedAt,
+    embeddable: resolveEmbeddable(url, embeddableLookup),
   };
 }
 
@@ -167,7 +188,7 @@ export function seedRowToSQL(row: SeedRow): string {
     ? `'${sqlEscape(row.built_with)}'`
     : "NULL";
 
-  return `INSERT INTO sites (url, title, mood_tags, character, stack, host, static_or_dynamic, built_with, why_note, nsfw, vibecoded, source, tier, added_at) VALUES ('${sqlEscape(row.url)}', '${sqlEscape(row.title)}', '${sqlEscape(row.mood_tags)}', '${sqlEscape(row.character)}', ${stackVal}, ${hostVal}, ${staticOrDynamicVal}, ${builtWithVal}, '${sqlEscape(row.why_note)}', ${row.nsfw}, ${row.vibecoded}, '${sqlEscape(row.source)}', '${sqlEscape(row.tier)}', '${sqlEscape(row.added_at)}') ON CONFLICT(url) DO UPDATE SET title = excluded.title, mood_tags = excluded.mood_tags, character = excluded.character, stack = excluded.stack, host = excluded.host, static_or_dynamic = excluded.static_or_dynamic, built_with = excluded.built_with, why_note = excluded.why_note, nsfw = excluded.nsfw, vibecoded = excluded.vibecoded, source = excluded.source;`;
+  return `INSERT INTO sites (url, title, mood_tags, character, stack, host, static_or_dynamic, built_with, why_note, nsfw, vibecoded, source, tier, added_at, embeddable) VALUES ('${sqlEscape(row.url)}', '${sqlEscape(row.title)}', '${sqlEscape(row.mood_tags)}', '${sqlEscape(row.character)}', ${stackVal}, ${hostVal}, ${staticOrDynamicVal}, ${builtWithVal}, '${sqlEscape(row.why_note)}', ${row.nsfw}, ${row.vibecoded}, '${sqlEscape(row.source)}', '${sqlEscape(row.tier)}', '${sqlEscape(row.added_at)}', ${row.embeddable}) ON CONFLICT(url) DO UPDATE SET title = excluded.title, mood_tags = excluded.mood_tags, character = excluded.character, stack = excluded.stack, host = excluded.host, static_or_dynamic = excluded.static_or_dynamic, built_with = excluded.built_with, why_note = excluded.why_note, nsfw = excluded.nsfw, vibecoded = excluded.vibecoded, source = excluded.source, embeddable = excluded.embeddable;`;
 }
 
 /**
@@ -183,7 +204,11 @@ export function buildColIndex(header: string[]): Map<string, number> {
  * Processes full CSV text into an array of SQL INSERT statements.
  * Returns the SQL statements (excluding the CREATE TABLE) for data rows.
  */
-export function csvToInsertStatements(csvText: string, addedAt: string): string[] {
+export function csvToInsertStatements(
+  csvText: string,
+  addedAt: string,
+  embeddableLookup?: EmbeddableLookup
+): string[] {
   const rows = parseCSV(csvText);
 
   if (rows.length < 2) return [];
@@ -199,7 +224,7 @@ export function csvToInsertStatements(csvText: string, addedAt: string): string[
     // Skip empty rows (trailing newline can produce an empty last row)
     if (row.length === 1 && row[0].trim() === "") continue;
 
-    const seedRow = csvRowToSeedRow(row, colIndex, addedAt);
+    const seedRow = csvRowToSeedRow(row, colIndex, addedAt, embeddableLookup);
     if (seedRow) {
       statements.push(seedRowToSQL(seedRow));
     }

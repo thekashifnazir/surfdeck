@@ -3,34 +3,34 @@ import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 
 /**
- * TuneFlyout component tests — logic-level / structural.
+ * TellyMenu component tests — logic-level / structural.
  * Validates the component renders correct filter sets based on mode,
  * clear-all triggers the callback, and CSS classes are applied properly.
  */
 
 const SOURCE = readFileSync(
-  resolve(__dirname, "TuneFlyout.tsx"),
+  resolve(__dirname, "TellyMenu.tsx"),
   "utf-8"
 );
 
-describe("TuneFlyout: Component structure", () => {
+describe("TellyMenu: Component structure", () => {
   it("exports a default function component", () => {
-    expect(SOURCE).toContain("export default function TuneFlyout");
+    expect(SOURCE).toContain("export default function TellyMenu");
   });
 
-  it("accepts the open prop and applies tune-flyout--open class conditionally", () => {
+  it("accepts the open prop and applies osd--open class conditionally", () => {
     // The className logic should be based on the `open` prop
-    expect(SOURCE).toContain('tune-flyout--open');
-    expect(SOURCE).toMatch(/open\s*\?\s*"\s*tune-flyout--open"/);
+    expect(SOURCE).toContain('osd--open');
+    expect(SOURCE).toMatch(/open\s*\?\s*"\s*osd--open"/);
   });
 
-  it("renders tune-flyout as the root className", () => {
-    // Template literal builds className starting with "tune-flyout"
-    expect(SOURCE).toContain("`tune-flyout");
+  it("renders osd as the root className", () => {
+    // Template literal builds className starting with "osd"
+    expect(SOURCE).toContain("`osd");
   });
 });
 
-describe("TuneFlyout: OPEN WEB mode (cornerMode=false)", () => {
+describe("TellyMenu: OPEN WEB mode (cornerMode=false)", () => {
   it("renders character chips with all 4 values", () => {
     expect(SOURCE).toContain("modern_indie");
     expect(SOURCE).toContain("old_web");
@@ -71,7 +71,7 @@ describe("TuneFlyout: OPEN WEB mode (cornerMode=false)", () => {
   });
 });
 
-describe("TuneFlyout: VIBECODED mode (cornerMode=true)", () => {
+describe("TellyMenu: VIBECODED mode (cornerMode=true)", () => {
   it("renders tier chips from availableFilters.corner_tiers", () => {
     expect(SOURCE).toContain("availableFilters.corner_tiers");
     expect(SOURCE).toContain('aria-label="Tier filter"');
@@ -93,10 +93,10 @@ describe("TuneFlyout: VIBECODED mode (cornerMode=true)", () => {
   });
 });
 
-describe("TuneFlyout: Clear all button", () => {
+describe("TellyMenu: Clear all button", () => {
   it("renders a Clear all button", () => {
     expect(SOURCE).toContain("Clear all");
-    expect(SOURCE).toContain("tune-flyout__clear");
+    expect(SOURCE).toContain("osd__clear");
   });
 
   it("calls onClearAll when clicked", () => {
@@ -104,7 +104,7 @@ describe("TuneFlyout: Clear all button", () => {
   });
 });
 
-describe("TuneFlyout: Accessibility", () => {
+describe("TellyMenu: Accessibility", () => {
   it("uses aria-pressed on all chip buttons", () => {
     // Count occurrences — should have aria-pressed in multiple places
     const matches = SOURCE.match(/aria-pressed/g);

@@ -144,6 +144,90 @@
         "chatSessionId": "sess_20f87340-da0b-4436-a1a6-9fe3ad07ab41",
         "timestamp": 1787348199777
       }
+    ],
+    "13. D1 schema: add `embeddable` column": [
+      {
+        "executionId": "fa0949e9-d5f4-4733-9c60-abe1e28c4ae4",
+        "chatSessionId": "sess_05c46228-dc76-40a4-8187-8deae55acfe5",
+        "timestamp": 1787351011960
+      },
+      {
+        "executionId": "fa0949e9-d5f4-4733-9c60-abe1e28c4ae4",
+        "chatSessionId": "sess_05c46228-dc76-40a4-8187-8deae55acfe5",
+        "timestamp": 1787351137082
+      }
+    ],
+    "14. Pipeline script: `scripts/check-embeddable.ts`": [
+      {
+        "executionId": "cd5d44b4-f03a-4cea-a0b0-cc97da0cc3b1",
+        "chatSessionId": "sess_e306e5b0-fb6b-4264-8498-5755bff29d1b",
+        "timestamp": 1787351176779
+      },
+      {
+        "executionId": "cd5d44b4-f03a-4cea-a0b0-cc97da0cc3b1",
+        "chatSessionId": "sess_e306e5b0-fb6b-4264-8498-5755bff29d1b",
+        "timestamp": 1787351342796
+      }
+    ],
+    "15. Seed script: populate `embeddable` from cache": [
+      {
+        "executionId": "202da7da-7893-4188-9d7c-e3a27e5438f5",
+        "chatSessionId": "sess_95b488d5-3a57-4f4a-840a-b0ffa2b7ca79",
+        "timestamp": 1787351373616
+      },
+      {
+        "executionId": "202da7da-7893-4188-9d7c-e3a27e5438f5",
+        "chatSessionId": "sess_95b488d5-3a57-4f4a-840a-b0ffa2b7ca79",
+        "timestamp": 1787351535017
+      }
+    ],
+    "16. API: include `embeddable` in surf response": [
+      {
+        "executionId": "85cd75a0-dcf4-454e-a5f8-7a04ed0f09f7",
+        "chatSessionId": "sess_5959eef0-8d90-46dc-bd0f-7a33fb590074",
+        "timestamp": 1787351561878
+      },
+      {
+        "executionId": "85cd75a0-dcf4-454e-a5f8-7a04ed0f09f7",
+        "chatSessionId": "sess_5959eef0-8d90-46dc-bd0f-7a33fb590074",
+        "timestamp": 1787351722200
+      }
+    ],
+    "17. Client: conditional tab-open vs iframe in useSurf + App state": [
+      {
+        "executionId": "81d9c050-a65a-44a9-91f5-5edfadb857a4",
+        "chatSessionId": "sess_6f526de2-a414-4406-b8bf-42758671e454",
+        "timestamp": 1787351745480
+      },
+      {
+        "executionId": "81d9c050-a65a-44a9-91f5-5edfadb857a4",
+        "chatSessionId": "sess_6f526de2-a414-4406-b8bf-42758671e454",
+        "timestamp": 1787352051346
+      }
+    ],
+    "18. Telly: render iframe + pop-out button + fallback state": [
+      {
+        "executionId": "d0e58477-bc71-45f5-9243-1e4ec56455e0",
+        "chatSessionId": "sess_17427e35-981e-4d3e-9c08-d85a62855642",
+        "timestamp": 1787352084320
+      },
+      {
+        "executionId": "d0e58477-bc71-45f5-9243-1e4ec56455e0",
+        "chatSessionId": "sess_17427e35-981e-4d3e-9c08-d85a62855642",
+        "timestamp": 1787352346014
+      }
+    ],
+    "19. Tests for iframe/embed behaviour": [
+      {
+        "executionId": "558e8c7b-16e8-466d-be8f-1321c07523bf",
+        "chatSessionId": "sess_f663b2a0-360d-421c-9041-efb28a76f33b",
+        "timestamp": 1787352376124
+      },
+      {
+        "executionId": "558e8c7b-16e8-466d-be8f-1321c07523bf",
+        "chatSessionId": "sess_f663b2a0-360d-421c-9041-efb28a76f33b",
+        "timestamp": 1787352727552
+      }
     ]
   }
 }

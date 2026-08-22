@@ -115,7 +115,7 @@ body {
 .scene {
   display: flex;
   flex-direction: row;
-  align-items: flex-end;
+  align-items: flex-start;
   gap: 2rem;
   margin-bottom: 2rem;
 }
@@ -308,8 +308,8 @@ body {
   box-shadow: 0 1px 0 #A33417;
 }
 
-/* TUNE Key */
-.tune-key {
+/* MENU Key — toggles the on-screen TUNING menu (same chiclet as INPUT) */
+.menu-key {
   width: 100%;
   padding: 0.5rem;
   font-family: var(--font-body);
@@ -327,69 +327,196 @@ body {
   transition: background 0.15s, color 0.15s, transform 0.1s, box-shadow 0.1s;
 }
 
-.tune-key:hover {
+.menu-key:hover {
   background: #E8E6DF;
 }
 
-.tune-key:active {
+.menu-key:active {
   transform: translateY(2px);
   box-shadow: 0 1px 0 #B8B4A8;
 }
 
-.tune-key--active {
+.menu-key--active {
   background: var(--coral);
   color: #fff;
   box-shadow: 0 3px 0 #A33417;
 }
 
-.tune-key--active:hover {
+.menu-key--active:hover {
   background: #d44a28;
 }
 
-.tune-key--active:active {
+.menu-key--active:active {
   box-shadow: 0 1px 0 #A33417;
 }
 
-/* TUNE Flyout */
-.tune-flyout {
-  width: 100%;
-  max-height: 0;
+/* On-Screen Display (OSD) — the TUNING menu drawn inside the telly screen.
+   Layered above every screen state (idle/static/tuned) and the Phase D iframe
+   embed.
+
+   The panel sizes to its CONTENT: it is anchored to the top and sides of the
+   screen and grows downward only as far as the content needs, capped by
+   max-height so it never spills past the screen's bottom edge. At desktop
+   sizes the content fits and the body does not clip or scroll. Only when the
+   screen is genuinely small (mobile) does the body scroll, with the styled
+   green scrollbar below as the affordance. */
+.osd {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  right: 12px;
+  bottom: auto;
+  max-height: calc(100% - 24px);
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  background: rgba(16, 18, 15, 0.93);
+  border: 1px solid var(--lcd-green);
+  border-radius: 6px;
+  padding: 14px 18px;
   overflow: hidden;
-  transition: max-height 0.25s ease;
+  opacity: 0;
+  transform: translateY(6px);
+  pointer-events: none;
+  transition: opacity 0.18s ease, transform 0.18s ease;
 }
 
-.tune-flyout--open {
-  max-height: min(400px, 50vh);
+.osd--open {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+/* Subtle scanline texture over the OSD */
+.osd__scanlines {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    to bottom,
+    rgba(159, 232, 112, 0.06) 0,
+    rgba(159, 232, 112, 0.06) 1px,
+    transparent 1px,
+    transparent 3px
+  );
+  border-radius: inherit;
+}
+
+.osd__header {
+  font-family: var(--font-lcd);
+  font-weight: 900;
+  font-size: 13px;
+  letter-spacing: 0.35em;
+  text-align: center;
+  color: var(--lcd-green);
+  margin-bottom: 0.75rem;
+  flex-shrink: 0;
+  position: relative;
+}
+
+/* Content region — at desktop the OSD sizes to its content, so this neither
+   clips nor scrolls. Only when the OSD hits its max-height (small/mobile
+   screens) does the body scroll, never the page. The scrollbar is styled to
+   the OSD's green-on-dark language for that case. */
+.osd__body {
+  position: relative;
+  min-height: 0;
   overflow-y: auto;
+  /* Firefox: thin green thumb on dark track (shown only when scrolling). */
+  scrollbar-width: thin;
+  scrollbar-color: var(--lcd-green) rgba(159, 232, 112, 0.12);
 }
 
-.tune-flyout .filters__group {
+/* WebKit/Blink: style the scrollbar green-on-dark for when the body scrolls. */
+.osd__body::-webkit-scrollbar {
+  width: 8px;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.osd__body::-webkit-scrollbar-track {
+  background: rgba(159, 232, 112, 0.12);
+  border-radius: 100px;
+}
+
+.osd__body::-webkit-scrollbar-thumb {
+  background: rgba(159, 232, 112, 0.75);
+  border-radius: 100px;
+}
+
+.osd__body::-webkit-scrollbar-thumb:hover {
+  background: var(--lcd-green);
+}
+
+.osd .filters__group {
+  display: grid;
+  grid-template-columns: 84px 1fr;
+  align-items: start;
+  gap: 0.5rem;
+  margin-bottom: 0.6rem;
+}
+
+.osd .filters__label {
+  color: var(--lcd-green);
+  opacity: 0.6;
+  font-size: 0.62rem;
+  margin-bottom: 0;
+  padding-top: 0.5rem;
+}
+
+/* Chips inside the OSD — green outline, filled when active */
+.osd .chip {
+  background: transparent;
+  border: 1px solid rgba(159, 232, 112, 0.55);
+  color: var(--lcd-green);
+  border-radius: 100px;
+}
+
+.osd .chip:hover {
+  border-color: var(--lcd-green);
+  color: var(--lcd-green);
+}
+
+.osd .chip--active {
+  background: var(--lcd-green);
+  border-color: var(--lcd-green);
+  color: #141613;
+  font-weight: 600;
+}
+
+.osd .chip--active:hover {
+  background: var(--lcd-green);
+  border-color: var(--lcd-green);
+  color: #141613;
+}
+
+.osd__clear {
+  display: inline-block;
   margin-top: 0.5rem;
-}
-
-.tune-flyout__clear {
-  display: block;
-  width: 100%;
-  margin-top: 0.75rem;
-  padding: 0.4rem 0;
+  padding: 0.3rem 0;
   font-family: var(--font-body);
-  font-size: 0.7rem;
+  font-size: 0.72rem;
   font-weight: 400;
-  color: var(--body-grey);
+  color: var(--lcd-green);
   background: none;
   border: none;
   cursor: pointer;
-  text-align: center;
-  transition: color 0.12s;
+  text-align: left;
+  position: relative;
+  transition: opacity 0.12s;
 }
 
-.tune-flyout__clear:hover {
-  color: var(--coral);
+.osd__clear:hover {
+  opacity: 0.75;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .tune-flyout {
+  .osd {
     transition: none;
+  }
+
+  .osd--open {
+    transform: none;
   }
 }
 
@@ -400,19 +527,188 @@ body {
   min-width: 0;
   display: flex;
   flex-direction: column;
+  transition: flex-basis 0.3s ease;
+}
+
+/* Telly grows to ~70% of the scene width when a site is embedded (desktop). */
+.telly-container--embedded {
+  flex-basis: 70%;
 }
 
 .telly {
+  position: relative;
   background: #26262A;
   border-radius: 14px;
   padding: 12px;
   box-shadow: 0 6px 0 #141416;
 }
 
+/* Bezel — the dark frame strip below the screen that holds the pop-out.
+   Right-aligned near the stand. A small top gap separates it from the screen;
+   a negative bottom margin pulls it up into the telly's existing 12px bottom
+   padding so it does not grow the telly's footprint. */
+.telly__bezel {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  margin-top: 4px;
+  /* Pull the bezel up into the telly's 12px bottom padding so the button adds
+     as little height as possible over the non-embedded footprint. */
+  margin-bottom: -8px;
+}
+
+/* Pop-out button — a clearly pressable coral control on the TV bezel below the
+   screen, so it never overlaps the embedded site's content. Icon + short label
+   so it reads as a button at a glance, with obvious hover and focus states. */
+.telly__popout {
+  min-height: 28px;
+  padding: 5px 12px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--coral);
+  color: #F2F0E9;
+  border: none;
+  border-radius: 7px;
+  cursor: pointer;
+  box-shadow: 0 3px 0 #A33417;
+  transition: transform 0.1s ease, box-shadow 0.1s ease, background 0.1s ease;
+}
+
+.telly__popout-icon {
+  width: 14px;
+  height: 14px;
+  fill: #F2F0E9;
+  flex-shrink: 0;
+}
+
+.telly__popout-label {
+  font-family: var(--font-lcd);
+  font-weight: 900;
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.telly__popout-label::after {
+  content: " \2197"; /* ↗ */
+}
+
+.telly__popout:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 0 #A33417;
+}
+
+.telly__popout:active {
+  transform: translateY(2px);
+  box-shadow: 0 1px 0 #A33417;
+}
+
+.telly__popout:focus-visible {
+  outline: 3px solid #F2F0E9;
+  outline-offset: 2px;
+}
+
+/* Embed backdrop — while a site is embedded the screen itself is plain dark
+   (the loading-static layer and the iframe sit on top). Keeps the tuned
+   off-white from bleeding through the frame. */
+.telly__screen--embed {
+  background: var(--screen);
+}
+
+/* Embedded channel iframe — fills the screen, fades in once loaded */
+.telly__iframe {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: none;
+  border-radius: 6px;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  z-index: 2;
+}
+
+.telly__iframe--loaded {
+  opacity: 1;
+}
+
+/* Loading static — the TV noise runs under the iframe while it loads (same
+   pixel-dot fuzz as the zap ceremony), then fades out as the iframe fades in.
+   Sits below the iframe (z-index 1 < iframe's 2) so the fade-in reveals the
+   site over the settling static. */
+.telly__embed-static {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  border-radius: 6px;
+  background-image: radial-gradient(rgba(242, 240, 233, .7) 0.6px, transparent 0.6px);
+  background-size: 3px 3px;
+  background-color: var(--screen);
+  opacity: .45;
+  animation: fuzz .4s steps(3) infinite;
+}
+
+/* Non-embeddable / load-failure fallback — one big, unmistakably pressable
+   button filling the screen. Shows the caught site's title. High contrast on
+   the dark screen, with hover / pressed / keyboard-focus states. Rendered as a
+   <button>, so reset the UA button chrome. */
+.telly__screen--fallback {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  text-align: center;
+  padding: 24px 28px;
+  background: var(--coral);
+  color: #F2F0E9;
+  border: none;
+  cursor: pointer;
+  box-shadow: inset 0 0 0 3px rgba(242, 240, 233, 0.35);
+  transition: filter 0.12s ease, box-shadow 0.12s ease, transform 0.06s ease;
+}
+
+.telly__fallback-name {
+  font-family: var(--font-lcd);
+  font-weight: 900;
+  font-size: clamp(18px, 4vw, 30px);
+  letter-spacing: 0.04em;
+  line-height: 1.1;
+  text-transform: uppercase;
+}
+
+.telly__fallback-line {
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: clamp(12px, 2.2vw, 15px);
+  line-height: 1.35;
+  max-width: 32ch;
+}
+
+.telly__screen--fallback:hover {
+  filter: brightness(1.06);
+  box-shadow: inset 0 0 0 3px rgba(242, 240, 233, 0.6);
+}
+
+.telly__screen--fallback:active {
+  transform: translateY(2px);
+  filter: brightness(0.96);
+}
+
+.telly__screen--fallback:focus-visible {
+  outline: 3px solid #F2F0E9;
+  outline-offset: -6px;
+}
+
 .telly__screen {
   width: 100%;
   aspect-ratio: 16 / 10;
-  min-height: 158px;
+  min-height: 240px;
   background: var(--screen);
   border-radius: 6px;
   display: flex;
@@ -493,17 +789,6 @@ body {
   margin-top: 8px;
 }
 
-/* 6b. Card Column (beside telly on desktop, below on mobile)
-   ------------------------------------------------------------ */
-.card-column {
-  width: 220px;
-  flex-shrink: 0;
-  align-self: stretch;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-end;
-}
-
 /* 7. Card Slot
    ------------------------------------------------------------ */
 .card-slot {
@@ -515,7 +800,7 @@ body {
 
 .card-slot--visible,
 .card-slot--reprint {
-  max-height: 190px;
+  max-height: 320px;
 }
 
 .card-slot__inner {
@@ -545,6 +830,10 @@ body {
 /* 8. Provenance Card
    ------------------------------------------------------------ */
 .prov-card {
+  max-width: 680px;
+  width: 100%;
+  align-self: flex-start;
+  margin-top: 1rem;
   background: var(--card-white);
   border: 2px solid #26262A;
   border-top: none;
@@ -553,31 +842,44 @@ body {
   font-family: var(--font-card);
   position: relative;
   box-shadow: 0 4px 8px rgba(38, 38, 42, 0.12);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr);
+  column-gap: 24px;
+  align-items: start;
+}
+
+.prov-card__left,
+.prov-card__right {
+  min-width: 0;
+}
+
+.prov-card__right {
+  padding-top: 1.5rem;
 }
 
 .prov-card__title {
+  padding-right: 90px;
   font-family: var(--font-body);
   font-weight: 600;
-  font-size: 14px;
+  font-size: 16px;
   color: var(--ink);
   margin: 0 0 0.25rem;
 }
 
 .prov-card__heading {
-  padding-right: 90px;
   font-family: var(--font-body);
-  font-size: 0.65rem;
+  font-size: 0.7rem;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.06em;
   color: var(--caption-grey);
-  margin: 0 0 0.75rem;
+  margin: 0;
 }
 
 .prov-card__body {
-  font-size: 1rem;
+  font-size: 15px;
   color: var(--ink);
-  margin: 0 0 0.75rem;
+  margin: 0 0 0.5rem;
   line-height: 1.5;
 }
 
@@ -589,9 +891,9 @@ body {
 .prov-card__why {
   font-family: var(--font-body);
   font-style: italic;
-  font-size: 12px;
+  font-size: 13px;
   color: var(--body-grey);
-  margin: 0 0 0.75rem;
+  margin: 0 0 0.5rem;
 }
 
 .prov-card__footer {
@@ -811,8 +1113,22 @@ body {
     animation: none;
   }
 
+  .telly__iframe {
+    opacity: 1;
+    transition: none;
+  }
+
+  /* Loading static becomes a plain dark screen — no animated noise — and the
+     site cuts straight in (the iframe is at opacity 1 above). */
+  .telly__embed-static {
+    animation: none;
+    background-image: none;
+    opacity: 1;
+    background-color: var(--screen);
+  }
+
   .card-slot {
-    max-height: 190px;
+    max-height: 320px;
     transition: none;
   }
 
@@ -843,11 +1159,6 @@ body {
     align-items: stretch;
   }
 
-  .card-column {
-    width: 100%;
-    order: 3;
-  }
-
   .remote {
     width: 100%;
     min-width: unset;
@@ -855,8 +1166,22 @@ body {
     padding: 1.25rem 1rem 1.5rem;
   }
 
+  /* Keep the telly full-width when stacked — no flex-basis growth on mobile */
+  .telly-container--embedded {
+    flex-basis: auto;
+  }
+
   .page {
     padding: 1.5rem 1rem;
+  }
+
+  .prov-card {
+    grid-template-columns: minmax(0, 1fr);
+    column-gap: 0;
+  }
+
+  .prov-card__left {
+    margin-bottom: 0.75rem;
   }
 }
 

@@ -15,6 +15,7 @@ export interface UseSurfOptions {
   selectedTiers: number[];
   onSurfResult: (site: SurfSite | null) => void;
   onStatusChange: (status: StatusKind) => void;
+  onEmbedUrl: (url: string | null) => void;
 }
 
 export interface UseSurfReturn {
@@ -97,6 +98,60 @@ function buildQueryString(
   return qs ? `?${qs}` : "";
 }
 
+/** Callbacks the response handler needs to drive App state. */
+interface SurfResponseHandlers {
+  onSurfResult: (site: SurfSite | null) => void;
+  onStatusChange: (status: StatusKind) => void;
+  onEmbedUrl: (url: string | null) => void;
+}
+
+/**
+ * Applies the surf API response to app state.
+ *
+ * Pure with respect to React — extracted so the branching can be unit-tested
+ * without a DOM. Nothing opens on surf press: no tab is pre-opened, so there is
+ * no tab to navigate or close here. The opener for non-embeddable sites is the
+ * telly's pressable fallback control (a user gesture, never popup-blocked).
+ *
+ * - status "ok" + embeddable: hand the URL to App state so the telly renders an
+ *   iframe.
+ * - status "ok" + non-embeddable: clear the embedded URL and open nothing — the
+ *   telly's fallback control is the opener.
+ * - no_match / exhausted / error: clear the embedded URL.
+ */
+export function applySurfResponse(
+  data: { status?: string; site?: SurfSite },
+  { onSurfResult, onStatusChange, onEmbedUrl }: SurfResponseHandlers
+): void {
+  if (data.status === "ok" && data.site) {
+    const site = data.site;
+
+    if (site.embeddable === true) {
+      // Embeddable: hand the URL to App state so the telly renders an iframe.
+      onEmbedUrl(site.url);
+    } else {
+      // Non-embeddable: open nothing. The telly's pressable fallback control
+      // is the opener; clear any prior embedded URL so it shows.
+      onEmbedUrl(null);
+    }
+
+    appendToSeenList(site.id);
+    onSurfResult(site);
+    onStatusChange("ok");
+  } else if (data.status === "no_match") {
+    onEmbedUrl(null);
+    onSurfResult(null);
+    onStatusChange("no_match");
+  } else if (data.status === "exhausted") {
+    onEmbedUrl(null);
+    onSurfResult(null);
+    onStatusChange("exhausted");
+  } else {
+    onEmbedUrl(null);
+    onStatusChange("error");
+  }
+}
+
 /**
  * Hook that encapsulates all surf logic: fetch, tab opening, seen-list, and status.
  * Extracted from the old SurfButton component to decouple behaviour from UI.
@@ -109,14 +164,13 @@ export function useSurf({
   selectedTiers,
   onSurfResult,
   onStatusChange,
+  onEmbedUrl,
 }: UseSurfOptions): UseSurfReturn {
   const [isLoading, setIsLoading] = useState(false);
 
   const handleSurf = useCallback(async () => {
-    // Open blank tab synchronously within the click gesture (required for Safari)
-    const tab = window.open("about:blank", "_blank");
-    const popupBlocked = !tab;
-
+    // Nothing opens on press — the telly embeds the site or shows a pressable
+    // fallback whose click is the opener. No optimistic blank tab.
     setIsLoading(true);
     onStatusChange(null);
     onSurfResult(null);
@@ -135,7 +189,7 @@ export function useSurf({
       clearTimeout(timeoutId);
 
       if (!response.ok) {
-        tab?.close();
+        onEmbedUrl(null);
         onStatusChange("error");
         return;
       }
@@ -145,37 +199,15 @@ export function useSurf({
         site?: SurfSite;
       };
 
-      if (data.status === "ok" && data.site) {
-        if (popupBlocked) {
-          appendToSeenList(data.site.id);
-          onSurfResult(data.site);
-          onStatusChange("popup_blocked");
-        } else {
-          tab.location.href = data.site.url;
-          appendToSeenList(data.site.id);
-          onSurfResult(data.site);
-          onStatusChange("ok");
-        }
-      } else if (data.status === "no_match") {
-        tab?.close();
-        onSurfResult(null);
-        onStatusChange("no_match");
-      } else if (data.status === "exhausted") {
-        tab?.close();
-        onSurfResult(null);
-        onStatusChange("exhausted");
-      } else {
-        tab?.close();
-        onStatusChange("error");
-      }
+      applySurfResponse(data, { onSurfResult, onStatusChange, onEmbedUrl });
     } catch {
       clearTimeout(timeoutId);
-      tab?.close();
+      onEmbedUrl(null);
       onStatusChange("error");
     } finally {
       setIsLoading(false);
     }
-  }, [selectedMood, selectedCharacter, buildFilters, cornerMode, selectedTiers, onSurfResult, onStatusChange]);
+  }, [selectedMood, selectedCharacter, buildFilters, cornerMode, selectedTiers, onSurfResult, onStatusChange, onEmbedUrl]);
 
   return { handleSurf, isLoading };
 }

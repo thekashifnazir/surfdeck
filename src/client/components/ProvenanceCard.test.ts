@@ -17,6 +17,7 @@ function renderCard(overrides: Partial<SurfSite> = {}, props: { cornerMode?: boo
     host: "vercel",
     static_or_dynamic: "static",
     built_with: null,
+    embeddable: true,
     ...overrides,
   };
 

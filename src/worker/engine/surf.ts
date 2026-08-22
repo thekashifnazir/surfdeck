@@ -45,6 +45,7 @@ export interface SiteRow {
   source: string;
   tier: string;
   added_at: string;
+  embeddable: number;
 }
 
 /** Surf result — one of three outcomes. */

@@ -57,6 +57,7 @@ const siteRowArb = (id: number): fc.Arbitrary<SiteRow> =>
     source: fc.constant("manual"),
     tier: fc.constant("featured"),
     added_at: fc.constant("2024-01-01T00:00:00.000Z"),
+    embeddable: fc.constant(1),
   });
 
 /** Generate a corpus of 5-30 sites with sequential IDs */
@@ -436,6 +437,7 @@ describe("Property 2: NSFW exclusion", () => {
               source: fc.constant("manual"),
               tier: fc.constant("featured"),
               added_at: fc.constant("2024-01-01T00:00:00.000Z"),
+              embeddable: fc.constant(1),
             })
           )
         )
@@ -574,6 +576,7 @@ describe("Property 4: Mood filter semicolon parsing", () => {
             source: "manual",
             tier: "featured",
             added_at: "2024-01-01T00:00:00.000Z",
+            embeddable: 1,
           };
 
           // Pick a different mood for the second site
@@ -594,6 +597,7 @@ describe("Property 4: Mood filter semicolon parsing", () => {
             source: "manual",
             tier: "featured",
             added_at: "2024-01-01T00:00:00.000Z",
+            embeddable: 1,
           };
 
           const corpus = [siteWithMood, siteWithoutMood];
@@ -862,6 +866,7 @@ const cornerSiteRowArb = (id: number): fc.Arbitrary<SiteRow> =>
     why_note: fc.constant("An AI-built site"),
     nsfw: fc.constant(0),
     vibecoded: fc.constant(1),
+    embeddable: fc.constant(1),
     source: fc.constant("manual"),
     tier: fc.constant("featured"),
     added_at: fc.constant("2024-01-01T00:00:00.000Z"),
@@ -1041,6 +1046,7 @@ describe("Vibecoded Corner: Tier with no matching rows returns no_match", () => 
             source: "manual",
             tier: "featured",
             added_at: "2024-01-01T00:00:00.000Z",
+            embeddable: 1,
           }));
 
           const cornerSites: SiteRow[] = [
@@ -1060,6 +1066,7 @@ describe("Vibecoded Corner: Tier with no matching rows returns no_match", () => 
               source: "manual",
               tier: "featured",
               added_at: "2024-01-01T00:00:00.000Z",
+              embeddable: 1,
             },
             {
               id: openCount + 2,
@@ -1077,6 +1084,7 @@ describe("Vibecoded Corner: Tier with no matching rows returns no_match", () => 
               source: "manual",
               tier: "featured",
               added_at: "2024-01-01T00:00:00.000Z",
+              embeddable: 1,
             },
           ];
 

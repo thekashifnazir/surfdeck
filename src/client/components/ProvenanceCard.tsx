@@ -62,19 +62,23 @@ export default function ProvenanceCard({ site, cornerMode, corpusTotal, embedded
 
   return (
     <div className="prov-card">
-      <p className="prov-card__title">{site.title}</p>
-      <p className="prov-card__heading">
-        CATCH №&nbsp;{site.id} OF {corpusTotal}
-      </p>
-      <p className={`prov-card__body${isFallback ? " prov-card__body--fallback" : ""}`}>
-        {bodyContent}
-      </p>
-      {site.why_note && (
-        <p className="prov-card__why">{site.why_note}</p>
-      )}
-      <p className="prov-card__footer">
-        Everyone's a builder. Learn from the sites you like.
-      </p>
+      <div className="prov-card__left">
+        <p className="prov-card__title">{site.title}</p>
+        <p className="prov-card__heading">
+          CATCH №&nbsp;{site.id} OF {corpusTotal}
+        </p>
+      </div>
+      <div className="prov-card__right">
+        <p className={`prov-card__body${isFallback ? " prov-card__body--fallback" : ""}`}>
+          {bodyContent}
+        </p>
+        {site.why_note && (
+          <p className="prov-card__why">{site.why_note}</p>
+        )}
+        <p className="prov-card__footer">
+          Everyone's a builder. Learn from the sites you like.
+        </p>
+      </div>
       <span className="prov-card__stamp" aria-hidden="true">
         {embedded ? "OPENS IN TELLY" : "OPENS IN NEW TAB"}
       </span>

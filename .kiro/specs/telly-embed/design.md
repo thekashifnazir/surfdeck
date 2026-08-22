@@ -18,14 +18,22 @@ The embeddable flag is runtime metadata derived from HTTP headers — not a prop
 scripts/check-embeddable.ts
     │
     ├── reads all URLs from data/featured-sites.csv (or from D1 via wrangler)
-    ├── HTTP HEAD each URL (concurrency-limited, e.g. 5 at a time)
+    ├── HTTP GET each URL (concurrency-limited, e.g. 5 at a time; follow
+    │     redirects; desktop-browser User-Agent; body discarded, not downloaded)
     ├── inspects response headers:
     │     X-Frame-Options: DENY or SAMEORIGIN → embeddable = false
     │     CSP frame-ancestors: not * and not including our origin → embeddable = false
-    │     network error / timeout → embeddable = true (optimistic)
+    │     network error / timeout → embeddable = false (pessimistic)
     │
     └── writes results to .embeddable-cache/<url-hash>.json
             { "url": "…", "embeddable": true/false, "checked_at": "ISO" }
+
+Why GET, not HEAD: measured on 30 corpus sites, neal.fun returns 403 to a
+HEAD request and the block page's own X-Frame-Options was misleading; the same
+URL under GET returns the real page headers. Why pessimistic on failure: a
+false negative costs only a harmless new-tab fallback, whereas a false positive
+shows a blank telly. The body is read-then-discarded (never persisted) so we
+pay only header cost while still triggering the real (non-HEAD) response.
 ```
 
 ### Seed integration
@@ -94,13 +102,19 @@ A `<button className="telly__popout">` sits in the `.telly` padding area (top-ri
 .telly__popout:hover svg { fill: var(--coral); }
 ```
 
-### Non-embeddable fallback
+### Non-embeddable / load-failure fallback
 
-When `embeddable === false`:
-- `useSurf` opens a new tab (existing `window.open` path — unchanged).
-- Telly transitions to tuned state showing a fallback message instead of an iframe.
-- New `.telly__screen--fallback` modifier: off-white bg, centered text "this channel won't tune in — opened across the room" in Doto 12px.
-- Pop-out button hidden (site is already in a new tab).
+When `embeddable === false` (or an embed fails to load within 5s — see below):
+- `useSurf` opens nothing; `embeddedUrl` stays null.
+- Telly transitions to tuned state showing a pressable fallback control instead of an iframe.
+- The fallback is a real `<button className="telly__screen--fallback">`: off-white bg, centered text "this channel won't tune in — press to open it across the room" in Doto 12px. Its `onClick` calls `window.open(url, '_blank')` — a user gesture, so it is never popup-blocked.
+- Pop-out button hidden during the fallback (the fallback control is itself the opener).
+
+### Load-failure timer (embed that never renders)
+
+When an embed starts (`embeddedUrl` set + tuned), Telly arms a 5-second timer. The iframe's `onload` clears it. If the timer expires first, Telly swaps to the same pressable fallback control for that site's URL.
+
+`onload` is NOT treated as proof the site rendered — Chrome fires `onload` even for XFO-blocked frames. Preventing those is the precomputed `embeddable` flag's job; the timer is a backstop for sites whose headers changed since the last check. The pop-out button stays visible for the whole embedded session (it only disappears once we swap to the fallback control).
 
 ### SurfSite type update
 
@@ -113,11 +127,11 @@ export interface SurfSite {
 
 ### useSurf.ts changes
 
-The hook's branching:
-- If `site.embeddable === true`: do NOT call `window.open`. Pass the URL to App state for iframe rendering.
-- If `site.embeddable === false`: call `window.open` as today (synchronous, Safari-safe).
+Nothing opens on surf press — the optimistic blank tab is removed entirely, along with all tab-close logic. The hook's branching after the fetch resolves:
+- If `site.embeddable === true`: call `onEmbedUrl(site.url)` so the telly renders an iframe.
+- If `site.embeddable === false`: call `onEmbedUrl(null)`. Do NOT auto-open anything — the telly's pressable fallback control is the opener.
 
-The blank-tab trick (`window.open("about:blank", "_blank")`) must be conditional: only open the blank tab when we DON'T know the site is embeddable yet (since we fetch first). Design choice: **always open the blank tab optimistically**, then close it if embeddable. This preserves the synchronous gesture requirement for non-embeddable sites.
+This drops the earlier "open a blank tab optimistically then close it" trick. Because we no longer open anything on press, the synchronous-gesture concern moves to the fallback control: the visitor's click on that button is itself the gesture, so its `window.open` is never popup-blocked.
 
 ---
 
@@ -332,27 +346,28 @@ User presses SURF
        │
        ├─ channelCounter updated (rolling)
        ├─ zapState → "zapping"
-       ├─ window.open("about:blank") [optimistic blank tab]
+       ├─ (nothing opens — no blank tab)
        │
        └─ fetch /api/surf?…
               │
               ├─ response: { status: "ok", site: { …, embeddable } }
               │     │
               │     ├─ embeddable === true
-              │     │     ├─ close the blank tab
               │     │     ├─ setEmbeddedUrl(site.url)
               │     │     └─ ceremony completes → iframe fades in
+              │     │            └─ 5s load-failure timer; onload clears it,
+              │     │               else swap to pressable fallback
               │     │
               │     └─ embeddable === false
-              │           ├─ blank tab navigates to site.url
-              │           ├─ setEmbeddedUrl(null)
-              │           └─ ceremony completes → fallback message on screen
+              │           ├─ setEmbeddedUrl(null)  [nothing auto-opens]
+              │           └─ ceremony completes → pressable fallback control
+              │                  └─ user press → window.open(url, "_blank")
               │
               ├─ response: { status: "no_match" }
-              │     └─ close blank tab, LCD shows no-match
+              │     └─ LCD shows no-match
               │
               └─ response: { status: "exhausted" }
-                    └─ close blank tab, NO SIGNAL state
+                    └─ NO SIGNAL state
 ```
 
 ---
@@ -377,17 +392,17 @@ User presses SURF
 
 | Risk | Impact | Mitigation |
 |------|--------|-----------|
-| Blank iframe for sites that changed headers since check | User sees empty telly screen | Pop-out button always available; consider an `onerror`/timeout fallback that shows the "won't tune in" message after 5s of no load |
+| Blank iframe for sites that changed headers since check | User sees empty telly screen | 5s load-failure timer (cleared by iframe `onload`) swaps to the pressable fallback control; pop-out button also available while embedded |
 | TUNE flyout makes remote taller than viewport on small screens | Scroll needed | Flyout uses `max-height: min(400px, 50vh)` with `overflow-y: auto` |
 | iframe sandbox too permissive (allow-same-origin + allow-scripts) | Framed site can access its own cookies/storage | Acceptable: we're not protecting our origin. The omission of allow-top-navigation prevents frame-busting. |
 | Corpus-size endpoint adds a DB query per page load | Negligible: COUNT on a ~350-row table is instant on D1 | Cache response with `Cache-Control: public, max-age=3600` |
-| Optimistic blank tab closed for embeddable sites causes Safari flash | Brief blank-tab appearance | Investigate opening tab in background; if flash is unacceptable, defer tab open until fetch resolves and accept that non-embeddable may be popup-blocked |
+| ~~Optimistic blank tab flash~~ (removed) | n/a | No tab opens on press anymore. The only `window.open` is the fallback control's, which runs inside the user's click gesture — never popup-blocked, no flash. |
 
 ---
 
 ## 11. Out of Scope
 
-- Live runtime frame-detection (onload/onerror sniffing) — explicitly excluded per requirements.
+- Live runtime frame-detection that treats `onload` as proof of a successful render — explicitly excluded (Chrome fires `onload` for blocked frames). The precomputed flag remains the source of truth; the 5s load-failure timer is only a coarse backstop for stale headers, not header sniffing.
 - Changes to the existing ceremony timing values (CSS custom properties unchanged).
 - Auth, accounts, or server-side user state.
 - CDN font loading — all fonts remain self-hosted.

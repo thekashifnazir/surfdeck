@@ -49,6 +49,7 @@ const sampleSite: SiteRow = {
   source: "manual",
   tier: "featured",
   added_at: "2024-01-01T00:00:00.000Z",
+  embeddable: 1,
 };
 
 /**
@@ -116,7 +117,33 @@ describe("/api/surf route", () => {
         host: "vercel",
         static_or_dynamic: "dynamic",
         built_with: null,
+        embeddable: true,
       });
+    });
+
+    it("includes the embeddable boolean field in the response", async () => {
+      const app = createApp(createMockD1({ count: 1, site: sampleSite }));
+      const res = await app.fetch("/api/surf");
+
+      const body = await json(res);
+      expect(body.site).toHaveProperty("embeddable");
+      expect(typeof body.site.embeddable).toBe("boolean");
+    });
+
+    it("maps embeddable integer to boolean", async () => {
+      const embeddableSite = createApp(
+        createMockD1({ count: 1, site: { ...sampleSite, embeddable: 1 } })
+      );
+      const embRes = await embeddableSite.fetch("/api/surf");
+      const embBody = await json(embRes);
+      expect(embBody.site.embeddable).toBe(true);
+
+      const nonEmbeddableSite = createApp(
+        createMockD1({ count: 1, site: { ...sampleSite, embeddable: 0 } })
+      );
+      const nonEmbRes = await nonEmbeddableSite.fetch("/api/surf");
+      const nonEmbBody = await json(nonEmbRes);
+      expect(nonEmbBody.site.embeddable).toBe(false);
     });
 
     it("transforms mood_tags from semicolon-separated string to array", async () => {
