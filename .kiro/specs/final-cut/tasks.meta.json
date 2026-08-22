@@ -300,6 +300,66 @@
         "chatSessionId": "sess_98ef2e2d-1fce-4145-ac46-065319eb8b60",
         "timestamp": 1787415101654
       }
+    ],
+    "26. Build-time colophon constants": [
+      {
+        "executionId": "387658f2-59c5-4004-b844-e18b3803fda9",
+        "chatSessionId": "sess_a43003e1-4879-4455-81ca-1034b8a4b33d",
+        "timestamp": 1787415946820
+      },
+      {
+        "executionId": "387658f2-59c5-4004-b844-e18b3803fda9",
+        "chatSessionId": "sess_a43003e1-4879-4455-81ca-1034b8a4b33d",
+        "timestamp": 1787417280196
+      }
+    ],
+    "27. Dead Air shell: header, telly, colour-bar, ouroboros ring": [
+      {
+        "executionId": "4bb82794-244e-439d-bdfc-3eeddb352aa3",
+        "chatSessionId": "sess_605e9a7a-5856-4df7-8750-17bd91389845",
+        "timestamp": 1787417303717
+      },
+      {
+        "executionId": "4bb82794-244e-439d-bdfc-3eeddb352aa3",
+        "chatSessionId": "sess_605e9a7a-5856-4df7-8750-17bd91389845",
+        "timestamp": 1787417694840
+      }
+    ],
+    "28. Self-portrait stat card": [
+      {
+        "executionId": "4bb78423-f390-4df5-a798-2e56ee5b2f6b",
+        "chatSessionId": "sess_f14b2fc5-59f6-4856-8d1a-d2dc85dd679b",
+        "timestamp": 1787417715710
+      },
+      {
+        "executionId": "4bb78423-f390-4df5-a798-2e56ee5b2f6b",
+        "chatSessionId": "sess_f14b2fc5-59f6-4856-8d1a-d2dc85dd679b",
+        "timestamp": 1787417913619
+      }
+    ],
+    "29. The ladder": [
+      {
+        "executionId": "9d394602-588e-4bce-9f75-7b1ad145a41f",
+        "chatSessionId": "sess_67d6ce00-fbed-45a6-904b-dcd80e3d0659",
+        "timestamp": 1787417932891
+      },
+      {
+        "executionId": "9d394602-588e-4bce-9f75-7b1ad145a41f",
+        "chatSessionId": "sess_67d6ce00-fbed-45a6-904b-dcd80e3d0659",
+        "timestamp": 1787418103611
+      }
+    ],
+    "30. Footer on `/ouroboros` + route tests": [
+      {
+        "executionId": "c2e5c478-2e11-45df-a6a6-57d5e2e65d8a",
+        "chatSessionId": "sess_2ba15224-0600-4118-bc78-d435c5554802",
+        "timestamp": 1787418147961
+      },
+      {
+        "executionId": "c2e5c478-2e11-45df-a6a6-57d5e2e65d8a",
+        "chatSessionId": "sess_2ba15224-0600-4118-bc78-d435c5554802",
+        "timestamp": 1787418322233
+      }
     ]
   }
 }

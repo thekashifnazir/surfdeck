@@ -105,6 +105,11 @@ body {
   letter-spacing: -0.01em;
 }
 
+.hero__wordmark-link {
+  color: inherit;
+  text-decoration: none;
+}
+
 .hero__headline {
   font-size: 1rem;
   color: var(--body-grey);
@@ -876,6 +881,72 @@ body {
   color: #fff;
 }
 
+/* Exhausted "END OF DIAL" stack — sits above the fuzz ::before layer. */
+.telly__exhausted {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: 0.7rem;
+  padding: 20px 24px;
+  max-width: 92%;
+}
+
+.telly__exhausted-line {
+  font-family: var(--font-body);
+  font-size: 12px;
+  line-height: 1.4;
+  color: #F2F0E9;
+  margin: 0;
+  max-width: 34ch;
+}
+
+/* Pressable "start the dial over ↻" — same coral, off-white, inset-ring style
+   as the won't-tune-in fallback button, sized to sit inline in the stack. */
+.telly__start-over {
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: 14px;
+  letter-spacing: 0.02em;
+  color: #F2F0E9;
+  background: var(--coral);
+  border: none;
+  border-radius: 8px;
+  padding: 10px 20px;
+  cursor: pointer;
+  box-shadow: inset 0 0 0 3px rgba(242, 240, 233, 0.35);
+  transition: filter 0.12s ease, box-shadow 0.12s ease, transform 0.06s ease;
+}
+
+.telly__start-over:hover {
+  filter: brightness(1.06);
+  box-shadow: inset 0 0 0 3px rgba(242, 240, 233, 0.6);
+}
+
+.telly__start-over:active {
+  transform: translateY(2px);
+  filter: brightness(0.96);
+}
+
+.telly__start-over:focus-visible {
+  outline: 3px solid #F2F0E9;
+  outline-offset: 2px;
+}
+
+/* OSD-voice hint under the button — green, italic. */
+.telly__exhausted-hint {
+  font-family: var(--font-body);
+  font-style: italic;
+  font-size: 11px;
+  line-height: 1.4;
+  color: var(--lcd-green);
+  margin: 0;
+  max-width: 36ch;
+}
+
 /* TV Stand */
 .telly__stand {
   width: 55%;
@@ -1061,12 +1132,25 @@ body {
 }
 
 .make-one__cue {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 0.2rem 0.75rem;
   font-family: var(--font-body);
   font-style: italic;
   font-size: 12px;
   color: var(--body-grey);
   line-height: 1.4;
   margin: 0;
+}
+
+/* Quiet "see the whole ladder →" link — sits right-aligned on the cue line,
+   dropping to its own line when the row wraps. Not italic like the cue text. */
+.make-one__ladder {
+  font-style: normal;
+  margin-left: auto;
+  white-space: nowrap;
 }
 
 .prov-card__stamp {
@@ -1203,11 +1287,25 @@ body {
 }
 
 .telly__screen--static,
-.telly__screen--static-fast,
-.telly__screen--exhausted {
+.telly__screen--static-fast {
   background-image: radial-gradient(rgba(242, 240, 233, .7) 0.6px, transparent 0.6px);
   background-size: 3px 3px;
   background-color: var(--screen);
+  opacity: .45;
+  animation: fuzz .4s steps(3) infinite;
+}
+
+/* Exhausted fuzz lives on a ::before layer (not the screen's own opacity) so
+   the NO SIGNAL text + "start the dial over" control sit at full opacity and
+   stay clickable above the noise. */
+.telly__screen--exhausted::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-image: radial-gradient(rgba(242, 240, 233, .7) 0.6px, transparent 0.6px);
+  background-size: 3px 3px;
   opacity: .45;
   animation: fuzz .4s steps(3) infinite;
 }
@@ -1262,7 +1360,9 @@ body {
     opacity: 0;
   }
 
-  .telly__screen--exhausted {
+  /* Kill only the fuzz layer — the NO SIGNAL text + "start the dial over"
+     control stay fully visible as the static end state. */
+  .telly__screen--exhausted::before {
     animation: none;
     opacity: 0;
   }

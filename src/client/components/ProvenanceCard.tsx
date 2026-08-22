@@ -58,7 +58,17 @@ function MakeOneBox({ lead, cue }: { lead: ReactNode; cue: string }): ReactNode 
     <div className="make-one">
       <p className="make-one__label">MAKE ONE YOURSELF</p>
       <p className="make-one__line">{lead}</p>
-      <p className="make-one__cue">{cue}</p>
+      <p className="make-one__cue">
+        <span className="make-one__cue-text">{cue}</span>
+        <a
+          className="prov-link make-one__ladder"
+          href="/ouroboros"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          see the whole ladder →
+        </a>
+      </p>
     </div>
   );
 }
@@ -127,7 +137,7 @@ export default function ProvenanceCard({ site, cornerMode, corpusTotal, embedded
         {tier !== null && (
           <>
             {" · "}Tier&nbsp;{tier}
-            {tierLabel ? ` — ${tierLabel.toLowerCase()}` : null}
+            {tierLabel ? ` — ${tierLabel}` : null}
           </>
         )}
       </>

@@ -14,11 +14,7 @@ const EXPECTED_LINKS: { label: string; href: string; external: boolean }[] = [
   { label: "GITHUB", href: "https://github.com/thekashifnazir", external: true },
   { label: "LINKEDIN", href: "https://www.linkedin.com/in/kashifnazir/", external: true },
   { label: "HOW THIS WAS MADE", href: "/ouroboros", external: false },
-  {
-    label: "REPO &amp; PROCESS LOG",
-    href: "https://github.com/thekashifnazir/surfdeck/blob/main/docs/kiro-process.md",
-    external: true,
-  },
+  { label: "REPO", href: "https://github.com/thekashifnazir/surfdeck", external: true },
 ];
 
 // ─── Links present in order with correct hrefs (Requirement 5.4) ───

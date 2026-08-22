@@ -32,6 +32,9 @@ export interface TellyProps {
   // Title of the currently-surfed site, shown on the pressable fallback button
   // (e.g. "SMASHING MAGAZINE won't tune in — press to open it across the room").
   siteTitle?: string | null;
+  // Clears the seen-list and immediately surfs again. Wired to the exhausted
+  // state's "start the dial over ↻" control (a user gesture, never popup-blocked).
+  onStartOver?: () => void;
   // On-screen TUNING menu (OSD) — overlaid inside the screen
   menuOpen: boolean;
   cornerMode: boolean;
@@ -63,6 +66,7 @@ export default function Telly({
   embeddedUrl,
   siteUrl,
   siteTitle,
+  onStartOver,
   menuOpen,
   cornerMode,
   selectedCharacter,
@@ -194,9 +198,27 @@ export default function Telly({
   return (
     <div className="telly" role="region" aria-label="Channel display">
       <div className={screenClass} aria-live="polite" ref={screenRef}>
-        {/* Exhausted state */}
+        {/* Exhausted state — the telly carries the whole "END OF DIAL" moment:
+            NO SIGNAL, a plain-language line, a pressable "start the dial over"
+            control (clears the seen-list and surfs in one user gesture, so the
+            surf's opener is never popup-blocked), and an OSD-voice hint. */}
         {status === "exhausted" && (
-          <span className="telly__no-signal">NO SIGNAL</span>
+          <div className="telly__exhausted">
+            <span className="telly__no-signal">NO SIGNAL</span>
+            <p className="telly__exhausted-line">
+              you've watched every channel on this input.
+            </p>
+            <button
+              type="button"
+              className="telly__start-over"
+              onClick={() => onStartOver?.()}
+            >
+              start the dial over ↻
+            </button>
+            <p className="telly__exhausted-hint">
+              or flip the INPUT · open MENU to widen the tuning
+            </p>
+          </div>
         )}
 
         {/* Idle state — invite the first surf. Distinct from the tuned/embed

@@ -10,6 +10,7 @@
     "test": "vitest --run --config vitest.config.ts",
     "test:watch": "vitest",
     "seed": "npx tsx scripts/seed.ts",
+    "generate:colophon": "npx tsx scripts/generate-colophon-stats.ts",
     "deploy": "npx wrangler deploy"
   },
   "dependencies": {

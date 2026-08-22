@@ -10,18 +10,14 @@ interface FooterLink {
  * Footer links (order + hrefs approved in review 9). Rendered space-separated
  * with no "·" separators; styled dotted-coral + uppercase via `.site-footer__link`.
  * "HOW THIS WAS MADE" is same-origin (/ouroboros); the rest open in a new tab.
- * "REPO & PROCESS LOG" is a deep link straight to the process log.
+ * "REPO" links to the repository root.
  */
 const FOOTER_LINKS: FooterLink[] = [
   { label: "KASHIFNAZIR.COM", href: "https://kashifnazir.com", external: true },
   { label: "GITHUB", href: "https://github.com/thekashifnazir", external: true },
   { label: "LINKEDIN", href: "https://www.linkedin.com/in/kashifnazir/", external: true },
   { label: "HOW THIS WAS MADE", href: "/ouroboros", external: false },
-  {
-    label: "REPO & PROCESS LOG",
-    href: "https://github.com/thekashifnazir/surfdeck/blob/main/docs/kiro-process.md",
-    external: true,
-  },
+  { label: "REPO", href: "https://github.com/thekashifnazir/surfdeck", external: true },
 ];
 
 /**

@@ -99,9 +99,14 @@ Two later additions to the learning layer are **text-authoritative**: the comps
 do NOT show them, but they reuse existing comp patterns exactly and invent no new
 visual design. The comps remain the authority for everything else.
 
-1. **Ladder rung 0 ("BY HAND").** A fifth rung ABOVE Tier 1 on `/ouroboros`, using
-   the same rung pattern as the comp (number label + title + description + "start
-   here →" link). See Requirement 4.7. The four existing rungs are unchanged.
+1. **Ladder rung 0 ("BY HAND") + bottom-up ordering.** A fifth rung on
+   `/ouroboros`, using the same rung pattern as the comp (number label + title +
+   description + "start here →" link). The ladder renders BOTTOM-UP like a real
+   ladder: top-to-bottom TIER 4 → TIER 3 → TIER 2 → TIER 1 → BY HAND, so BY HAND
+   is the BOTTOM rung and TIER 4 ("SURFDECK'S RUNG") is the TOP rung. This reverses
+   the comp's vertical sequence — ordering is text-authoritative; each rung's
+   visual pattern is unchanged from the comp. See Requirement 4.7. The four TIER
+   rungs are otherwise unchanged.
 2. **MAKE ONE YOURSELF on open-web cards.** The same dashed-coral block from the
    corner comp is rendered on OPEN-WEB cards too, with stack-keyed copy and a
    blank-stack fallback. See Requirement 3. Corner cards keep their tier-keyed
@@ -289,30 +294,36 @@ colophon — a self-portrait showing how Surfdeck itself was built.
      AI in Kiro, every step human-gated."
    - Links "Read the repo · read the build log" (dotted-coral; hrefs in
      `design.md` §4.1, reusing the review-9 repo and process-log URLs).
-7. THE page SHALL show THE LADDER as comped, plus one text-authoritative rung
-   above it:
+7. THE page SHALL show THE LADDER — the four comped TIER rungs plus one
+   text-authoritative BY HAND rung — rendered BOTTOM-UP like a real ladder:
    - Header "— THE LADDER —" (Doto) and subtitle "every site in the corner sits
      on a rung. pick yours and make one." (italic).
-   - A rung 0 ABOVE Tier 1, using the SAME rung pattern as the comp (number label
-     + bold title + grey description + dotted-coral "start here →" link). This
-     rung is a text-authoritative addition (see § Resolved Against Comps →
-     Amendment); it reuses the comped rung layout and invents no new design:
+   - THE rungs SHALL be ordered top-to-bottom TIER 4 → TIER 3 → TIER 2 → TIER 1 →
+     BY HAND, so BY HAND is the BOTTOM rung and TIER 4 is the TOP rung. This
+     vertical ordering is a text-authoritative amendment (see § Resolved Against
+     Comps → Amendment) that reverses the comp's sequence; each rung's visual
+     pattern is unchanged from the comp.
+   - THE BY HAND rung (bottom) uses the SAME rung pattern as the comp (number label
+     + bold title + grey description + dotted-coral "start here →" link); it reuses
+     the comped rung layout and invents no new design:
      - marker label "BY HAND" (Doto, in the same slot the comp uses for
        "TIER {N}") — title "No tools at all" — description "a text editor, one
        HTML file, a free host — the original way" — "start here →" →
        `https://neocities.org`.
      - The BY HAND rung SHALL have no badge.
-   - THEN four white rungs (unchanged from the comp), each with a coral "TIER {N}"
-     marker (Doto), a bold title, a grey description, and a dotted-coral
-     "start here →" link to a representative tool's official site (from the tool
-     map, `design.md` §4.3).
+   - THE four TIER rungs (unchanged from the comp in visual pattern), each with a
+     coral "TIER {N}" marker (Doto), a bold title, a grey description, and a
+     dotted-coral "start here →" link to a representative tool's official site
+     (from the tool map, `design.md` §4.3):
      - Tier 1 — "No-code AI builder" — "describe a site in a sentence, get a site"
      - Tier 2 — "AI app-builder" — "sketch screens and logic, AI wires it up"
      - Tier 3 — "AI-assisted coding" — "you steer, an AI pair-codes with you"
      - Tier 4 — "Developer cloud + agents" — "spec it, and agents build it — this
        site's own recipe"
-   - Tier 4 SHALL have a coral border and a coral "SURFDECK'S RUNG" badge.
-   - THE four existing (Tier 1–4) rungs SHALL be unchanged by this addition.
+   - Tier 4 (the TOP rung) SHALL have a coral border and a coral "SURFDECK'S RUNG"
+     badge.
+   - THE four TIER rungs SHALL be unchanged in visual pattern by this addition —
+     only their vertical order is reversed (ascending).
 8. THE page SHALL include the footer (Requirement 5).
 9. Build-time constants SHALL be computed from the repo (not scattered literals)
    and injected at build; `design.md` defines the derivation.

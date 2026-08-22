@@ -579,3 +579,47 @@ describe("Telly embed viewport — iframe is not remounted on resize", () => {
     expect(b).toMatch(/referrerpolicy="no-referrer"/i);
   });
 });
+
+// ─── Exhausted "END OF DIAL" — the telly carries the whole moment ───────────
+//
+// The below-scene StatusMessage no longer renders the exhausted case; the telly
+// screen now shows NO SIGNAL + a plain-language line + a pressable "start the
+// dial over ↻" control + an OSD-voice hint. renderToStaticMarkup strips event
+// handlers, so the control's onClick contract is asserted against the source.
+
+describe("Telly exhausted state (END OF DIAL)", () => {
+  it("renders NO SIGNAL and the 'every channel' line", () => {
+    const html = renderTelly({ status: "exhausted", zapState: "idle" });
+    expect(html).toContain("NO SIGNAL");
+    expect(html).toContain("you");
+    expect(html).toContain("ve watched every channel on this input.");
+  });
+
+  it("renders the pressable 'start the dial over ↻' control as a real <button>", () => {
+    const html = renderTelly({ status: "exhausted", zapState: "idle" });
+    expect(html).toMatch(/<button[^>]*class="telly__start-over"/);
+    expect(html).toContain("start the dial over ↻");
+  });
+
+  it("renders the OSD-voice hint under the button", () => {
+    const html = renderTelly({ status: "exhausted", zapState: "idle" });
+    expect(html).toContain("telly__exhausted-hint");
+    expect(html).toContain("or flip the INPUT · open MENU to widen the tuning");
+  });
+
+  it("does NOT render the exhausted control in a plain tuned / idle state", () => {
+    const idle = renderTelly({ status: null, zapState: "idle" });
+    expect(idle).not.toContain("telly__start-over");
+    expect(idle).not.toContain("start the dial over");
+  });
+
+  it("wires the control's onClick to onStartOver (clear seen-list + surf)", () => {
+    // The click delegates to the onStartOver prop; App's handler clears the
+    // seen-list then surfs in the same user gesture (never popup-blocked).
+    const startOverIdx = TELLY_SOURCE.indexOf('className="telly__start-over"');
+    expect(startOverIdx).toBeGreaterThan(-1);
+    const buttonBlock = TELLY_SOURCE.slice(startOverIdx, startOverIdx + 160);
+    expect(buttonBlock).toContain("onClick");
+    expect(buttonBlock).toMatch(/onStartOver\?\.\(\)/);
+  });
+});

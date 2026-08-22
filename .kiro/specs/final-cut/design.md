@@ -268,10 +268,11 @@ is present, omit the recipe line entirely.
 // comp: "Built with Lovable · Tier 1 — no-code AI builder"  (Lovable = link)
 const tier = getBuiltWithTier(site.built_with);      // e.g. 1
 const label = tier ? getTierLabel(tier) : null;      // "No-code AI builder"
-// render: Built with <a>{getBuiltWithLabel(built_with)}</a> · Tier {tier} — {label.toLowerCase()}
+// render: Built with <a>{getBuiltWithLabel(built_with)}</a> · Tier {tier} — {label}
 ```
-The comp shows the label lowercased in the card ("no-code AI builder"); apply
-`.toLowerCase()` (or a CSS `text-transform`) so it matches. `{Tool}` links via the
+The card renders the canonical `TIER_LABELS` value verbatim ("No-code AI
+builder") — no `.toLowerCase()` or `text-transform` (an approved correction
+removed it), matching `ProvenanceCard.tsx` and its test. `{Tool}` links via the
 tool map's URL (§3.2).
 
 ### 2.6 Footer + divider (open-web only) `[comp]`
@@ -443,21 +444,29 @@ rotation removed (static ring). Keeps the dot-matrix / Doto aesthetic.
 ### 4.3 The ladder `[comp]`
 
 Header "— THE LADDER —" (Doto) + subtitle "every site in the corner sits on a
-rung. pick yours and make one." One text-authoritative BY HAND rung (row 0) above
-four comped rungs — five white rungs total:
+rung. pick yours and make one." One text-authoritative BY HAND rung (rung 0) plus
+four comped rungs — five white rungs total.
+
+**Render order — bottom-up like a real ladder (`[text]` amendment):** the rungs
+climb from the ground up, so the DOM/visual order top-to-bottom is TIER 4 → TIER 3
+→ TIER 2 → TIER 1 → BY HAND. BY HAND is the BOTTOM rung (the original way, the
+ground you start from); TIER 4 ("SURFDECK'S RUNG") is the TOP rung. This reverses
+the comp's vertical sequence — only the ordering is text-authoritative; each rung's
+visual pattern is unchanged from the comp. Listed here top-to-bottom as rendered:
 
 | Rung | Title | Description | "start here →" href | Badge |
 |---|---|---|---|---|
-| BY HAND `[text]` | No tools at all | a text editor, one HTML file, a free host — the original way | https://neocities.org | — |
-| TIER 1 `[comp]` | No-code AI builder | describe a site in a sentence, get a site | https://www.godaddy.com/airo | — |
+| TIER 4 `[comp]` (top) | Developer cloud + agents | spec it, and agents build it — this site's own recipe | https://kiro.dev | SURFDECK'S RUNG |
+| TIER 3 `[comp]` | AI-assisted coding | you steer, an AI pair-codes with you | https://cursor.com | — |
 | TIER 2 `[comp]` | AI app-builder | sketch screens and logic, AI wires it up | https://lovable.dev | — |
-| TIER 3 `[comp]` | AI-assisted coding | you steer, an AI pair-codes with you | https://kiro.dev | — |
-| TIER 4 `[comp]` | Developer cloud + agents | spec it, and agents build it — this site's own recipe | https://workers.cloudflare.com | SURFDECK'S RUNG |
+| TIER 1 `[comp]` | No-code AI builder | describe a site in a sentence, get a site | https://www.godaddy.com/airo | — |
+| BY HAND `[text]` (bottom) | No tools at all | a text editor, one HTML file, a free host — the original way | https://neocities.org | — |
 
 - **BY HAND rung** (`[text]` = text-authoritative, requirements § Amendment):
   reuses the comped rung layout EXACTLY — its marker slot shows "BY HAND" (Doto,
-  where the comped rungs show "TIER {N}"); no badge. It sits ABOVE Tier 1 and
-  invents no new design. The four TIER rungs are unchanged from the comp.
+  where the comped rungs show "TIER {N}"); no badge. It sits at the BOTTOM, below
+  Tier 1, and invents no new design. The four TIER rungs are unchanged from the
+  comp in visual pattern — only their vertical order is reversed (ascending).
 
 - The visible link label is "start here →" (coral, dotted-underline); the href is
   a representative tool from `TOOL_MAP` (choices in §4.3 approved, review 3).

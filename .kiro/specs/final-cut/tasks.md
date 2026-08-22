@@ -263,7 +263,7 @@ mobile 390px keeps no horizontal scroll.
 
 ## Phase G — `/ouroboros` "Dead Air" rebuild (LAST)
 
-- [ ] 26. Build-time colophon constants
+- [x] 26. Build-time colophon constants
   - **Files:** new generated `src/worker/colophon-stats.ts` (+ a small
     build/generate step), `src/worker/routes/ouroboros.ts`
   - **Prerequisite:** write the Cycle 7 process-log entry (№82) in
@@ -278,7 +278,7 @@ mobile 390px keeps no horizontal scroll.
     literals).
   - _Requirements: 4.9_
 
-- [ ] 27. Dead Air shell: header, telly, colour-bar, ouroboros ring
+- [x] 27. Dead Air shell: header, telly, colour-bar, ouroboros ring
   - **Files:** `src/worker/routes/ouroboros.ts`
   - **Changes:** rebuild body/styles (keep `@font-face` + tokens): "The loop
     closes." + intro; telly with colour-bar strip; SVG segmented ouroboros ring in
@@ -288,7 +288,7 @@ mobile 390px keeps no horizontal scroll.
   - **Done when:** page renders the Dead Air telly per comp; reduced-motion static.
   - _Requirements: 4.1–4.5, 9.7_
 
-- [ ] 28. Self-portrait stat card
+- [x] 28. Self-portrait stat card
   - **Files:** `src/worker/routes/ouroboros.ts`
   - **Changes:** white card + coral "SELF-PORTRAIT" badge; "Surfdeck"; "CATCH №
     349 · THE ONE THAT CAUGHT ITSELF"; stats row from task 26 constants (render
@@ -298,21 +298,25 @@ mobile 390px keeps no horizontal scroll.
     process-log entry shows the `{n}+` form.
   - _Requirements: 4.6_
 
-- [ ] 29. The ladder
+- [x] 29. The ladder
   - **Files:** `src/worker/routes/ouroboros.ts`
-  - **Changes:** "— THE LADDER —" + subtitle; a BY HAND rung 0 ABOVE Tier 1
-    (text-authoritative addition, design §4.3): marker "BY HAND" in the same slot
-    the comped rungs use for "TIER {N}", title "No tools at all", description
-    "a text editor, one HTML file, a free host — the original way", "start here →"
-    → `https://neocities.org`, no badge — reusing the comped rung markup exactly.
-    THEN four comped rungs with comp titles/descriptions (design §4.3),
-    "start here →" links to representative tools (approved hrefs); Tier 4 coral
-    border + "SURFDECK'S RUNG" badge.
-  - **Done when:** ladder shows five rungs (BY HAND above Tier 1–4); the four TIER
-    rungs match the comp exactly; the BY HAND rung reuses the same rung pattern.
+  - **Changes:** "— THE LADDER —" + subtitle; render the rungs BOTTOM-UP like a
+    real ladder (text-authoritative ordering amendment, design §4.3): DOM/visual
+    order top-to-bottom is TIER 4 → TIER 3 → TIER 2 → TIER 1 → BY HAND. TIER 4
+    ("SURFDECK'S RUNG", coral border + badge) is the TOP rung; BY HAND is the
+    BOTTOM rung. The BY HAND rung reuses the comped rung markup exactly — marker
+    "BY HAND" in the same slot the comped rungs use for "TIER {N}", title "No tools
+    at all", description "a text editor, one HTML file, a free host — the original
+    way", "start here →" → `https://neocities.org`, no badge. The four TIER rungs
+    keep comp titles/descriptions/badge (design §4.3) and "start here →" links to
+    representative tools (approved hrefs); only their vertical order reverses to
+    ascending. Each rung's visual pattern is unchanged from the comp.
+  - **Done when:** ladder shows five rungs top-to-bottom TIER 4 → 3 → 2 → 1 → BY
+    HAND (TIER 4 top, BY HAND bottom); each rung's visual pattern matches the comp;
+    only the vertical order is reversed.
   - _Requirements: 4.7_
 
-- [ ] 30. Footer on `/ouroboros` + route tests
+- [x] 30. Footer on `/ouroboros` + route tests
   - **Files:** `src/worker/routes/ouroboros.ts`, `src/worker/routes/ouroboros.test.ts`
   - **Changes:** inline the footer markup/styles (mirror of `Footer.tsx`, design
     §5.2); extend tests for Dead Air copy, ladder rungs, stat-card numbers, and
@@ -335,7 +339,8 @@ mobile 390px keeps no horizontal scroll.
       (corner tier-keyed; open-web stack-keyed + blank-stack neocities fallback)
 - [ ] Footer on both the SPA and `/ouroboros`; links + Doto tagline correct
 - [ ] `/ouroboros`: Dead Air telly (green ring, colour bars), self-portrait numbers
-      from build constants, ladder = BY HAND rung above the four comped rungs
+      from build constants, ladder = bottom-up TIER 4 → 3 → 2 → 1 → BY HAND
+      (TIER 4 top rung, BY HAND bottom rung)
 - [ ] Embedded sites render desktop layout scaled to fit; scroll/click work; no
       reload on resize
 - [ ] Ceremony timing, palette, fonts unchanged; fonts still self-hosted

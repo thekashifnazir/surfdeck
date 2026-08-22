@@ -67,6 +67,7 @@ export function getActiveFilterSummary(
  * Pure function that computes the LCD readout text based on app state.
  *
  * Priority order:
+ *  0. exhausted status → "END OF DIAL"
  *  1. no_match status → fixed string
  *  2. zapping → "TUNING > CH {n}"
  *  3. tuned + mood + filters → "CH {n} · MOOD · FILTER_SUMMARY"
@@ -90,7 +91,9 @@ export function computeLcdText(opts: LcdTextOpts): string {
 
   const filterSummary = getActiveFilterSummary(selectedCharacter, buildFilters, selectedTiers);
 
-  if (statusMessage === "no_match") {
+  if (statusMessage === "exhausted") {
+    return "END OF DIAL";
+  } else if (statusMessage === "no_match") {
     return "NOTHING IN THAT CORNER RIGHT NOW";
   } else if (zapState === "zapping") {
     return `TUNING > CH ${channelCounter}`;

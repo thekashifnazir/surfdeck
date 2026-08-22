@@ -10,7 +10,7 @@ export interface StatusMessageProps {
  * StatusMessage — contextual messages expressed through the telly/remote metaphor.
  * No red error boxes. A miss is part of the wander.
  */
-export default function StatusMessage({ status, siteUrl, onReset }: StatusMessageProps) {
+export default function StatusMessage({ status, siteUrl }: StatusMessageProps) {
   // Ouroboros treatment
   if (status === "ok" && siteUrl === "/ouroboros") {
     return (
@@ -36,20 +36,9 @@ export default function StatusMessage({ status, siteUrl, onReset }: StatusMessag
     );
   }
 
-  if (status === "exhausted") {
-    return (
-      <div className="status-line" role="status" aria-live="polite">
-        <p className="status-line__text">
-          You've wandered the whole neighbourhood.
-        </p>
-        {onReset && (
-          <button type="button" className="reset-btn" onClick={onReset}>
-            Reset
-          </button>
-        )}
-      </div>
-    );
-  }
+  // The exhausted ("END OF DIAL") state is now carried entirely by the telly
+  // (NO SIGNAL + "start the dial over" control), so the below-scene
+  // StatusMessage no longer renders it.
 
   if (status === "popup_blocked") {
     return (

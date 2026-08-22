@@ -243,6 +243,18 @@ export default function App() {
     }
   }, [statusMessage]);
 
+  /**
+   * Start the dial over (from the exhausted telly): clear the seen-list, then
+   * immediately surf. One user gesture — the surf's opener runs inside the same
+   * click, so nothing is popup-blocked. Clearing localStorage before calling
+   * handleSurf works because the surf reads the seen-list synchronously at the
+   * start of the request.
+   */
+  const handleStartOver = useCallback(() => {
+    localStorage.removeItem(SEEN_KEY);
+    handleSurf();
+  }, [handleSurf]);
+
   /** Reset: clears seen-list, restores first-press ceremony. */
   function handleReset() {
     localStorage.removeItem(SEEN_KEY);
@@ -296,7 +308,9 @@ export default function App() {
     <main className="page">
       {/* Hero */}
       <header className="hero">
-        <h1 className="hero__wordmark">Surfdeck</h1>
+        <h1 className="hero__wordmark">
+          <a href="/" className="hero__wordmark-link">Surfdeck</a>
+        </h1>
         <p className="hero__headline">
           Somebody made this. See how.
         </p>
@@ -327,6 +341,7 @@ export default function App() {
             embeddedUrl={embeddedUrl}
             siteUrl={lastSurfResult?.url ?? null}
             siteTitle={lastSurfResult?.title ?? null}
+            onStartOver={handleStartOver}
             menuOpen={tuneOpen}
             cornerMode={cornerMode}
             selectedCharacter={selectedCharacter}

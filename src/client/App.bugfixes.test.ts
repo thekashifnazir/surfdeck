@@ -148,3 +148,45 @@ describe("Bug fix: LCD channel number when tuned with mood", () => {
     expect(result).toBe("TUNING > CH 218");
   });
 });
+
+// ─── Exhausted "END OF DIAL": LCD readout + start-the-dial-over wiring ───
+
+describe("Exhausted state: LCD reads END OF DIAL", () => {
+  it('computes "END OF DIAL" for the exhausted status', () => {
+    const result = computeLcdText({
+      statusMessage: "exhausted",
+      zapState: "idle",
+      selectedMood: null,
+      channelCounter: 217,
+      channelNumber: null,
+      cornerMode: false,
+    });
+    expect(result).toBe("END OF DIAL");
+  });
+
+  it("exhausted takes precedence over a selected mood", () => {
+    const result = computeLcdText({
+      statusMessage: "exhausted",
+      zapState: "idle",
+      selectedMood: "beautiful",
+      channelCounter: 217,
+      channelNumber: null,
+      cornerMode: true,
+    });
+    expect(result).toBe("END OF DIAL");
+  });
+});
+
+describe("Exhausted state: start-the-dial-over wiring in App.tsx", () => {
+  it("defines handleStartOver that clears the seen-list then surfs", () => {
+    // One user gesture: remove the seen-list key, then call handleSurf so the
+    // surf's opener runs inside the same click (never popup-blocked).
+    expect(APP_SOURCE).toMatch(
+      /const\s+handleStartOver\s*=\s*useCallback\(\s*\(\)\s*=>\s*\{[\s\S]*?localStorage\.removeItem\(SEEN_KEY\)[\s\S]*?handleSurf\(\)[\s\S]*?\}/
+    );
+  });
+
+  it("passes handleStartOver to the Telly as onStartOver", () => {
+    expect(APP_SOURCE).toContain("onStartOver={handleStartOver}");
+  });
+});

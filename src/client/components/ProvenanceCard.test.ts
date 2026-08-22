@@ -195,18 +195,27 @@ describe("ProvenanceCard recipe line", () => {
 // ─── Corner tier line (Requirement 2.7) ───
 
 describe("ProvenanceCard corner tier line", () => {
-  it('renders "Built with {Tool} · Tier N — {tier label lowercased}"', () => {
+  it('renders "Built with {Tool} · Tier N — {canonical TIER_LABELS value}"', () => {
     const html = renderCard({ built_with: "bolt" }, { cornerMode: true });
     // tool is a link
     expect(html).toContain(">Bolt</a>");
     expect(html).toContain('href="https://bolt.new"');
-    // tier number + lowercased label
-    expect(html).toContain("Tier\u00a02 — ai app-builder");
+    // tier number + canonical label, verbatim casing
+    expect(html).toContain("Tier\u00a02 — AI app-builder");
   });
 
-  it("lowercases the tier label for tier 1", () => {
-    const html = renderCard({ built_with: "godaddy_airo" }, { cornerMode: true });
-    expect(html).toContain("Tier\u00a01 — no-code ai builder");
+  it("prints the canonical TIER_LABELS value verbatim for all four tiers", () => {
+    // One representative built_with per tier (per BUILT_WITH_TIER).
+    const cases: Array<[string, string]> = [
+      ["godaddy_airo", "Tier\u00a01 — No-code AI builder"],
+      ["bolt", "Tier\u00a02 — AI app-builder"],
+      ["cursor", "Tier\u00a03 — AI-assisted + hosted"],
+      ["cloudflare_workers", "Tier\u00a04 — Developer cloud"],
+    ];
+    for (const [built_with, expected] of cases) {
+      const html = renderCard({ built_with }, { cornerMode: true });
+      expect(html).toContain(expected);
+    }
   });
 });
 
@@ -315,5 +324,23 @@ describe("ProvenanceCard MAKE ONE YOURSELF — open-web mode", () => {
     const withoutStack = renderCard({ stack: null }, { cornerMode: false });
     expect(withStack).toContain("a text editor and a free host is all it takes");
     expect(withoutStack).toContain("a text editor and a free host is all it takes");
+  });
+});
+
+// ─── MAKE ONE YOURSELF block — "see the whole ladder →" link (both modes) ───
+
+describe("ProvenanceCard MAKE ONE YOURSELF — ladder link", () => {
+  it("appends the quiet 'see the whole ladder →' link to /ouroboros (new tab) in corner mode", () => {
+    const html = renderCard({ built_with: "bolt" }, { cornerMode: true });
+    expect(html).toContain(
+      '<a class="prov-link make-one__ladder" href="/ouroboros" target="_blank" rel="noopener noreferrer">see the whole ladder →</a>'
+    );
+  });
+
+  it("appends the quiet 'see the whole ladder →' link to /ouroboros (new tab) in open-web mode", () => {
+    const html = renderCard({ stack: "nextjs" }, { cornerMode: false });
+    expect(html).toContain(
+      '<a class="prov-link make-one__ladder" href="/ouroboros" target="_blank" rel="noopener noreferrer">see the whole ladder →</a>'
+    );
   });
 });
